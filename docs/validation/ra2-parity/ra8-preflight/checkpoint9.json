@@ -1,0 +1,91 @@
+{
+  "checkpoint": 9,
+  "utc": "2026-10-19T04:42:08.148266+00:00",
+  "status": "validated scoped preflight; mandatory full13 and fresh both756 R29 distributions pending root checkpoint release; not independent review",
+  "source_commit": "4e2c3774cff5b2d26c5630413227f2c35f776877",
+  "preflight_working_tree_base": "618e9b4f2890a9cb5e95d920dcd94fedbca3955f",
+  "runtime": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d",
+    "assets/data/ai.ron": "a29e0ceedfb2212d26bdc4c9c1ecc94f7d05106b7e635fd45925d48451a964b7",
+    "scripts/generate_ra2_data.py": "357c3dd026e7ff537106e1d29a1fb4c131a2ca68474d4c2806675da7bae168fa"
+  },
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "static_tests": 1313,
+  "baseline_static_tests": 1124,
+  "added": 189,
+  "removed_or_renamed": 0,
+  "ignored": 0,
+  "preflight": {
+    "commands": 17,
+    "test_target_invocations": 10,
+    "passed": 165,
+    "failed": 0,
+    "ignored": 0,
+    "wall_seconds": 4003.874346165976,
+    "command_seconds_sum": 4002.749485580018,
+    "all_exits_zero": true,
+    "summary_sha256": "8435481956034d5ccede5faf87f6a470da646bb940e157080b1b3f2d02b81bf3"
+  },
+  "m13": {
+    "count": 21,
+    "winners": 21,
+    "ten_builders": 21,
+    "unchanged_outer_limit": 400000,
+    "mean_budget_ms": 5,
+    "end_tick_median": 101272,
+    "end_tick_p90_nearest_rank": 152216,
+    "end_tick_max": 275899,
+    "worst_mean_map": "coral_archipelago",
+    "worst_mean_ms": 1.693,
+    "measured_seconds_sum": 2489.3360000000002,
+    "elapsed_seconds_sum": 2489.602,
+    "raw_sha256": "338ca4002178a162921a649785511986c428d8b0aeec6d5b7245c20fb12a65e5"
+  },
+  "fixed256_means_ms": {
+    "liberty_bay": 3.391,
+    "continental_divide": 2.314,
+    "pacific_atoll": 1.497
+  },
+  "references": [
+    "checkpoint9-metrics.json",
+    "checkpoint9-inventory.json",
+    "checkpoint9-source-check.json",
+    "checkpoint9-source-staged-check.json",
+    "checkpoint9-storage.json",
+    "checkpoint9-attempt8-preservation.json",
+    "attempt8-final8-runtime-manifest.json",
+    "attempt8-final8-test-example-manifest.json"
+  ],
+  "source_staged_hygiene_exit": 0,
+  "evidence_staged_hygiene": {
+    "exit": 2,
+    "passed": false,
+    "raw_only_diagnostic_count": 140,
+    "counts": {
+      "trailing whitespace": 23,
+      "new blank line at EOF": 117
+    },
+    "source_data_test_document_errors": 0,
+    "stdout_sha256": "9d882e024ac396b890dad6631776fec9edc8f30d0e0f3b1667b11edc9636fbe8",
+    "raw": "checkpoint9-staged-hygiene-raw.json",
+    "classification": "checkpoint9-staged-hygiene.json",
+    "identical_final_staged_recheck_required": true
+  },
+  "assumptions_and_migrations": "DECISIONS R144\u2013R155, retaining R88\u2013R143; no dropped original assertions or limits",
+  "ra9_carryforward": [
+    "M6 review2 P2 gathering_point terrain-only floodfill/owned-yard partition",
+    "R83 Size/SizeLimit/loaded boarding and attached Squid-host WeaponFired",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal ability resolution",
+    "R99 unproved bombable capability lead",
+    "All new modules/policies/migrations and source soundness; R97 mechanism closed in R103"
+  ],
+  "verification_pending": [
+    "full13 on this committed source",
+    "both fresh756-winner sweeps/R29 before-after distributions",
+    "independent review",
+    "user visual/audio/play feel"
+  ],
+  "new_substantial_external_directories_since_checkpoint8": []
+}

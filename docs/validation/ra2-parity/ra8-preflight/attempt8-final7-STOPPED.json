@@ -1,0 +1,463 @@
+{
+  "utc": "2026-10-19T02:59:33.157451+00:00",
+  "reason": "Completed entire31-case target:30explicitWon/oneNone at unchanged limit. Stop all dependent phases; no runtime cause inferred from final snapshot.",
+  "command": {
+    "phase": "retained31-four-threads",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--",
+      "--nocapture",
+      "--test-threads=4"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 1533.2578754590359,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-retained31-four-threads.log",
+    "sha256": "88d09015dd08b5ff885498598086cd5b2fd3e5d087320fa0497819ca6b16d388",
+    "test_targets": 1,
+    "passed": 30,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "winner_cases": [
+    {
+      "map": "demo",
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 66111
+    },
+    {
+      "map": "jungle_delta",
+      "countries": [
+        "cuba",
+        "russia"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 0,
+      "tick": 52444
+    },
+    {
+      "map": "riverlands",
+      "countries": [
+        "iraq",
+        "cuba"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 69169
+    },
+    {
+      "map": "crossroads",
+      "countries": [
+        "great_britain",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 34104
+    },
+    {
+      "map": "thousand_lakes",
+      "countries": [
+        "russia",
+        "libya"
+      ],
+      "difficulties": [
+        "medium",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 28395
+    },
+    {
+      "map": "liberty_bay",
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 69855
+    },
+    {
+      "map": "harvest_plains",
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 172033
+    },
+    {
+      "map": "pacific_atoll",
+      "countries": [
+        "cuba",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 51902
+    },
+    {
+      "map": "oasis_gulf",
+      "countries": [
+        "france",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 126977
+    },
+    {
+      "map": "oasis_gulf",
+      "countries": [
+        "libya",
+        "iraq"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 190833
+    },
+    {
+      "map": "black_water",
+      "countries": [
+        "libya",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 56358
+    },
+    {
+      "map": "continental_divide",
+      "countries": [
+        "france",
+        "cuba"
+      ],
+      "difficulties": [
+        "easy",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 24703
+    },
+    {
+      "map": "demo",
+      "countries": [
+        "france",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 21533
+    },
+    {
+      "map": "demo",
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 50831
+    },
+    {
+      "map": "black_water",
+      "countries": [
+        "korea",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 145920
+    },
+    {
+      "map": "ember_caldera",
+      "countries": [
+        "libya",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "medium"
+      ],
+      "winner": 0,
+      "tick": 32935
+    },
+    {
+      "map": "glacier_pass",
+      "countries": [
+        "korea",
+        "russia"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 59637
+    },
+    {
+      "map": "frozen_sound",
+      "countries": [
+        "cuba",
+        "germany"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 70138
+    },
+    {
+      "map": "harvest_plains",
+      "countries": [
+        "america",
+        "korea"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 146287
+    },
+    {
+      "map": "liberty_bay",
+      "countries": [
+        "iraq",
+        "korea"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 1,
+      "tick": 104386
+    },
+    {
+      "map": "red_canyon",
+      "countries": [
+        "france",
+        "russia"
+      ],
+      "difficulties": [
+        "medium",
+        "easy"
+      ],
+      "winner": 0,
+      "tick": 31614
+    },
+    {
+      "map": "continental_divide",
+      "countries": [
+        "iraq",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 108914
+    },
+    {
+      "map": "liberty_bay",
+      "countries": [
+        "iraq",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 94886
+    },
+    {
+      "map": "oasis_gulf",
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 53249
+    },
+    {
+      "map": "steel_harbor",
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "medium",
+        "medium"
+      ],
+      "winner": 0,
+      "tick": 58598
+    },
+    {
+      "map": "thousand_lakes",
+      "countries": [
+        "great_britain",
+        "america"
+      ],
+      "difficulties": [
+        "easy",
+        "easy"
+      ],
+      "winner": 1,
+      "tick": 108661
+    },
+    {
+      "map": "steel_harbor",
+      "countries": [
+        "cuba",
+        "america"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 53266
+    },
+    {
+      "map": "thousand_lakes",
+      "countries": [
+        "france",
+        "germany"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 0,
+      "tick": 109196
+    },
+    {
+      "map": "wheel_of_worlds",
+      "countries": [
+        "germany",
+        "great_britain"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 57417
+    },
+    {
+      "map": "wheel_of_worlds",
+      "countries": [
+        "cuba",
+        "france"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "winner": 1,
+      "tick": 144684
+    }
+  ],
+  "failure_cases": [
+    {
+      "map": "steel_harbor",
+      "countries": [
+        "america",
+        "cuba"
+      ],
+      "difficulties": [
+        "brutal",
+        "brutal"
+      ],
+      "limit": 288000
+    }
+  ],
+  "completed_commands": 12,
+  "completed_counts": {
+    "passed": 158,
+    "failed": 1,
+    "ignored": 0
+  },
+  "completed_command_seconds": 1734.5306496259873,
+  "raw_sha256": "88d09015dd08b5ff885498598086cd5b2fd3e5d087320fa0497819ca6b16d388",
+  "source_checks": {
+    "runtime": {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-runtime-manifest.json",
+      "sha256": "c9a00ea1c7e6ef3a69d45ab441e1bf1d2d9bc3613a99986e6faace14445127b3",
+      "files": 342,
+      "mismatches": []
+    },
+    "test-example": {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-test-example-manifest.json",
+      "sha256": "770a15eef7a15cc7c1ed2e2e3ed4a3979ad93820b69a52468e5833e7384a9242",
+      "files": 101,
+      "mismatches": []
+    }
+  },
+  "unrun": [
+    "fresh all21 ten-player sweep",
+    "fixed256 benchmark",
+    "three explicit example guards",
+    "full13"
+  ],
+  "broad_preflight": "Separate fullsim/game/M10/companions remain unrun/superseded by mandatory full13 command4, not counted as passed."
+}

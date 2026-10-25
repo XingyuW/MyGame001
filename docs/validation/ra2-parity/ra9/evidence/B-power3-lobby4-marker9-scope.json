@@ -1,0 +1,245 @@
+{
+  "status": "ROOT_AUTHORIZED_NAMED_EVIDENCE_SCOPE_MIGRATIONS_NOT_NATIVE_SUCCESS",
+  "metadata_changes": [
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-contracts.tsv",
+      "changed_required_route_cells": 3,
+      "before": "cd4a0d4d626076230b4983e2677b1b6d2aefe3845142ad22469ca134277473fb",
+      "after": "e261e9437ab12ea7d4b85ced7a225047e13880d34614087dd5c2485c9d50c615"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-contracts.tsv",
+      "changed_required_route_cells": 4,
+      "before": "11c52970e2a65b3e209c1bcce79e5e38db08a98cc06e59fa174bbedf85ecbb34",
+      "after": "90ae0e2234efd08861352d0debb045555628fba0b72c2504738e14a45fad7514"
+    }
+  ],
+  "marker9": {
+    "actual_universal_functions": [
+      {
+        "path": "crates/game/src/minimap.rs",
+        "function": "owned_markers",
+        "line": 434,
+        "whole_file_sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d",
+        "body_sha256": "f849d61b2de306b26a1332fba2af7c0d5f1a2682e4d7d20addb730c3dd989e19",
+        "body": "fn owned_markers(host: &SimHost) -> Vec<(CellPos, Marker, sim::PlayerId)> {\n    let Some(players) = host.players() else {\n        return Vec::new();\n    };\n    let mut markers = Vec::new();\n    if let Some(mut units) = host.world().try_query::<(&sim::SimId, &Owner, &Mobile)>() {\n        for (id, owner, mobile) in units.iter(host.world()) {\n            if crate::units::unit_shown(owner.0, mobile, players)\n                && !host\n                    .world()\n                    .get_resource::<sim::SpecialState>()\n                    .is_some_and(|s| s.hidden.contains(&(HUMAN, *id)))\n            {\n                let marker = if owner.0 == HUMAN {\n                    Marker::OwnUnit\n                } else {\n                    Marker::EnemyUnit\n                };\n                markers.push((mobile.cell, marker, owner.0));\n            }\n        }\n    }\n    if let Some(mut buildings) = host.world().try_query::<(&Owner, &Building)>() {\n        for (owner, building) in buildings.iter(host.world()) {\n            if crate::buildings::building_shown(owner.0, building.footprint, players) {\n                let marker = if owner.0 == HUMAN {\n                    Marker::OwnBuilding\n                } else {\n                    Marker::EnemyBuilding\n                };\n                markers.extend(\n                    building\n                        .footprint\n                        .cells()\n                        .map(|cell| (cell, marker, owner.0)),\n                );\n            }\n        }\n    }\n    // Units are drawn over buildings (a unit never stands in a building's cell, I6).\n    markers.sort_by_key(|(_, marker, _)| matches!(marker, Marker::OwnUnit | Marker::EnemyUnit));\n    markers\n}"
+      },
+      {
+        "path": "crates/game/src/minimap.rs",
+        "function": "draw_minimap",
+        "line": 639,
+        "whole_file_sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d",
+        "body_sha256": "f3fad10abf81f6e3e8c365b1da94e602e83cee4dc214825213dde63edb187282",
+        "body": "fn draw_minimap(\n    teams: Option<Res<crate::presentation::TeamColors>>,\n    notices: Option<Res<PublicBuildingNotices>>,\n    host: Res<SimHost>,\n    terrain: Option<Res<MapTerrain>>,\n    looks: Option<Res<crate::map::MapLooks>>,\n    minimap: Option<Res<Minimap>>,\n    mut state: ResMut<MinimapState>,\n    mut images: ResMut<Assets<Image>>,\n) {\n    let (Some(terrain), Some(minimap)) = (terrain, minimap) else {\n        return;\n    };\n    let tick = host.tick();\n    let notice_revision = notices.as_deref().map_or(0, |notices| notices.revision);\n    if state.drawn_tick == Some(tick) && state.notice_revision == notice_revision {\n        return;\n    }\n    // Without radar nothing of the map is drawn (RA2).\n    let online = radar_online(&host);\n    let pixels = if online {\n        let owned = owned_markers(&host);\n        let marked: Vec<_> = owned\n            .iter()\n            .map(|&(cell, marker, _)| (cell, marker))\n            .collect();\n        let mut colours = cell_colours_with_looks(\n            &terrain.0,\n            looks.as_deref().map_or(&[], |l| l.0.as_slice()),\n            human_vision(host.players()),\n            &marked,\n        );\n        for &(cell, _, owner) in &owned {\n            let rgb = teams\n                .as_deref()\n                .unwrap_or(&crate::presentation::TeamColors(0))\n                .rgb_of(owner);\n            if let Some(pixel) =\n                colours.get_mut((cell.y as u32 * terrain.0.width() + cell.x as u32) as usize)\n            {\n                *pixel = [rgb[0], rgb[1], rgb[2], 255];\n            }\n        }\n        let mut pixels = render(&minimap.layout, &colours);\n        if let Some(notices) = notices.as_deref() {\n            draw_public_building_notices(&minimap.layout, notices, &owned, &mut pixels);\n        }\n        pixels\n    } else {\n        offline_pixels(&minimap.layout)\n    };\n    state.offline = !online;\n    state.lit_pixels = pixels\n        .as_chunks::<4>()\n        .0\n        .iter()\n        .filter(|pixel| pixel[3] > 0 && pixel[..3] != [0, 0, 0])\n        .count();\n    state.map_pixels = map_pixels(&pixels);\n    if let Some(mut image) = images.get_mut(&minimap.image)\n        && image.data.as_ref() != Some(&pixels)\n    {\n        image.data = Some(pixels);\n    }\n    state.notice_revision = notice_revision;\n    state.drawn_tick = Some(tick);\n    state.drawings = state.drawings.saturating_add(1);\n}"
+      },
+      {
+        "path": "crates/game/src/units.rs",
+        "function": "unit_shown",
+        "line": 560,
+        "whole_file_sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b",
+        "body_sha256": "5603c4be0498850f3ae9e2aa4842f30664c19c6a236346e4c6235cd8495e713b",
+        "body": "fn unit_shown(owner: PlayerId, mobile: &Mobile, players: &Players) -> bool {\n    owner == HUMAN\n        || players\n            .get(HUMAN)\n            .is_some_and(|state| state.vision().sees_unit(mobile))\n}"
+      },
+      {
+        "path": "crates/game/src/buildings.rs",
+        "function": "building_shown",
+        "line": 253,
+        "whole_file_sha256": "d5f7a71055169f39f9edcbfa63aa21ef7a417ad37b1d6c169134add9e29d16ab",
+        "body_sha256": "0e926e545b1884f75a169b1a51468bddff60951215ed4b565b5b5374a3cc544c",
+        "body": "fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) -> bool {\n    owner == HUMAN\n        || players\n            .get(HUMAN)\n            .is_some_and(|state| state.vision().sees_footprint(footprint))\n}"
+      }
+    ],
+    "atoms": [
+      {
+        "file": "rules",
+        "section": "BEAG",
+        "key": "RadarInvisible",
+        "exact_value": "no",
+        "classification": "CURRENT_MODEL_NONREAD",
+        "specific_reason": "Exact [BEAG] RadarInvisible=no: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "black_eagle",
+        "mapped_kind": "unit",
+        "route": "client/b87/markers/BEAG",
+        "model_guard_id": "b87:radar-visibility:BEAG.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "ORCA",
+        "key": "RadarInvisible",
+        "exact_value": "no",
+        "classification": "CURRENT_MODEL_NONREAD",
+        "specific_reason": "Exact [ORCA] RadarInvisible=no: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "harrier",
+        "mapped_kind": "unit",
+        "route": "client/b87/markers/ORCA",
+        "model_guard_id": "b87:radar-visibility:ORCA.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "SHAD",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [SHAD] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "nighthawk",
+        "mapped_kind": "unit",
+        "route": "client/b87/markers/SHAD",
+        "model_guard_id": "b87:radar-visibility:SHAD.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "ZEP",
+        "key": "RadarInvisible",
+        "exact_value": "no",
+        "classification": "CURRENT_MODEL_NONREAD",
+        "specific_reason": "Exact [ZEP] RadarInvisible=no: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "kirov",
+        "mapped_kind": "unit",
+        "route": "client/b87/markers/ZEP",
+        "model_guard_id": "b87:radar-visibility:ZEP.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "CABHUT",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [CABHUT] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "bridge_hut",
+        "mapped_kind": "building",
+        "route": "client/b87/markers/CABHUT",
+        "model_guard_id": "b87:radar-visibility:CABHUT.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "CATHOSP",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [CATHOSP] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "hospital",
+        "mapped_kind": "building",
+        "route": "client/b87/markers/CATHOSP",
+        "model_guard_id": "b87:radar-visibility:CATHOSP.RadarInvisible",
+        "premise": "Mapped actual typed unit uses Owner+Mobile+SimId with unit_shown and per-observer hidden veto; mapped typed building uses Owner+Building footprint visibility. No UnitKind/Role selector in the universal consumer; no per-type observed draw claim."
+      },
+      {
+        "file": "rules",
+        "section": "CACITY01",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [CACITY01] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "civilian_tower",
+        "mapped_kind": "building",
+        "route": "client/b87/markers/CACITY01",
+        "model_guard_id": "b87:radar-visibility:CACITY01.RadarInvisible",
+        "premise": "Actual civilian map representation is Props, not ECS Building; owned_markers does not enumerate Props. A directly spawned ECS Building, when present, follows generic owner/Footprint visibility branch. No claim this source type was individually drawn."
+      },
+      {
+        "file": "rules",
+        "section": "CAEUR1",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [CAEUR1] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "civilian_house",
+        "mapped_kind": "building",
+        "route": "client/b87/markers/CAEUR1",
+        "model_guard_id": "b87:radar-visibility:CAEUR1.RadarInvisible",
+        "premise": "Actual civilian map representation is Props, not ECS Building; owned_markers does not enumerate Props. A directly spawned ECS Building, when present, follows generic owner/Footprint visibility branch. No claim this source type was individually drawn."
+      },
+      {
+        "file": "rules",
+        "section": "CAWA2A",
+        "key": "RadarInvisible",
+        "exact_value": "yes",
+        "classification": "INTENTIONAL_CURRENT_MODEL_DIFFERENCE",
+        "specific_reason": "Exact [CAWA2A] RadarInvisible=yes: Keep real owned_markers/unit_shown/building_shown/hidden policy, then real draw_minimap radar_online gate. RadarInvisible is not parsed. Owner markers remain visible; nonowner yes rows can differ when actually visible. Limitation: ModEnc30569 distinguishes RA2 nonowner effect and TS obsolescence; Phobos house extensions excluded. False/no rows retain actual visibility/power premises; none are waived as unused.",
+        "game_id": "civilian_city",
+        "mapped_kind": "building",
+        "route": "client/b87/markers/CAWA2A",
+        "model_guard_id": "b87:radar-visibility:CAWA2A.RadarInvisible",
+        "premise": "Actual civilian map representation is Props, not ECS Building; owned_markers does not enumerate Props. A directly spawned ECS Building, when present, follows generic owner/Footprint visibility branch. No claim this source type was individually drawn."
+      }
+    ],
+    "generic_observed_draw": {
+      "receipt": "60-game-native-controls.json",
+      "receipt_sha256": "81edcc45443a381fa9efe10c4881bd80ed418bd66bd15d3a3b87fff043abe0f8",
+      "log": "60-game-native-controls.log",
+      "log_sha256": "46d1ae3e188e3b5ae087e4b326bdf2a2a6e44e48758c004e34553fe1e925b9df",
+      "test": "minimap::ra9_behavior87_routes::ra9_b87_gap_owner_allied_neutral_cloak_and_real_power_sales_reach_draw",
+      "actual_scope": "Real amphibious_transport/Squid owner/allied/neutral/Gap/concealment and actual public power-sales\u2192production markers/draw; generic actual branch control only. These9 source kinds were NOT individually drawn."
+    },
+    "loaded_scope": {
+      "receipt": "78-policy-guards-and-fire.json",
+      "log": "78-policy-guards-and-fire.log",
+      "test": "ra9_audit::ra9_actual_source_policy_consumer_premises_and_physical_dependencies_match",
+      "scope": "Actual behavior87 source mapping/loaded type/model/physical guards, NOT native flag consumption."
+    },
+    "static_contract_sha256": "574119f02fdc0a2f25b09827d4b5bf4d993e858c690b78898c56018419b14fa0"
+  },
+  "lobby4": {
+    "source_keys": [
+      {
+        "file": "rules",
+        "section": "MultiplayerDialogSettings",
+        "key": "CaptureTheFlag",
+        "exact_value": "no"
+      },
+      {
+        "file": "rules",
+        "section": "MultiplayerDialogSettings",
+        "key": "HarvesterTruce",
+        "exact_value": "no"
+      },
+      {
+        "file": "rules",
+        "section": "MultiplayerDialogSettings",
+        "key": "MultiEngineer",
+        "exact_value": "no"
+      },
+      {
+        "file": "rules",
+        "section": "MultiplayerDialogSettings",
+        "key": "ShadowGrow",
+        "exact_value": "no"
+      }
+    ],
+    "path": "crates/sim/src/match_setup.rs",
+    "sha256": "72f1cc68d213322191f3887016072c73da3d88163e459f039f765e32ff4f965a",
+    "match_rules_body": "pub struct MatchRules {\n    /// A player is defeated without buildings and base unit; off: without buildings and units.\n    /// Read only in a world with a rules file.\n    pub short_game: bool,\n    /// Superweapon buildings may be queued.\n    pub superweapons: bool,\n    /// `Command::Undeploy` is accepted.\n    pub mcv_repacks: bool,\n    /// Crates appear (RA5, `crate::crates`): in a match with players, in a world with a rules\n    /// file.\n    pub crates: bool,\n    /// Ore grows and spreads (RA5, `crate::ore`; the lobby's `TiberiumGrows`). Read only in a\n    /// world with a rules file.\n    pub ore_grows: bool,\n    pub bridge_destruction: bool,\n    /// Explored cells cease showing current activity when enabled (RA7).\n    pub fog_of_war: bool,\n}\n\n",
+    "match_options_body": "pub struct MatchOptions {\n    /// Human controllers with Super Me.\n    pub super_players: Vec<PlayerId>,\n    /// Human controllers whose building prerequisites are waived.\n    pub unlock_players: Vec<PlayerId>,\n    /// The speed of the units of the Super Me players in percent of their type's speed, from\n    /// 100 to [`MAX_UNIT_SPEED_PERCENT`] (values outside are clamped; 0 means 100). Players\n    /// without Super Me are never changed.\n    pub unit_speed_percent: u16,\n    /// Off (the default, fixed decision 3): in a match with a human player, the computer players\n    /// form one team: they do not fire at each other, do not march on each other's bases, and\n    /// the match ends once only they are left; without a human player nothing changes. On:\n    /// every player for itself.\n    pub free_for_all: bool,\n    /// Players whose faction is drawn from the countries of the skirmish file with `SimRng`\n    /// (the lobby's \"random\"), in ascending order of their ids; their `PlayerSetup::faction` is\n    /// not read.\n    pub random_countries: Vec<PlayerId>,\n    /// The starting credits of every player; `None` for those of the skirmish file. With a\n    /// rules file they must lie in its range and on its step (`MinMoney`, `MaxMoney`,\n    /// `MoneyIncrement`).\n    pub starting_credits: Option<i64>,\n    /// The lobby's unit count, from which the starting units of a country's players follow\n    /// ([`starting_units`]); `None` for the default of the rules file. It must lie in the\n    /// range of the rules file.\n    pub unit_count: Option<u32>,\n    /// A country's player starts with the base unit of its side; off: with the Construction\n    /// Yard it deploys into, standing at the start position.\n    pub mcv_start: bool,\n    /// See [`MatchRules`].\n    pub short_game: bool,\n    pub superweapons: bool,\n    pub crates: bool,\n    pub mcv_repacks: bool,\n    pub ore_grows: bool,\n    pub bridge_destruction: bool,\n    /// Explored cells cease showing current activity when enabled (RA7).\n    pub fog_of_war: bool,\n}\n\n",
+    "scope": "No exposed CTF/truce/multiEngineer/shadowgrow option/state field in these actual struct declarations. Exact false original keys remain unparsed current model; ordinary capture, hostility, fog/Gap and configured options retain separate gameplay controls. No sourceTrue or original no-effect claim."
+  },
+  "power3": {
+    "required_route": "current-paid-power-and-loaded-country-census",
+    "scope": "Replace original finalRA8 receipt label with current bounded actual83 paid/power policy +82 loaded-country census only; finalfull13/all21/<5ms performance and late/source gates remain globalpending.",
+    "receipts": [
+      {
+        "path": "83-shared-ai-policy-controls.json",
+        "sha256": "3e2065ecd6f34b4a54ddd86ac4ad58624310c181fadd73f76c1b1e385f3394d7"
+      },
+      {
+        "path": "83-shared-ai-policy-controls.log",
+        "sha256": "2997067e5dca6cfdf2fe7264975d045550670ac309ab55032495657908171fce"
+      },
+      {
+        "path": "82-corrected-acquisition-cost-and-orders.json",
+        "sha256": "348d9a4dbd63b3f87ae0de44c059e3bdaa411eeae1576969683b0eedebcedc19"
+      },
+      {
+        "path": "82-corrected-acquisition-cost-and-orders.log",
+        "sha256": "f720b6c548987c6c6740afc7b86a106ecfab61d9636af740c8913ef14a8cc1a0"
+      }
+    ]
+  },
+  "global_binding": "90c70018cb66b87669dba18e60fa26a89d16f1c2dd50270f6d72d09b8f5e43d4 retained pending A combined source delta",
+  "executed": "Static Python checks only; no native/Cargo",
+  "new_directories": []
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "passed": false,
+  "stdout": "docs/validation/ra2-parity/ra8-preflight/attempt2-game-exact-final2.log:551: new blank line at EOF.\n",
+  "stdout_sha256": "4dca9f376ed3c611e8d0e9b59ec04e40ca193099456b039120f6a237706aa1d8",
+  "stderr": "",
+  "diagnostics": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt2-game-exact-final2.log",
+      "line": 551,
+      "raw_line": "\n",
+      "classification": "preserved raw capture EOF, not a passed hygiene check"
+    }
+  ],
+  "source_data_test_doc_diagnostics": 0
+}

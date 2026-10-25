@@ -1,0 +1,13 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.92s
+     Running tests/m10_unlocks_and_enemies.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m10_unlocks_and_enemies-61e318796d819d42)
+
+running 5 tests
+test a_defeated_human_ends_while_several_computer_players_fight_on ... ok
+test advanced_requirements_hold_and_unlock_all_waives_only_prerequisites ... ok
+test allied_and_soviet_units_unlock_through_their_structures_and_obey_orders ... ok
+test every_human_production_item_has_a_reachable_unlock_path ... ok
+test several_independent_computer_players_play_complete_matches_on_every_map ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 167.84s
+

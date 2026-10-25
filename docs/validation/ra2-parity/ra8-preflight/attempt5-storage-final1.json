@@ -1,0 +1,9 @@
+{
+  "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+  "measured_utc": "2026-10-16T12:03:58.887750+00:00",
+  "files": 58,
+  "file_bytes": 584038,
+  "allocated_bytes": 733184,
+  "retained": "Recreatable parser/slow-speed fixture scratch for reruns, unnecessary for release",
+  "other_external_directories": "No new clone/worktree/environment/cache; existing RA5 render and RA7 parser scratch retained; configured CARGO_TARGET_DIR/UV_CACHE_DIR/PIP_CACHE_DIR preserved"
+}

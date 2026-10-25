@@ -1,0 +1,138 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-23T00:44:32.081043+00:00",
+  "pid": 66657,
+  "head": "73bdfe90ce2a3ef23bbc4c59c0b9eb5c67673c76",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/remediation2-c3-isolated-five-02-plan.json",
+  "plan_sha256": "cf2d6786481b35fdbefb527b5a5d76d3130d67a5b6c33b2e1868104f564aeaf4",
+  "runner_sha256": "dfecd0b723700a7726d6ac7acef982a8be0e28cdb0175354b95b405eb0a80d3a",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "to-the-end",
+        "all"
+      ],
+      "start": "2026-10-23T00:44:32.295941+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02/01-all21-to-won.log",
+      "pid": 66670,
+      "pgid": 66670,
+      "exit": 0,
+      "end": "2026-10-23T01:50:33.345775+00:00",
+      "raw_bytes": 8359,
+      "raw_sha256": "04736caa07ee2996dc8f8cb2c081ea4538c21f7e2615bba4f54abdaeb5fa7edb",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "liberty_bay",
+        "continental_divide",
+        "pacific_atoll"
+      ],
+      "start": "2026-10-23T01:50:33.959418+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02/02-fixed-three-windows.log",
+      "pid": 77752,
+      "pgid": 77752,
+      "exit": 0,
+      "end": "2026-10-23T01:53:59.342364+00:00",
+      "raw_bytes": 1279,
+      "raw_sha256": "bc7a91f4ebe953ab4111d0f482c4a2dc54398e64cb08613c8634552a51235757",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T01:53:59.950624+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02/03-m13_ten_players-guards.log",
+      "pid": 78237,
+      "pgid": 78237,
+      "exit": 0,
+      "end": "2026-10-23T01:54:04.975280+00:00",
+      "raw_bytes": 470,
+      "raw_sha256": "bca3adff65420b38f4ca3a5d2f4ae454f52cf2b0ef78069bc6ff10c5fd0fc82c",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m14_duels",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T01:54:05.560662+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02/04-m14_duels-guards.log",
+      "pid": 78287,
+      "pgid": 78287,
+      "exit": 0,
+      "end": "2026-10-23T01:54:10.583789+00:00",
+      "raw_bytes": 445,
+      "raw_sha256": "fb5074b4f72e99671b0e6c84915f94dcf3e40c61f88f7a0d0e59999ae6a56412",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m7_soak",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T01:54:11.194954+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-isolated-five-02/05-m7_soak-guards.log",
+      "pid": 78333,
+      "pgid": 78333,
+      "exit": 0,
+      "end": "2026-10-23T01:54:16.204096+00:00",
+      "raw_bytes": 473,
+      "raw_sha256": "2735a50a8b6d4f8f98379fda66a01e18cbc4dbfbea2bc88f88dd5f3fa5d35609",
+      "source_unchanged": true
+    }
+  ],
+  "frozen_manifest": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json",
+    "sha256": "4732181fabaa8f96456c8d6ceefcdf93479df648d938ca5d9e187addd880862b",
+    "source_files": 689,
+    "authority_spans": 64
+  },
+  "caffeinate_pid": 66665,
+  "heartbeat": "2026-10-23T01:54:11.200084+00:00",
+  "end": "2026-10-23T01:54:16.524637+00:00",
+  "source_unchanged": true
+}

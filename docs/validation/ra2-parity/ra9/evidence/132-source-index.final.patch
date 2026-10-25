@@ -1,0 +1,76 @@
+--- crates/sim/tests/ra9_audit/policy-admission.rs
++++ crates/sim/tests/ra9_audit/policy-admission.rs
+@@ -123,6 +123,7 @@
+     pub(super) consumer_bindings: &'a str,
+     pub(super) model_guard_id: &'a str,
+ }
++#[derive(Clone)]
+ pub(super) struct SourceAcceptance<'a> {
+     pub(super) key: SourceKey,
+     pub(super) exact: &'a str,
+@@ -192,24 +193,23 @@
+     acceptance_census(include_str!("source-policy-acceptance.tsv"), wanted)
+ }
+ 
+-pub(super) fn source_acceptance(key: &SourceKey) -> AuditResult<Option<SourceAcceptance<'static>>> {
+-    let rows = records(
+-        include_str!("source-policy-acceptance.tsv"),
+-        SOURCE_ACCEPTANCE_HEADER,
+-    )?;
+-    let mut seen = BTreeSet::new();
+-    let mut result = None;
+-    for r in rows {
+-        if r.len() != 10 {
+-            return Err("source acceptance width".into());
+-        }
+-        let item = SourceKey::new(r[0], r[1], r[2]);
+-        if !seen.insert(item.clone()) {
+-            return Err("duplicate exact source acceptance".into());
+-        }
+-        if &item == key {
+-            result = Some(SourceAcceptance {
+-                key: item,
++type SourceIndex = BTreeMap<SourceKey, SourceAcceptance<'static>>;
++fn installed_source_acceptances() -> &'static AuditResult<SourceIndex> {
++    // The installed include_str! bytes are immutable for this binary. Parse/validate their
++    // complete duplicate census once; live source/model/route guards still run per admission.
++    static INDEX: std::sync::OnceLock<AuditResult<SourceIndex>> = std::sync::OnceLock::new();
++    INDEX.get_or_init(|| {
++        let mut index = BTreeMap::new();
++        for r in records(
++            include_str!("source-policy-acceptance.tsv"),
++            SOURCE_ACCEPTANCE_HEADER,
++        )? {
++            if r.len() != 10 {
++                return Err("source acceptance width".into());
++            }
++            let item = SourceKey::new(r[0], r[1], r[2]);
++            let accepted = SourceAcceptance {
++                key: item.clone(),
+                 exact: r[3],
+                 reason: r[4],
+                 consumer_bindings: r[5],
+@@ -217,10 +217,19 @@
+                 recorded_decision: r[7],
+                 final_input_sha256: r[8],
+                 native_receipts: r[9],
+-            });
+-        }
+-    }
+-    Ok(result)
++            };
++            if index.insert(item, accepted).is_some() {
++                return Err("duplicate exact source acceptance".into());
++            }
++        }
++        Ok(index)
++    })
++}
++pub(super) fn source_acceptance(key: &SourceKey) -> AuditResult<Option<SourceAcceptance<'static>>> {
++    match installed_source_acceptances() {
++        Ok(index) => Ok(index.get(key).cloned()),
++        Err(error) => Err(error.clone()),
++    }
+ }
+ 
+ // Installed actual prepared negative block: integration-blockers-20261019-v1.UNVALIDATED.policy-negatives.rs.txt

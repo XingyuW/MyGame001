@@ -1,0 +1,38 @@
+{
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "trace",
+    "jungle_delta"
+  ],
+  "utc_start": "2026-10-21T10:09:42.442831+00:00",
+  "source_head": "99bcdf1913f3d74079ce2baa8b440b68a315223a",
+  "runtime_commit": "eb308a231e302048c9dc8d1e8b9543b7c5f64ef7",
+  "source_before": {
+    "unique_files": 495,
+    "mismatches": []
+  },
+  "status": "COMPLETED",
+  "purpose": "One unchanged exact seed13/ten normal Medium players replay with existing observational trace. Functional diagnosis only; not isolated performance evidence.",
+  "preservation": "docs/validation/ra2-parity/ra8-recovery17-failed/PRESERVED.json",
+  "pid": 53499,
+  "exit": 1,
+  "seconds": 201.0284615830169,
+  "utc_end": "2026-10-21T10:13:03.524305+00:00",
+  "source_after": {
+    "unique_files": 495,
+    "mismatches": []
+  },
+  "raw": {
+    "path": "docs/validation/ra2-parity/ra8-attempt17-jungle/trace1.log",
+    "bytes": 2046063,
+    "sha256": "351f82959288320593c90a23270ec4146120e9f0cff9e3bfd5761bdc2148747c"
+  }
+}

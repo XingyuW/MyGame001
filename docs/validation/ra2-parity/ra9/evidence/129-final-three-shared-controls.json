@@ -1,0 +1,76 @@
+{
+  "utc": "2026-10-21T03:04:24.001304+00:00",
+  "commands": [
+    [
+      "cargo",
+      "test",
+      "-p",
+      "game",
+      "--bin",
+      "game",
+      "--",
+      "every_on_off_row_sets_its_option_of_the_match_and_no_other",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    [
+      "cargo",
+      "test",
+      "-p",
+      "sim",
+      "--test",
+      "ra6_infantry",
+      "--test",
+      "ra6_vehicles",
+      "--no-fail-fast",
+      "--",
+      "ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000",
+      "ra6_spy_disguise_default_copy_and_dog_detection",
+      "--nocapture",
+      "--test-threads=1"
+    ]
+  ],
+  "scope": "Only3 exact existing/current lobby/Curtain/Spy publicMove controls; no heavy replay/performance",
+  "ended_utc": "2026-10-21T03:04:42.370173+00:00",
+  "results": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--bin",
+        "game",
+        "--",
+        "every_on_off_row_sets_its_option_of_the_match_and_no_other",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 6.269
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "sim",
+        "--test",
+        "ra6_infantry",
+        "--test",
+        "ra6_vehicles",
+        "--no-fail-fast",
+        "--",
+        "ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000",
+        "ra6_spy_disguise_default_copy_and_dog_detection",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "seconds": 12.098
+    }
+  ],
+  "exit_code": 0,
+  "seconds": 18.368,
+  "input_mismatches": []
+}

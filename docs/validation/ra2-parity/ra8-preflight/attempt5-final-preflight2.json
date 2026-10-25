@@ -1,0 +1,222 @@
+[
+  {
+    "name": "attempt5-sim-final1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "--test",
+      "ra1_commands",
+      "--test",
+      "ra8_ai",
+      "--test",
+      "ra8_definitions",
+      "--test",
+      "ra8_placement",
+      "--test",
+      "ra4_ai",
+      "--test",
+      "ra5_world",
+      "--test",
+      "ra6_infantry",
+      "--test",
+      "ra6_vehicles",
+      "--test",
+      "ra7_context",
+      "--test",
+      "ra7_orders",
+      "--test",
+      "ra7_vision",
+      "--test",
+      "ra9_data_parity",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 96.14875308299088,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-sim-final1.log",
+    "sha256": "46c32b5e3083f53c8d3ef7a6f5d4ef3d020e60967915452fdd0b2b94e4180bf5"
+  },
+  {
+    "name": "attempt5-game-units2",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--bin",
+      "game",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 154.35851120800362,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-game-units2.log",
+    "sha256": "84dbe6a022d2cb48d29cf876a8216a2808c62689fe7202de6db2773c6e46c285"
+  },
+  {
+    "name": "attempt5-game-ai1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 53.61741425000946,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-game-ai1.log",
+    "sha256": "506acc5ce89b3383f26a51e70e6a7c39b4b5f9065bc094c4a76bb7bcbce5116e"
+  },
+  {
+    "name": "attempt5-m10-final1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m10_unlocks_and_enemies",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 165.45439287499175,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-m10-final1.log",
+    "sha256": "167b9877646da0e63bd1f234c4c8d54a20b6552f8d41f6edd52e1ad9f34fab7a"
+  },
+  {
+    "name": "attempt5-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.504273500002455,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match.log",
+    "sha256": "be658a157239fe46215357430f3e52fb58be01400f876f86e87f462ba3def8ef"
+  },
+  {
+    "name": "attempt5-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.158634499995969,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first.log",
+    "sha256": "2a4781f49ddf92149fe9979687599b915922d1c956e4f9a9d1e3953d0fd90502"
+  },
+  {
+    "name": "attempt5-companion-crossroads_armies_finish_after_new_terrain_changes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "crossroads_armies_finish_after_new_terrain_changes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 5.320136249996722,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-companion-crossroads_armies_finish_after_new_terrain_changes.log",
+    "sha256": "060c3ba076b5da7bd67bd60c668e73e9f4496a511cba1fe31aaea96073e3b701"
+  },
+  {
+    "name": "attempt5-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 15.283648207987426,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes.log",
+    "sha256": "1a0d56d2ed2c3b75b35a2462ff90cd99b3abb039b334bff8f8777f8ebc589407"
+  },
+  {
+    "name": "attempt5-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 22.198173374985345,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes.log",
+    "sha256": "87dd0d87a39856ff1ca867bb77c3167eb5815ad56b27f7f1693069fbdb10e231"
+  },
+  {
+    "name": "attempt5-all-exact-final1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1078.1352117919887,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-all-exact-final1.log",
+    "sha256": "d3f7b7d47072c8177085113af5290b746b84ff2bde3867902bec8c9455e38309"
+  }
+]

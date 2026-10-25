@@ -1,0 +1,23 @@
+{
+  "label": "attempt11-ore-only-final-negative1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_real_ore_income_with_only_an_unarmed_worker_does_not_renew_producerless_repairs",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:07:28.704220+00:00",
+  "elapsed_seconds": 24.58966729202075,
+  "exit": 101,
+  "original_sha256": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854",
+  "mutated_sha256": "f14f273734a7dbf7466cf35afb63313387d596982a60faf8e50f189266ec6872",
+  "restored_sha256": "8362c19c3552d2375f4dd4e2a5142ed93b9108b1020f92b52ff35f3fdeadf854",
+  "log_sha256": "eb54a0049be22c9cb5f4e48ac0a4eb59dfb876d0a6ae7074cf5a2cde38d2db57"
+}

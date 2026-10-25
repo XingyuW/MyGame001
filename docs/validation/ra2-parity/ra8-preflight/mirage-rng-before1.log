@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 22.14s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_rejected_empty_guard_cannot_reorder_mirage_appearance_and_crate_rng' (4343672) panicked at crates/sim/tests/ra8_ai.rs:180:5:
+assertion `left == right` failed
+  left: Crates { cells: {CellPos { x: 34, y: 29 }: 4799}, due: [], started: true }
+ right: Crates { cells: {CellPos { x: 30, y: 34 }: 5074}, due: [], started: true }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_rejected_empty_guard_cannot_reorder_mirage_appearance_and_crate_rng ... FAILED
+
+failures:
+
+failures:
+    ra8_rejected_empty_guard_cannot_reorder_mirage_appearance_and_crate_rng
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

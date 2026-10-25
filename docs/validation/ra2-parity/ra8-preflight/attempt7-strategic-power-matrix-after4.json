@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.923686166992411,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-format7.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.60351154100499,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after4.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 4.252456082991557,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-clippy4.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "ra8_gate_harvest_bridge_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 141.39755879199947,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-exact-after3.log"
+  }
+]

@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 18.16s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_real_periodic_income_funds_paid_recruit_before_optional_repairs ... finite repair before tick0 cash100 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick20 cash98 repairing{SimId(4), SimId(5)} queues[]
+finite repair before tick40 cash845 repairing{SimId(4), SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 1, charged: 1, fraction: 250 }])]
+finite repair before tick60 cash818 repairing{SimId(4), SimId(5)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 26, charged: 26, fraction: 250 }])]
+finite repair before tick80 cash789 repairing{SimId(5)} queues[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 1, charged: 1, fraction: 250 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(15)), progress: 1, charged: 1, fraction: 250 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 51, charged: 51, fraction: 250 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+finite repair recruit{SimId(12)} cash0 queues[(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(2)), progress: 308, charged: 308, fraction: 250 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(15)), progress: 305, charged: 305, fraction: 250 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 167, charged: 167, fraction: 500 }, QueueItem { item: Unit(UnitKind(1)), progress: 0, charged: 0, fraction: 0 }])]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 114 filtered out; finished in 0.15s
+

@@ -1,0 +1,43 @@
+[
+  {
+    "name": "ten-player-all-end7",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "to-the-end",
+      "all"
+    ],
+    "exit": 0,
+    "started_utc": "2026-10-16T11:47:53.061282+00:00",
+    "elapsed_seconds": 871.8827065830119,
+    "log": "docs/validation/ra2-parity/ra8-preflight/ten-player-all-end7.log",
+    "sha256": "b7a1513f1736063b7ee6b7ea86628606bc4f528d8cfd89a01cd32f59e4ab8911"
+  },
+  {
+    "name": "ten-player256-benchmark7",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "liberty_bay",
+      "continental_divide",
+      "pacific_atoll"
+    ],
+    "exit": 0,
+    "started_utc": "2026-10-16T12:02:24.952030+00:00",
+    "elapsed_seconds": 60.30043195898179,
+    "log": "docs/validation/ra2-parity/ra8-preflight/ten-player256-benchmark7.log",
+    "sha256": "6b30df1943392d3f782aefd7c0176e556a0c5eb1d26ea819b776f78af3907269"
+  }
+]

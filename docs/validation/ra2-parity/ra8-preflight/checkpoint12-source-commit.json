@@ -1,0 +1,23 @@
+{
+  "utc": "2026-10-19T20:31:48.009736+00:00",
+  "source_commit": "8d5fa86cf75a1917aa92a7eaba5562b3a090c9b0",
+  "preflight_working_tree_base": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "chronology": "All final8 commands ran on the frozen working source before this source commit; recorded path hashes match exactly.",
+  "source_paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/examples/m13_ten_players.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_attrition_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/src/special/infantry.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "crates/sim/tests/ra8_temporal.rs"
+  ],
+  "source_staged_check_exit": 0,
+  "source_staged_check_sha256": "94da32865e7180f8b4823ea45ee7c0a60184f8c8ecebee8cf1070ba66f99f5df",
+  "snapshot_unique_files": 495,
+  "snapshot_mismatches": [],
+  "branch": "ra2-parity",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "source_delta_after_commit": []
+}

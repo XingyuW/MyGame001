@@ -1,0 +1,15 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.02s
+     Running tests/m6_production_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m6_production_matches-8ab180ddcd59ed04)
+
+running 1 test
+test ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner ... RA9 late twins: winner=PlayerId(0) outcome_tick=41738 steps=41739/72000 first_late_native_ticks=[Some(36392), Some(36609), Some(36567)] late_counts=[444, 8, 6] final_hash=78c81bd069fca660 trajectory_hash=5a8adabd01d20b05 candidate=("crossroads", ["america", "russia"], ["easy", "easy"], 0)
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 105.67s
+

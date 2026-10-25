@@ -1,0 +1,18 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused import: `Definitions`
+ --> crates/sim/tests/ra8_ai.rs:5:61
+  |
+5 | use sim::{Cell, CellPos, Command, CommandQueue, Controller, Definitions, Grid, MatchOptions,
+  |                                                             ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra8_ai") generated 1 warning (run `cargo fix --test "ra8_ai" -p sim` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3.28s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_raw_spy_spawn_with_empty_queue_is_concealed_before_actual_ai_thinks ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "",
+  "status": "standalone unfiltered check passed; separately rechecked after staging this record"
+}

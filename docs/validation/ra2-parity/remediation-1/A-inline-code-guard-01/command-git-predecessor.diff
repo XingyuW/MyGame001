@@ -1,0 +1,18 @@
+--- af18ce22736ab98b516560d433384b5746774880:crates/sim/src/command.rs
++++ current:crates/sim/src/command.rs
+@@ -775,7 +775,14 @@
+                 })
+         } else {
+             let buildings = buildings.get_or_insert_with(|| economy.building_index());
+-            economy_commands::apply(&issued, &mut economy, buildings, &mut grid, &mut events)
++            economy_commands::apply(
++                &issued,
++                &mut economy,
++                buildings,
++                &mut grid,
++                &mut events,
++                &special,
++            )
+         };
+         if let Err(reason) = result
+             && !ai_intent

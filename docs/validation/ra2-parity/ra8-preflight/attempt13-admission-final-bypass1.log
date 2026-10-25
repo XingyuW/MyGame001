@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 21.82s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+zero-job combined arms paidSimId(6) infantry_shottrue worker_joinedfalse worker_wave_shotfalse
+
+thread 'ra8_zero_job_armed_workers_join_real_paid_infantry_through_ordinary_team_readiness' (10740815) panicked at crates/sim/tests/ra8_ai.rs:10503:5:
+a worker with no actual or known economic job must contribute to the ordinary ready infantry wave
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_zero_job_armed_workers_join_real_paid_infantry_through_ordinary_team_readiness ... FAILED
+
+failures:
+
+failures:
+    ra8_zero_job_armed_workers_join_real_paid_infantry_through_ordinary_team_readiness
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.20s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

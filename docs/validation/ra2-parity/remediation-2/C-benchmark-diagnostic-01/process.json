@@ -1,0 +1,35 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T21:01:50.505886+00:00",
+  "pid": 25816,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/benchmark2-diagnostic-01-plan.json",
+  "plan_sha256": "bed62cba0fd591532e490a2bd0c9ab2815cdef4a0434520949e680d13fabc778",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m7_benchmark"
+      ],
+      "start": "2026-10-22T21:01:50.660894+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-benchmark-diagnostic-01/01-original-plus-observations.log",
+      "pid": 25830,
+      "pgid": 25830,
+      "exit": 1,
+      "end": "2026-10-22T21:02:10.699751+00:00",
+      "raw_bytes": 14076,
+      "raw_sha256": "218a4c7bdbee261e73ed531332313d02920db18e20ad6e7cf5f12f5730eef341",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T21:02:05.688884+00:00",
+  "end": "2026-10-22T21:02:10.807966+00:00",
+  "source_unchanged": true
+}

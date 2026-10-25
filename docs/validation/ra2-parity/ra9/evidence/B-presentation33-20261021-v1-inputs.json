@@ -1,0 +1,34 @@
+{
+  "scope": "exact33 source-inspected presentation migration65, not native/render/loaded execution",
+  "contract_sha256": "15868508e6f156add7b8d7599bdc49248a28122a9c84f07697e0cb74f7ec88ff",
+  "migration_receipt_sha256": "dc4fa2399575a35909dc3c145fed72dd3c82a9308accfff1fffb793bd4f904bd",
+  "source_reference_sha256": "0d4b6a110cffb7d43991ace2e404a0b896747d75cb215d04b5151f367f377265",
+  "artifact_sha256": "122a866fa05ff62cd3989a9139d57040a8c84cdd78f7b4927989fd8d350a9fd2",
+  "inputs": {
+    "crates/game/src/sidebar.rs": "b4443f46365953c81bffe6938f411ac7f012995fb92766773544af0a593d7338",
+    "crates/game/src/units.rs": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b",
+    "crates/game/src/battlefield.rs": "7b960dc1a9b67f6b0a32c61a7dd7ad8316662d8cf6f49fd996ac689b2e7c5fc6",
+    "crates/game/src/camera.rs": "1e556f6278ae3f5ae2624bc194dbb18ed9a30360c520a7493c883c070a1b936c",
+    "crates/game/src/weapon_fx.rs": "d31ac1eab212429b88cddc2ba9f53ce30ae5bb6a6e5727a89a7ffb3be2be58b2",
+    "crates/game/src/hd_art.rs": "e1620021f9933420befdb776650757bc76a82e3899926d81d5e8181f25d6eddf",
+    "crates/game/src/audio.rs": "00a8e197d652c0b740a4d1f2d839f68f1c4707992e4c66b252191486df0902a5",
+    "scripts/generate_hd_art.py": "a0374bdb8e4687604e8089d5228121213fadd617883ef12b9f8ad96b8d38277c",
+    "scripts/generate_ra2_data.py": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+    "crates/sim/src/arsenal.rs": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5",
+    "crates/sim/src/definitions.rs": "e423c067ee04dbcd7d0b68b14c1d46bd958116cd54aa634cd3ef444061695343",
+    "crates/sim/tests/ra9_audit/model162-loaded.rs": "cf0e034880f81ef3cca547e312cefc9e3e3e17501759017e7bbfd70b42d77ac2",
+    "crates/sim/tests/ra9_audit/model162-admission.rs": "c8732fcf0e380a3ac01f4513781bd3af87deccef2d37888621c09ad70b51ba21",
+    "assets/data/arsenal.ron": "8d28adb1d5b49e699ae6190997d575117cd3c6fe32eab4c48b6fc85766268921",
+    "assets/data/units.ron": "15133fbe575551b541339af4420974f9563e66f2dc94f620a33929531749ff2d",
+    "crates/sim/tests/reference/ra2_mapping.tsv": "92ca1764cc5ba7ebb80d7da741ce14a6b91ce0ced373834c96374776df9f8073",
+    "crates/sim/tests/reference/ra2_reference.tsv": "0d4b6a110cffb7d43991ace2e404a0b896747d75cb215d04b5151f367f377265",
+    "crates/sim/tests/ra9_audit/model162-loaded-gates.tsv": "e6d24931b5fb1224abfc32320d317631d216d99a238d79d3afb480fbe9e65734"
+  },
+  "counts": {
+    "nonhuman": 3,
+    "names": 16,
+    "fx-world": 11,
+    "jumpjet-defaults": 3
+  },
+  "excluded": "CollapseChance/FireSupress/DamageDelay/BlendedFog/InfantryBlinkDisguiseTime/radar privacy and Jumpjet acceleration/climb/turn all unchanged; source acceptance/user verification remains separate"
+}

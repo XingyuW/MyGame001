@@ -1,0 +1,20 @@
+// RA3 fixture (as the RA2 fixture's): the skirmish definitions of the small two sided world of the RA1 fixture: three countries, the
+// starting unit types of both sides, and the fixture map maps/skirmish_40x40.tmx. With the costs
+// of economy.ron the mean starting cost is (400 + 100 + 650 + 50) / 4 = 300. Fixture data
+// (invariant I10).
+(
+    schema_version: 3,
+    starting_credits: 3000,
+    sides: [
+        (side: "allied", starting_vehicles: ["tank"], starting_infantry: ["rifleman"]),
+        (side: "soviet", starting_vehicles: ["heavy"], starting_infantry: ["conscript"]),
+    ],
+    factions: [
+        (id: "alpha", label: "Alpha", side: "allied", roster_buildings: [], roster_units: [], buildings: [], units: []),
+        (id: "beta", label: "Beta", side: "allied", roster_buildings: [], roster_units: [], buildings: [], units: []),
+        (id: "gamma", label: "Gamma", side: "soviet", roster_buildings: [], roster_units: [], buildings: [], units: []),
+    ],
+    maps: [
+        (id: "skirmish_40x40", starts: [(x: 5, y: 5), (x: 32, y: 32)]),
+    ],
+)

@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T04:26:25.421816+00:00",
+  "completed_utc": "2026-10-21T04:26:28.196259+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "ra9_completion_whole",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "seconds": 2.774,
+  "input_count": 656,
+  "input_drift": [],
+  "scope": "Real loaded102 baseline/source mutation/missing Compared/active ORCA mapping/fake read-dependency controls; not complete source admission/native flag/final acceptance"
+}

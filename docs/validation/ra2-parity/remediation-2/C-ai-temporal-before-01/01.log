@@ -1,0 +1,24 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.90s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 2 tests
+
+thread 'ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host' (18328556) panicked at crates/sim/tests/ra8_ai.rs:13732:9:
+a currently erased host must wait without invalid Deploy intents
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host ... FAILED
+
+thread 'ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry' (18328557) panicked at crates/sim/tests/ra8_ai.rs:13732:9:
+a currently erased host must wait without invalid Deploy intents
+test ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry ... FAILED
+
+failures:
+
+failures:
+    ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host
+    ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

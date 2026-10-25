@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 50s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-ee06563c18f69d10)
+
+running 2 tests
+native nested owned cargo: tracked=true, detector=false, outstanding=true, failures=0, prior_failures=0
+test ai::ra8_lifecycle_remediation_tests::ra9_recursive_owned_cargo_keeps_real_ai_memory_and_attack_attempt_then_unloads_same_ids ... ok
+test ai::ra8_lifecycle_remediation_tests::ra9_recursive_ai_census_releases_real_captured_and_destroyed_roots ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 135 filtered out; finished in 0.56s
+

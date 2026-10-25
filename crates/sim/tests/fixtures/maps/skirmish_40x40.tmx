@@ -8,7 +8,7 @@
      x 36..37, y 20..23. -->
 <map version="1.10" tiledversion="1.11.2" orientation="isometric" renderorder="right-down" width="40" height="40" tilewidth="64" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="1">
  <properties>
-  <property name="schema_version" type="int" value="1"/>
+  <property name="schema_version" type="int" value="2"/>
  </properties>
  <tileset firstgid="1" name="fixture" tilewidth="64" tileheight="32" tilecount="4" columns="4">
   <!-- The image is never opened by sim; only the game renders tilesets. -->

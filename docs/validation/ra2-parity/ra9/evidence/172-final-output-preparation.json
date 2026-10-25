@@ -1,0 +1,85 @@
+{
+  "status": "READ_ONLY_SOURCE_INSPECTION_AND_OUTPUT_TEMPLATES_ONLY_NO_CANONICAL_WRITES_NO_COMMAND_EXECUTION_OR_APPROVAL",
+  "common_current_evidence_supplement_template": "Current frozen canonical RA9 candidate: TIP={TIP}, based on RA8 closure {RA8_HEAD}. The current canonical factual input scope is {CANONICAL_SCOPE_PATH} (SHA256 {CANONICAL_SCOPE_SHA256}); the root independently checked its actual source/authority/receipt bytes. This factual binding is not original-engine fidelity, review or approval.\n\nPreliminary chronology remains intact. 158 completed the whole audit: 1 passed, 0 failed; 16,211 physical fields = 13,419 Compared + 2,792 GameOwned; 7,108 demanded/successful dependency pairs; 5,022 source atoms = 3,111 Compared + 1,911 typed dispositions. 159 then ran all 181 audit tests unfiltered and failed 175 passed/6 failed, 0 ignored/0 filtered. The exact five test/helper changes in166 repaired those six diagnostics; 165 strict passed and168 ran precisely the six repaired cases (6 passed,0 failed,0 ignored,175 filtered). All failures/preimages and exact input scopes remain preserved. There was no second preliminary full181 pass. The canonical full13 command4 outcome is {CANONICAL_AUDIT_RESULT}, logged at {CANONICAL_TEST_LOG}. A related pass, declaration, loaded guard or receipt does not grant another route's coverage.\n\nThe current source classifications are759 CURRENT_MODEL_NONREAD and1,152 INTENTIONAL_DIFFERENCE, zero ORIGINAL_ENGINE_UNUSED. These1,911 atoms comprise1,869 Whole and42 components; the new174 atom set has132 Whole plus19/19/4 components and spans151 keys. Preserve exact literals, classes, reasons, aliases, portions and independently demanded real Compared dependencies. Static presentation/model-absence evidence proves only the named current parser/schema/state/consumer boundary, never original-engine nonuse or native flag consumption.\n\nCanonical validation: {FULL13_RESULT}; workspace {WORKSPACE_COUNTS}; audit181 {AUDIT_COUNTS}; smoke release/debug {SMOKE_RESULTS}; benchmark {BENCH_RESULT}; soak {SOAK_RESULT}; duel756 {DUEL_RESULT}; package {PACKAGE_RESULT}; both generator/reference checks {REGEN_RESULT}. The soak's deterministic windows are separately scoped: RA8 original soak260 twin windows covered18.72 million ticks and sampled final worlds could still be Running; it did not establish all-to-Won outcomes or378 ending matches. Required canonical m13 all21 supplies separate actual Won/performance coverage: {M13_RESULT}; fixed3 {FIXED3_RESULT}; example guards {EXAMPLE_GUARDS}.\n\nThe loaded catalogue at {CATALOGUE_PATH} was emitted by the actual Definitions, skirmish, AI and map loaders at frozen source; its source helper hash, command, output hash and source guard are in {CATALOGUE_RECEIPT}. Reachable modules/data are enumerated at {REACHABILITY_PATH}; support files/merge residues are identified separately. The observed preintegration census48Rust/67TSV/4TXT,16referencefiles,27RA9simtargets must be replaced by the measured frozen census, not assumed unchanged.\n\n183 stable debt IDs remain separately reconciled in RA2_HISTORICAL_DEBT.tsv with original claims/aliases retained. An execution result is distinct from acceptance by documentation or an independent panel. Each remaining limitation/unverified acceptance and exact available test scope stays explicit. The user alone verifies the complete HOWTOSEE list of visual/audio/readability/animation/pacing/feel and human victory/defeat/package/platform behavior. No screenshot, headless/App test, locked/black capture, source reading or audio synthesis check passes those items.\n\nR172 authorizes all five fresh independent slices in two batches3+2, followed by a fresh lead. Implementers, remediators, preparers and the orchestrator are ineligible. All cumulative RA0-RA9 changes/baseline regressions remain in scope; historical stopped-RA5 and preliminary pending prose below are dated history. Root owns reviewer validation full13 at clean TIP, the fresh lead decision, and any authorized main merge/reviewed tag. Only the user creates an approval tag.\n",
+  "status_closure_template": "### RA9 canonical implementation and validation closure \u2014 {DATE}\n\nSource: {SOURCE_COMMIT}; final evidence/output commit: {EVIDENCE_COMMIT}. Scope: RA8 closure {RA8_HEAD} plus the257-path prepared RA9 port, explicit doc-generator delta, canonical factual rebinding and output closure; source changes after freeze: {SOURCE_DRIFT}. No original prompt edit, deleted/ignored test, cap increase, skip, or original media import is authorized by this closure.\n\n{COMMON_CURRENT_EVIDENCE_SUPPLEMENT}\n\nValidation table must use actual13 summary lines, not copied counts. Include elapsed times and exact no-ignored totals, complete audit counts, both756 distributions median/p90/max and unchanged limits, soak worker/process/window scope, benchmark actual movement witnesses, all21 m13 Won/per-map mean/busiest/max/over50ms, fixed3, guards, package size/architecture/signature/OS/window warnings from actual outputs.\n\nAssumptions and intentional differences: preserve R4 map-growth OFF/R7 speed conversion/R29 unchanged72,000 base cap; exact75 numeric differences (including47 footprint dimensions across28 rectangles and five elite helper omissions); all1,911 per-atom model choices with route/portion classes, original-engine uncertainty and component restrictions; retained P1-P13 numbered aliases; source patch1.006 unproven marker; original formulas/weak-source assumptions still qualified in AppendixD. Do not replace them with a claim of universal original-engine equivalence.\n\nCurrent debt: retain all183 IDs and aliases, independently link each actual final-source named result or precise retained limit. Do not close GATHER-01 (terrain-only flood through building partitions), AMMO-EVENT-01, FREEUNIT-01, permanent air-cell blockers or stock-only retry scope. Preserve unresolved START/SPAWN/MOVE-DUP/executable-asset-failure coverage obligations unless actual narrowly required evidence resolves them; root/fresh lead must see exact scope. Preserve presentation, event-interface, performance-tail, unsupported configuration, distribution/notices and user-only limitations.\n\nRequires user verification: insert all rows verbatim from current GAP How to perform user verification through the next Historical baseline heading, with all results still PENDING and each HOWTOSEE preserved. Refresh only factual source-lifecycle references (R165 garrison/actorlessProp/weighted transport) from actual code; do not invent in-game editor/console or claim quality passed.\n\nStorage: preserve ordinary ra9-integration-validation copy and its source/preimages/raw logs in existing reviews cache for replay/review; preserve configured Cargo/uv/pip caches. Record any additional substantial outside-repository directory actually created and continuing necessity. No clone/worktree or substantial/tmp output.\n",
+  "provenance_policy": "Current supplement supersedes historical pending prose; preserve every failed raw result and original source/receipt bytes. Output paths resolve using exact portable plan including original-path+hash aliases. Source-authority P1-P13 all64 spans byte-exact; numbered aliases appended after R190, never rename authority headings. Final output edits excluded from gameplay scope, never create circular rebinding.",
+  "output_paths": [
+    "README.md",
+    "docs/STATUS.md",
+    "docs/HANDOFF.md",
+    "docs/CONSTRUCTION_SYSTEM.md",
+    "docs/RA2_GAP_ANALYSIS.md",
+    "docs/RA2_HISTORICAL_DEBT.tsv",
+    "assets/LICENSES.md",
+    "docs/RA9_INTEGRATION_CHECKLIST.md",
+    "docs/reviews/RA2-parity-review-requirements.md",
+    "docs/reviews/RA2-parity-reviews-outstanding.md",
+    "docs/prompts/ra2-parity-review/README.md",
+    "docs/prompts/ra2-parity-review/slice-sim1.md",
+    "docs/prompts/ra2-parity-review/slice-sim2.md",
+    "docs/prompts/ra2-parity-review/slice-data.md",
+    "docs/prompts/ra2-parity-review/slice-tests.md",
+    "docs/prompts/ra2-parity-review/slice-client.md",
+    "docs/prompts/ra2-parity-review/lead.md"
+  ],
+  "observed_static_census": {
+    "audit_rust": 48,
+    "audit_tsv": 67,
+    "audit_txt": 4,
+    "audit_historical_merge_residues": 3,
+    "reference_files": 16,
+    "top_level_ra9_sim_tests": 27,
+    "debt_ids": 183,
+    "debt_unique_ids": 183,
+    "debt_acceptance": {
+      "NOT_ACCEPTED_BY_DOCUMENTATION": 183
+    }
+  },
+  "howtosee_preimage": {
+    "path": "docs/RA2_GAP_ANALYSIS.md",
+    "section_start": "## How to perform user verification",
+    "section_end": "## Historical baseline and source provenance",
+    "bytes": 13855,
+    "sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+    "actual_check_rows": 51
+  },
+  "catalogue_preparation": {
+    "existing_helper": "crates/sim/examples/ra9_catalogue.rs",
+    "current_actual91_output_sha256": "dfdeb40c04f9a3f4fc18761c29d9fe5d60cad08215d52bdffe832659fa007326",
+    "current_helper_limit": "Definitions only, no skirmish/maps/plans",
+    "authorized_after_release_delta": "Narrow existing helper extension using actual load_skirmish/load_ai/load_map; no simulation/new framework. Explicit655 source scope delta, core97 unchanged."
+  },
+  "remaining_coverage_scope_checks": [
+    {
+      "ids": [
+        "START-01",
+        "R56-38"
+      ],
+      "actual_scope": "ra1_match fixture yard-start only; no actual all-shipped-map/player-count MCV-off sweep located",
+      "required_disposition": "Root classify concrete acceptance coverage vs exact retained limit before freeze; no blanket closure"
+    },
+    {
+      "ids": [
+        "SPAWN-01",
+        "R56-43",
+        "R56-63"
+      ],
+      "actual_scope": "ra4_spawns broad40..44 flight/10..30 launch spacing/200-window regeneration; ra9_guard75 readiness tests America/Aegis/Nuke do not by themselves establish every original spawn boundary",
+      "required_disposition": "Preserve exact scope; root classify required acceptance before freeze"
+    },
+    {
+      "ids": [
+        "MOVE-DUP-01"
+      ],
+      "actual_scope": "Waypoint3 MoveCompleted test exists; combat-at-destination AttackMove reproduction not located",
+      "required_disposition": "Hypothesis not proven defect; no undocumented closure"
+    },
+    {
+      "ids": [
+        "SMOKE-FAIL-01"
+      ],
+      "actual_scope": "Actual two native App/Error-exit handler controls in60; no actual executable/package missing-asset exit receipt located",
+      "required_disposition": "Retain handler/process distinction per existing ledger requested disposition"
+    }
+  ]
+}

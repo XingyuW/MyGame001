@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_NATIVE_TIMELINE_TRACE": "1"
+  },
+  "start_utc": "2026-10-20T05:07:28.905347+00:00",
+  "elapsed_seconds": 17.10073037503753,
+  "exit": 101,
+  "source_before_retained": {
+    "crates/sim/src/ai.rs": "a36c5576733dae0dc6f4792e369d64acab8e2863eca638ca42a455ad9d07dcfd",
+    "crates/sim/src/ai/strategy.rs": "f93171ec217ebdfd393256c0d90cfb6e7680c98ff257e5064cdfe2c5aa2dc3fc",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/tests/ra8_ai.rs": "10f437528e7b0e7ae024d3c95e1dfb64ffe87e41a91477382103c723489bffab",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553"
+  },
+  "instrumented_helper_sha256": "53b6552e8333ccc55f3d3ff66b89786e912c5287c6822d00c3498e2b30e7cbdb",
+  "log_sha256": "417bad7fa88c024af278cf2cfb411ce07a6e62ef2110b2614f5c621c146ace2d",
+  "diagnostic_scope": "Observational names,event windows,credit/queue/repairing/power/controller snapshots only;no gameplay state writes. HP increase is not exact repair-debit attribution."
+}

@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+test ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes ... thousand_lakes seed0 ["russia", "libya"] ["medium", "brutal"]: Some(Won { winner: PlayerId(1), tick: 28392 })
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 35.39s
+

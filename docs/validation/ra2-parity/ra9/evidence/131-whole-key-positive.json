@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T03:07:28.002148+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_scope_sha256": "a706429c38f15d4b1d51ed84130f261bb464dff7b95db4f2401469af96de019f",
+  "scope": "actual full typed1737source+wholephysicalvalue/dependency census; preliminary root-authorized input/choices and qualified real routes, not canonical acceptance",
+  "ended_utc": "2026-10-21T03:11:26.134800+00:00",
+  "exit_code": 101,
+  "seconds": 238.131,
+  "input_mismatches": []
+}

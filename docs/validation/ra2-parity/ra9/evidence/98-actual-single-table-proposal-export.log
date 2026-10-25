@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 13s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-f191adb6678c35d5)
+
+running 1 test
+test ra9_audit::ra9_export_actual_single_table_proposals ... Error: "guard75 full original/producer/command/model scope observation changed or unverified"
+FAILED
+
+failures:
+
+failures:
+    ra9_audit::ra9_export_actual_single_table_proposals
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 173 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

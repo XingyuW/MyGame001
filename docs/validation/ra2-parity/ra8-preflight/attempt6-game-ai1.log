@@ -1,0 +1,34 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 19.71s
+     Running tests/ra8_ai_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai_matches-f4b147b14025da0d)
+
+running 1 test
+test ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules ... demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8899: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8900: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8901: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 30105 })
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12860: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12861: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(92), SimId(139)], target: CellPos { x: 45, y: 35 } } }, ai_intent: Some(AiIntent { owned: {SimId(92), SimId(139)}, armed: {SimId(92), SimId(139)}, target: None, strategic_valid: false }), action: Command }] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12862: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(0), tick: 37121 })
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13480: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13481: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13482: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Building(BuildingKind(30)) } }, ai_intent: Some(AiIntent { owned: {}, armed: {}, target: None, strategic_valid: false }), action: Command }] }
+demo seed0 ["france", "iraq"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 23368 })
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9619: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9620: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9621: CommandQueue { pending: [] }
+
+thread 'ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules' (6320429) panicked at crates/game/tests/ra8_ai_matches.rs:142:9:
+demo seed0 ["france", "cuba"] ["brutal", "brutal"]: None after72000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.77s
+
+error: test failed, to rerun pass `-p game --test ra8_ai_matches`

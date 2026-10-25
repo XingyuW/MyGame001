@@ -1,0 +1,368 @@
+{
+  "utc": "2026-10-20T05:47:42.913566+00:00",
+  "summary": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-summary.json",
+  "summary_sha256": "97947f69f9fb2a6d9eead9e33e2fe91b5dbf80f34ca17425de42b9086740f65b",
+  "validation_commands": 12,
+  "rust_target_invocations": 9,
+  "rust_counts": [
+    160,
+    0,
+    0
+  ],
+  "command_elapsed_sum_seconds": 203.5327592100948,
+  "wrapper_monotonic_seconds": 204.12889449996874,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T05:43:23.960545+00:00",
+      "end_utc": "2026-10-20T05:43:24.973102+00:00",
+      "elapsed_seconds": 1.0125889170449227,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T05:43:25.017436+00:00",
+      "end_utc": "2026-10-20T05:43:25.094144+00:00",
+      "elapsed_seconds": 0.07672775001265109,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T05:43:25.140224+00:00",
+      "end_utc": "2026-10-20T05:43:26.329046+00:00",
+      "elapsed_seconds": 1.1888449160032906,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-03-clippy.log",
+      "log_sha256": "f468b7b63a32927e610df1f05494ed0a42f607e2921f65d0c164636f79da27c5",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "crossroads-russia-america",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:43:26.382768+00:00",
+      "end_utc": "2026-10-20T05:44:10.481602+00:00",
+      "elapsed_seconds": 44.09884075005539,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-04-crossroads-russia-america.log",
+      "log_sha256": "14fdaf9a06b7d5dbc7e6086092a4e5a8a2f2f8f2239aa115e87edd4567d5d050",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "crossroads-america-russia",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:44:10.569164+00:00",
+      "end_utc": "2026-10-20T05:44:17.390900+00:00",
+      "elapsed_seconds": 6.821754166972823,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-05-crossroads-america-russia.log",
+      "log_sha256": "b52c1745c7e49e3cc8e1b7144944f2c81960e2ad3a8f9957e4e668a0290a6807",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "riverlands-france-germany",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:44:17.436393+00:00",
+      "end_utc": "2026-10-20T05:44:22.210587+00:00",
+      "elapsed_seconds": 4.774202583997976,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-06-riverlands-france-germany.log",
+      "log_sha256": "9bbcc640d4f1a4f9d507fdea692007744ade60026979b019211482f35c06fbd7",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "ra8-ai",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:44:22.254048+00:00",
+      "end_utc": "2026-10-20T05:45:08.718783+00:00",
+      "elapsed_seconds": 46.46473412500927,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-07-ra8-ai.log",
+      "log_sha256": "fc93bf0639b20a72b0e45edfe5f141b4b55762b74d986852d9669d19fa422707",
+      "rust_results": [
+        [
+          131,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "attrition",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "ra8_attrition_tests",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:45:08.767295+00:00",
+      "end_utc": "2026-10-20T05:45:28.537703+00:00",
+      "elapsed_seconds": 19.770421291992534,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-08-attrition.log",
+      "log_sha256": "45b21f1c4791a839a6469eab1e4236a2709d9ad650dcaa602d5897eac9a51794",
+      "rust_results": [
+        [
+          16,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "slot",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--lib",
+        "last_stand",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:45:28.583541+00:00",
+      "end_utc": "2026-10-20T05:45:28.853689+00:00",
+      "elapsed_seconds": 0.2701712920097634,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-09-slot.log",
+      "log_sha256": "0328a5eec4881b8f16012b1d20c23339278fe2d7a81764faa555be34878efe6a",
+      "rust_results": [
+        [
+          4,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "legacy",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra4_ai",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:45:28.897606+00:00",
+      "end_utc": "2026-10-20T05:45:34.489813+00:00",
+      "elapsed_seconds": 5.592232958995737,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-10-legacy.log",
+      "log_sha256": "aeb05528f645115fb42f27234c4433fec8eb57e4af66e8950f6c50d5661efec9",
+      "rust_results": [
+        [
+          2,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:45:34.535675+00:00",
+      "end_utc": "2026-10-20T05:46:26.554699+00:00",
+      "elapsed_seconds": 52.019010208023246,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-11-demo10.log",
+      "log_sha256": "724455119e5997e3feaaf01d5e53e15eba6ee38b39000a884ba0a9058e3e00bd",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T05:46:26.600770+00:00",
+      "end_utc": "2026-10-20T05:46:48.043999+00:00",
+      "elapsed_seconds": 21.443230249977205,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final4-12-grown3.log",
+      "log_sha256": "d467b81aa28d7ca2fd69857b837f4d771ae18f8946b98688f75992af8b3ad6dc",
+      "rust_results": [
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    }
+  ],
+  "exact_final_combined": {
+    "crossroads-russia-america": [
+      "crossroads seed0 [\"russia\", \"america\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 61986 })"
+    ],
+    "crossroads-america-russia": [
+      "crossroads seed0 [\"america\", \"russia\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 41738 })"
+    ],
+    "riverlands-france-germany": [
+      "riverlands seed0 [\"france\", \"germany\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 33776 })"
+    ],
+    "demo10": [
+      "demo seed0 [\"germany\", \"great_britain\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 15172 })",
+      "demo seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 29953 })",
+      "demo seed0 [\"france\", \"iraq\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 33428 })",
+      "demo seed0 [\"france\", \"cuba\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 22017 })",
+      "demo seed0 [\"russia\", \"libya\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 62722 })",
+      "demo seed0 [\"cuba\", \"germany\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 30721 })",
+      "demo seed0 [\"cuba\", \"russia\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(1), tick: 27393 })",
+      "demo seed0 [\"russia\", \"libya\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 29810 })",
+      "demo seed0 [\"cuba\", \"russia\"] [\"brutal\", \"medium\"]: Some(Won { winner: PlayerId(0), tick: 18049 })",
+      "demo seed0 [\"russia\", \"libya\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(0), tick: 18461 })"
+    ],
+    "grown3": [
+      "grown exact Some(Won { winner: PlayerId(1), tick: 45321 }) after 45322 ticks, defeated {PlayerId(0): 39060, PlayerId(2): 10868, PlayerId(3): 12658, PlayerId(4): 6927, PlayerId(5): 7094, PlayerId(6): 18715, PlayerId(7): 22828, PlayerId(8): 45321, PlayerId(9): 27228}"
+    ]
+  },
+  "deferred_required_acceptance": [
+    "Complete unchanged full13 all0",
+    "Both actual fresh756Won tables/distributions",
+    "Same-source isolated all21 m13 actualWon/tenbuilders/means<5ms",
+    "Same-source three actual256x256 budget runs",
+    "Three explicit example guard tests"
+  ],
+  "not_claimed": [
+    "Independent review",
+    "RA8 full validation closure",
+    "Performance transfer from older runtime",
+    "Exclusive ending attribution to any single native fixture"
+  ],
+  "scope": "344runtime +169additional -18overlap =495unique"
+}

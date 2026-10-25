@@ -1,0 +1,81 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error: for loop over a single element
+    --> crates/sim/tests/ra8_ai.rs:990:5
+     |
+ 990 | /     for cell in [target] {
+ 991 | |         assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+ 992 | |             cell,
+ 993 | |             Cell {
+...    |
+ 999 | |         ));
+1000 | |     }
+     | |_____^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#single_element_loop
+     = note: `-D clippy::single-element-loop` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::single_element_loop)]`
+help: try
+     |
+ 990 ~     {
+ 991 +         let cell = target;
+ 992 +         assert!(app.world_mut().resource_mut::<Grid>().set_terrain(
+ 993 +             cell,
+ 994 +             Cell {
+ 995 +                 passable: false,
+ 996 +                 buildable: false,
+ 997 +                 water: true,
+ 998 +                 ore: 0
+ 999 +             }
+1000 +         ));
+1001 +     }
+     |
+
+error: this `if` statement can be collapsed
+    --> crates/sim/tests/ra8_ai.rs:1068:17
+     |
+1068 | /                 if let sim::SimEvent::WeaponFired {
+1069 | |                     attacker,
+1070 | |                     target: found,
+1071 | |                     ..
+...    |
+1087 | |                 }
+     | |_________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+     = note: `-D clippy::collapsible-if` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+     |
+1072 ~                 } = e
+1073 ~                     && found == target && own.is_none_or(|id| id == attacker) {
+1074 |                         let world = app.world_mut();
+ ...
+1084 |                         fired = true;
+1085 ~                     }
+     |
+
+error: this `if` statement can be collapsed
+    --> crates/sim/tests/ra8_ai.rs:1113:17
+     |
+1113 | /                 if let sim::SimEvent::WeaponFired {
+1114 | |                     attacker,
+1115 | |                     target: found,
+1116 | |                     ..
+...    |
+1132 | |                 }
+     | |_________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+1117 ~                 } = e
+1118 ~                     && found == target && own.is_none_or(|id| id == attacker) {
+1119 |                         let world = app.world_mut();
+ ...
+1129 |                         fired = true;
+1130 ~                     }
+     |
+
+error: could not compile `sim` (test "ra8_ai") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

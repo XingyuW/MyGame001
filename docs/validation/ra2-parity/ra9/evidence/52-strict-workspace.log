@@ -1,0 +1,35 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+error: redundant field names in struct initialization
+    --> crates/game/src/construction.rs:1186:33
+     |
+1186 | ...                   cell: cell,
+     |                       ^^^^^^^^^^ help: replace it with: `cell`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#redundant_field_names
+     = note: `-D clippy::redundant-field-names` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::redundant_field_names)]`
+
+error: this `if` statement can be collapsed
+    --> crates/game/src/sidebar.rs:2510:13
+     |
+2510 | /             if let (Some(text), Some(colour)) =
+2511 | |                 (world.get::<Text>(entity), world.get::<TextColor>(entity))
+2512 | |             {
+2513 | |                 if text.0.starts_with('$') {
+...    |
+2516 | |             }
+     | |_____________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+     = note: `-D clippy::collapsible-if` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+     |
+2511 ~                 (world.get::<Text>(entity), world.get::<TextColor>(entity))
+2512 ~                 && text.0.starts_with('$') {
+2513 |                     return (card, text.0.clone(), colour.0);
+2514 ~                 }
+     |
+
+error: could not compile `game` (bin "game" test) due to 2 previous errors

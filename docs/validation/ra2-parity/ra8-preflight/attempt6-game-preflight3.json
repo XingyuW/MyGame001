@@ -1,0 +1,172 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--bin",
+      "game",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 140.78588820900768,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-01.log",
+    "sha256": "e41668f01d9f3dec381cf7e6f7b1dd917ce3ae97c19e0519ee36016bfedf6dde"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 60.521338749997085,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-02.log",
+    "sha256": "06fc5f86166a39d7f8d1fa3c5e2fcb961d5b1e2a6f5d58fafe5802ab03ade35f"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m10_unlocks_and_enemies",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 172.24758129098336,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-03.log",
+    "sha256": "25143933ef8f110ebaca9c54aab42ec259c0258762283f37457cd4d42bfe790c"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 6.0599897079810034,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-04.log",
+    "sha256": "6cc03d9c8e09952952f271b9ba1277b9338623eecc7f676938e3ce1324ec1fda"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 8.003217499994207,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-05.log",
+    "sha256": "72c5531415ad8fd4a06265e0391552f7029b905a4ca36b3c110727a7f5b86026"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "crossroads_armies_finish_after_new_terrain_changes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 10.480409667012282,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-06.log",
+    "sha256": "b3ae99b7ca25e3a2f039df6654bf9b6a33810f077130199d47ca358612f1b591"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 25.11666862500715,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-07.log",
+    "sha256": "952a64230a242755b2c376e78e41406a928933fe208b18f8af12619f88607e12"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m6_production_matches",
+      "ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+      "--",
+      "--exact",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 75.0939725000062,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-08.log",
+    "sha256": "e8b4377ce03da3c0f850e636fbdd4c4974982d7b61df056ffc9863a2ec7f3c6b"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_gate_matches",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 1180.571257417003,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-finalgame3-09.log",
+    "sha256": "78b80ea37b6f3ab75e4822e78ba952450525d17617f6a69bbc11d8d8528c9103"
+  }
+]

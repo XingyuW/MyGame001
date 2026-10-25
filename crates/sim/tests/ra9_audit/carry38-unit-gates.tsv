@@ -1,0 +1,17 @@
+group_id	section	game_id	actual_role	actual_base_weapons	actual_elite_weapons	kind	side	note
+moving-fire	AEGIS	aegis_cruiser	flak	medusa	medusa_e	unit	allied	-
+idle-acquisition	BEAG	black_eagle	combat	maverick2	maverick2_e	unit	allied	-
+idle-acquisition	CARRIER	aircraft_carrier	combat	hornet_launcher	hornet_launcher	unit	allied	-
+moving-fire	DEST	destroyer	combat	gun_155mm,asw_launcher	gun_155mm_e,asw_launcher	unit	allied	-
+idle-acquisition	DRED	dreadnought	combat	dred_launcher	dred_launcher	unit	soviet	-
+idle-acquisition	DTRUCK	demolition_truck	suicide	demobomb	demobomb	unit	soviet	-
+moving-fire	HARV	war_miner	combat	gun_20mm_rapid	gun_20mm_rapid_e	unit	soviet	-
+moving-fire	HTNK	rhino	combat	gun_120mm	gun_120mm_e	unit	soviet	-
+moving-fire	MTNK	grizzly	combat	gun_105mm	gun_105mm_e	unit	allied	-
+idle-acquisition	ORCA	harrier	combat	maverick	maverick_e	unit	allied	-
+idle-acquisition	PDPLANE	paradrop_plane	combat	para_drop_weapon	para_drop_weapon	unit	none	support
+idle-acquisition	SHAD	nighthawk	transport	black_hawk_cannon	black_hawk_cannon_e	unit	allied	-
+idle-acquisition	SPY	spy	spy	makeup_kit	makeup_kit	unit	allied	-
+idle-acquisition	TERROR	terrorist	suicide	terror_bomb	terror_bomb	unit	soviet	-
+idle-acquisition	V3	v3_launcher	combat	v3_launcher	v3_launcher	unit	soviet	-
+idle-acquisition	YURIPR	yuri_prime	mind_control	super_mind_control,psi_wave	super_mind_control,psi_wave	unit	soviet	stolen_tech

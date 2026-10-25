@@ -1,0 +1,36 @@
+{
+  "completed_failed_phase": {
+    "phase": "failed-smallest-ten-player-and-neighbors",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m13_grown_maps",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "start_utc": "2026-10-19T12:56:00.873517+00:00",
+    "exit": 101,
+    "elapsed_seconds": 52.353049333032686,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt11-final4-failed-smallest-ten-player-and-neighbors.log",
+    "sha256": "1bf9ea625bda7d0647e4b05d10b33ad8e336b615a3eed822875cab11ba3b771c",
+    "test_targets": 1,
+    "passed": 2,
+    "failed": 1,
+    "ignored": 0,
+    "source_mismatches": []
+  },
+  "remaining_unrun": [
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "runtime_mismatches": [],
+  "elapsed_seconds": 1616.3607531249872
+}

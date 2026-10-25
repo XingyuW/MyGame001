@@ -1,0 +1,175 @@
+diff --git a/crates/sim/src/ai/strategy.rs b/crates/sim/src/ai/strategy.rs
+index ded114b..4cbec70 100644
+--- a/crates/sim/src/ai/strategy.rs
++++ b/crates/sim/src/ai/strategy.rs
+@@ -725,6 +725,7 @@ pub(super) fn decide(
+                                 })
+                             })
+                         })
++                        && !healthy_counterfire(view, unit)
+                         && !incoming_wave_threat(view, unit)
+                 })
+                 .map(|unit| unit.id)
+@@ -735,9 +736,10 @@ pub(super) fn decide(
+                     target: *target.0,
+                 });
+             }
+-            // A previously installed building focus must not ignore newly arrived
+-            // local defenders. Switch once to normal en-route acquisition; an
+-            // already healthy AttackMove keeps its path and weapon history.
++            // Respond to a real observed defender rather than letting nearest
++            // acquisition select an unarmed economic distraction. Preserve an
++            // already matching counter-attack and a healthy moving approach.
++            let mut counterfire: BTreeMap<SimId, Vec<SimId>> = BTreeMap::new();
+             let mut responses: BTreeMap<CellPos, Vec<SimId>> = BTreeMap::new();
+             for unit in ground_wave.iter().filter(|unit| {
+                 view.fights(unit)
+@@ -747,11 +749,38 @@ pub(super) fn decide(
+                     )
+                     && range(view.definitions, unit.kind)
+                         < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32
+-                    && matching_attack(unit)
+-                    && incoming_wave_threat(view, unit)
+             }) {
+-                let cell = surface_response_cell(view, unit, target.1.footprint);
+-                responses.entry(cell).or_default().push(unit.id);
++                if healthy_counterfire(view, unit) {
++                    controller.reserved.insert(unit.id);
++                    continue;
++                }
++                let distracted = matches!(
++                    unit.attack_order,
++                    Some(crate::AttackOrder::AttackMove { moving: false, .. })
++                ) && view.enemy_units.iter().any(|enemy| {
++                    Some(enemy.id) == unit.combat_target && !enemy.armed && enemy.harvest.is_some()
++                });
++                if !matching_attack(unit) && !distracted {
++                    continue;
++                }
++                if let Some(enemy) = view
++                    .enemy_units
++                    .iter()
++                    .filter(|enemy| {
++                        incoming_wave_threat_from(view, unit, enemy)
++                            && counterfire_eligible(view, unit, enemy)
++                    })
++                    .min_by_key(|enemy| (chebyshev(unit.mobile.cell, enemy.mobile.cell), enemy.id))
++                {
++                    controller.reserved.insert(unit.id);
++                    counterfire.entry(enemy.id).or_default().push(unit.id);
++                } else if matching_attack(unit) && incoming_wave_threat(view, unit) {
++                    let cell = surface_response_cell(view, unit, target.1.footprint);
++                    responses.entry(cell).or_default().push(unit.id);
++                }
++            }
++            for (target, units) in counterfire {
++                commands.push(Command::Attack { units, target });
+             }
+             for (target, units) in responses {
+                 commands.push(Command::AttackMove { units, target });
+@@ -1531,7 +1560,44 @@ fn surface_response_cell(view: &View<'_>, unit: &UnitSnap, target: Footprint) ->
+ 
+ // Surface handoffs require incoming eligible fire, not merely an opportunity
+ // for our own longer-range gun to shoot an otherwise harmless distraction.
++fn counterfire_eligible(view: &View<'_>, unit: &UnitSnap, enemy: &UnitSnap) -> bool {
++    if !enemy.armed {
++        return false;
++    }
++    let (Some(own), Some(hostile)) = (
++        view.definitions.unit_combat(unit.kind),
++        view.definitions.unit_combat(enemy.kind),
++    ) else {
++        return false;
++    };
++    let traits = screen_unit_traits(view, enemy, &hostile);
++    crate::weapon_against(view.definitions, &own, own.weapons(false), &traits).is_some_and(
++        |(kind, percent)| {
++            percent > 1
++                && view
++                    .definitions
++                    .weapon(kind)
++                    .is_some_and(|weapon| weapon.damage > 0)
++        },
++    )
++}
++
++fn healthy_counterfire(view: &View<'_>, unit: &UnitSnap) -> bool {
++    let Some(crate::AttackOrder::Attack { target, .. }) = unit.attack_order else {
++        return false;
++    };
++    view.enemy_units
++        .iter()
++        .any(|enemy| enemy.id == target && counterfire_eligible(view, unit, enemy))
++}
++
+ fn incoming_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
++    view.enemy_units
++        .iter()
++        .any(|enemy| incoming_wave_threat_from(view, unit, enemy))
++}
++
++fn incoming_wave_threat_from(view: &View<'_>, unit: &UnitSnap, enemy: &UnitSnap) -> bool {
+     let Some(terms) = view.definitions.unit_combat(unit.kind) else {
+         return false;
+     };
+@@ -1541,34 +1607,32 @@ fn incoming_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {
+         traits.immune_radiation = meta.immune_radiation;
+     }
+     let from = crate::combat::Extent::point(unit.mobile.position(view.grid, unit.id));
+-    view.enemy_units.iter().any(|enemy| {
+-        let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
+-            return false;
+-        };
+-        let Some((kind, percent)) =
+-            crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
+-        else {
+-            return false;
+-        };
+-        let Some(weapon) = view
+-            .definitions
+-            .weapon(kind)
+-            .filter(|weapon| percent > 1 && weapon.damage > 0)
+-        else {
+-            return false;
+-        };
+-        let (dx, dy) = from.gap(&crate::combat::Extent::point(
+-            enemy.mobile.position(view.grid, enemy.id),
+-        ));
+-        let reach = weapon
+-            .range
+-            .saturating_add(if traits.airborne && weapon.anti_air {
+-                hostile.air_range_bonus
+-            } else {
+-                0
+-            });
+-        crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
+-    })
++    let Some(hostile) = view.definitions.unit_combat(enemy.kind) else {
++        return false;
++    };
++    let Some((kind, percent)) =
++        crate::weapon_against(view.definitions, &hostile, hostile.weapons(false), &traits)
++    else {
++        return false;
++    };
++    let Some(weapon) = view
++        .definitions
++        .weapon(kind)
++        .filter(|weapon| percent > 1 && weapon.damage > 0)
++    else {
++        return false;
++    };
++    let (dx, dy) = from.gap(&crate::combat::Extent::point(
++        enemy.mobile.position(view.grid, enemy.id),
++    ));
++    let reach = weapon
++        .range
++        .saturating_add(if traits.airborne && weapon.anti_air {
++            hostile.air_range_bonus
++        } else {
++            0
++        });
++    crate::in_range(dx, dy, reach) && !crate::inside_min_range(dx, dy, weapon.min_range)
+ }
+ 
+ fn local_wave_threat(view: &View<'_>, unit: &UnitSnap) -> bool {

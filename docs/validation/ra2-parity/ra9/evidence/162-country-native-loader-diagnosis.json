@@ -1,0 +1,16 @@
+{
+  "status": "UNAPPLIED_WAIT159FROZEN_TARGET_COMPLETION",
+  "cause": "copy.loaded invokes Inputs::load raw schema guard first; native skirmish loader never reached. Preserve validcontrol+exactmutant, directly load copiednative ruleset then realnative skirmish to assert intended roster_units rejection.",
+  "source_before": [
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "sha256": "b160488120ca006a53e27b316934524c49ee2ebbd040eef7d9c547bfc0bed31e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "sha256": "aaa74d5332b21ba5c4fec7a600321a8c420cbf9e8a3f07e7e3c4d764f5a4599b"
+    }
+  ],
+  "patch_sha256": "3a44359eb97366283a70d6f5faefdf096ca683fec595bc670fb1a795478a99a4",
+  "no_source_files_written": true
+}

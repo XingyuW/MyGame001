@@ -1,0 +1,3 @@
+10 exit 0  4911 s  cargo run --release -p sim --example m14_duels -- full
+11 exit 0  19 s  sh scripts/package_macos.sh
+validation ra8-recovery17: PASSED

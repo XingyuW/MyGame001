@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.52s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 8 tests
+test ai::ra8_recovery_tests::ra8_attainable_power_recovery_restores_real_production_despite_reserved_unit_tails ... power recovery placedtrue slow8ticks5 fast8ticks_progress_and_paidcreditsSome((10, 10))
+ok
+test ai::ra8_recovery_tests::ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo ... ok
+test ai::ra8_recovery_tests::ra8_existing_main_building_obligation_cannot_be_reused_to_fund_the_defence_lane ... ok
+test ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails ... aggregate recovery refunds[(Unit(UnitKind(1)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(6)), 839)] grizzlies{SimId(10)} building_shots1
+ok
+test ai::ra8_recovery_tests::ra8_income_recovery_and_completed_construction_keep_their_normal_heads ... ok
+test ai::ra8_recovery_tests::ra8_no_income_reallocates_real_unfinished_tech_credits_to_starved_combat_without_requeue ... finite construction charged1600 refunds[1600] paid_tanktrue requeuedfalse
+finite recovery final credits100 queues[]
+ok
+test ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher ... unit recovery refunds[(Unit(UnitKind(1)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(27)), 0), (Unit(UnitKind(6)), 175), (Unit(UnitKind(27)), 175)] recruits{SimId(9)} actual_building_shots1
+ok
+test ai::ra8_recovery_tests::ra8_unit_reallocation_preserves_actual_income_harvesters_and_unreachable_alternatives ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 78 filtered out; finished in 0.90s
+

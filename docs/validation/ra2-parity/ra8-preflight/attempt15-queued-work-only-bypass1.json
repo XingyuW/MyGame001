@@ -1,0 +1,56 @@
+{
+  "label": "attempt15-queued-work-only-bypass1",
+  "path": "crates/sim/src/ai.rs",
+  "find": "        .chain(\n            view.state\n                .queues()\n                .flat_map(|(_, queue)| queue.iter().map(|q| q.item)),\n        )\n",
+  "replace": "",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests",
+    "--",
+    "--nocapture"
+  ],
+  "source_before": {
+    "crates/sim/src/ai.rs": "fc3c7ff564728787c124154db18b89d637c2f184304b708d566eeca5b0b7824c",
+    "crates/sim/src/ai/strategy.rs": "8c5b44a7c6bcf8e306994614619741572738843e39358771e8a4b08797341eee",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40"
+  },
+  "start_utc": "2026-10-20T10:55:25.212644+00:00",
+  "source_mutant": {
+    "crates/sim/src/ai.rs": "d75f0f033c4d6aef361b82d15a23d66b8d4170f1eeb50d223c0054fdc7b04e43",
+    "crates/sim/src/ai/strategy.rs": "8c5b44a7c6bcf8e306994614619741572738843e39358771e8a4b08797341eee",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40"
+  },
+  "exit": 0,
+  "elapsed_seconds": 23.920358665985987,
+  "log_sha256": "7fd01de2330e406abc75806b82b09ba0ab68265419bc12ef7ba94120a77da90e",
+  "source_after_finally": {
+    "crates/sim/src/ai.rs": "fc3c7ff564728787c124154db18b89d637c2f184304b708d566eeca5b0b7824c",
+    "crates/sim/src/ai/strategy.rs": "8c5b44a7c6bcf8e306994614619741572738843e39358771e8a4b08797341eee",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "27bbae268bbaf4b1bb324c4ce21b297904b2b7dc0993cf1d3423162c220c2e79",
+    "crates/game/tests/m6_production_matches.rs": "ae394550771394e7082bd9c6027d67b5e7ab2beff3b3c2b4008804246e32ac92",
+    "crates/sim/src/ai/ra8_recovery_tests.rs": "fa31396d27c0d353419712c4ee45dec347191d83cd3369d9bf879160c2e1fb40"
+  },
+  "restored_at_utc": "2026-10-20T10:55:49.135091+00:00",
+  "restored_exactly": true
+}

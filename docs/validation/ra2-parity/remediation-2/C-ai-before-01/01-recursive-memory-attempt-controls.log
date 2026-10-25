@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 53s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-ee06563c18f69d10)
+
+running 2 tests
+
+thread 'ai::ra8_lifecycle_remediation_tests::ra9_recursive_owned_cargo_keeps_real_ai_memory_and_attack_attempt_then_unloads_same_ids' (17479252) panicked at crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs:103:5:
+living owned grandchild must remain in actual memory
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_lifecycle_remediation_tests::ra9_recursive_owned_cargo_keeps_real_ai_memory_and_attack_attempt_then_unloads_same_ids ... FAILED
+test ai::ra8_lifecycle_remediation_tests::ra9_recursive_ai_census_releases_real_captured_and_destroyed_roots ... ok
+
+failures:
+
+failures:
+    ai::ra8_lifecycle_remediation_tests::ra9_recursive_owned_cargo_keeps_real_ai_memory_and_attack_attempt_then_unloads_same_ids
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 132 filtered out; finished in 0.53s
+
+error: test failed, to rerun pass `-p sim --lib`

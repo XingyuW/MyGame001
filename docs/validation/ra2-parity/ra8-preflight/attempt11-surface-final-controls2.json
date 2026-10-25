@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-surface-final-controls2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "surface_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start_utc": "2026-10-19T12:22:04.122093+00:00",
+  "elapsed_seconds": 6.808211499999743,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c"
+  },
+  "log_sha256": "b61314fe56b8c67b309e8a7d90b9d9c987ecf6c5bdb21e5d3ffdb3d4cc6f996c"
+}

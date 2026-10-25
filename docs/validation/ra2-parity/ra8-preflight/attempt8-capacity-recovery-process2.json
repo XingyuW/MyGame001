@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-18T22:03:21.012243+00:00",
+  "exit": 0,
+  "rows": [],
+  "source_shas": {
+    "crates/sim/src/ai.rs": "81d6d0f9d739979ce7504c960c22ce700e9517069a9488db3fe4b557622353a8",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "pending_output": "86174 returned completed101, four closure reference compile errors preserved; no mutation probe active."
+}

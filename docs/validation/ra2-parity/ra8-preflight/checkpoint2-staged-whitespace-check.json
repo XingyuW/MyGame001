@@ -1,0 +1,23 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit_code": 2,
+  "check_passed": false,
+  "stdout_unfiltered": "docs/validation/ra2-parity/ra8-preflight/crossroads-final2.log:8: new blank line at EOF.\n",
+  "stderr_unfiltered": "",
+  "classified_raw_evidence": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/crossroads-final2.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF.",
+      "raw_line": "",
+      "classification": "intentional preserved raw capture; no source/data/test exemption"
+    }
+  ],
+  "unexpected": [],
+  "initial_diagnostic_note": "An initial diagnostic shell call also ran git diff --cached --stat, so its outer exit0 masked the check status. The warning was inspected and an immediate standalone check exited2 before any commit. No passing check is claimed."
+}

@@ -1,0 +1,7 @@
+{
+  "utc": "2026-10-20T05:50:46.122710+00:00",
+  "read": "docs/validation/ra2-parity/ra8-preflight/checkpoint15-source-staged-check.json",
+  "completed_exit": 0,
+  "stdout_empty": true,
+  "same_five_staged_paths": true
+}

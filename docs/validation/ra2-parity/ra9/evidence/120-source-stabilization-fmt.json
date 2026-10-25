@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-21T02:47:40.740131+00:00",
+  "command": [
+    "cargo",
+    "fmt",
+    "--all"
+  ],
+  "exit_code": 0,
+  "seconds": 2.887,
+  "scope": "Format completed3newcurrentbehavior test appends and5fixturehygiene changes; latecomments factual selection only, all thresholds/nativebehavior unchanged",
+  "late_test_sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+}

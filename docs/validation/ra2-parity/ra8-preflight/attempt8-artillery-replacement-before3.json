@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-artillery-replacement-before3",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Real local Engineer/Spy observers prove both Barracks and remote armed Rocketeer visible; exercise actual combined-arms rear-slot branch instead of an unobserved enemy-start route. Healthy order first; actual fire/destruction follows.",
+  "start_utc": "2026-10-18T20:56:32.217796+00:00",
+  "elapsed_seconds": 8.562919000047259,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "bdc4d642573be48a52a55f290cd6d9c3fa3c2177b6b66f6ad306272c26918a32"
+}

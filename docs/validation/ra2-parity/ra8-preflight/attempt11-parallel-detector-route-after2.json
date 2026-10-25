@@ -1,0 +1,27 @@
+{
+  "label": "attempt11-parallel-detector-route-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "detector",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:18:27.239731+00:00",
+  "elapsed_seconds": 22.47238470800221,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "2e70270f3f9897e2433fde4d554077c986ce76f31d3f4a2fc637d6946f4dc45a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "2e70270f3f9897e2433fde4d554077c986ce76f31d3f4a2fc637d6946f4dc45a"
+  },
+  "log_sha256": "6c652e7cef9dcd872f2be1fbd0806bbdce74830b5623e4169ddbc74a7b1b3008"
+}

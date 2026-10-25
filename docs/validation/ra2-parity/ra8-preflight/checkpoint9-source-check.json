@@ -1,0 +1,21 @@
+{
+  "attempt8-final8-runtime-manifest.json": {
+    "count": 342,
+    "sha256": "21f36ba65a1d18b873868fe2f9f3a98d694e358250a26595adcd26e0430340fa",
+    "mismatches": []
+  },
+  "attempt8-final8-test-example-manifest.json": {
+    "count": 101,
+    "sha256": "770a15eef7a15cc7c1ed2e2e3ed4a3979ad93820b69a52468e5833e7384a9242",
+    "mismatches": []
+  },
+  "head_before_commits": "618e9b4f2890a9cb5e95d920dcd94fedbca3955f",
+  "branch": "ra2-parity",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "runtime_files": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "746f4d9ef52c27b93091421b266ab47df5a1ed6c6cefbd75929445e2a8cd966d",
+    "assets/data/ai.ron": "a29e0ceedfb2212d26bdc4c9c1ecc94f7d05106b7e635fd45925d48451a964b7",
+    "scripts/generate_ra2_data.py": "357c3dd026e7ff537106e1d29a1fb4c131a2ca68474d4c2806675da7bae168fa"
+  }
+}

@@ -1,0 +1,45 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 55.00s
+     Running tests/ra9_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_liveness-dd602565f1637a1d)
+
+running 1 test
+test ra9_real_command_strike_stops_dead_producer_progress_payment_and_spawn_at_exact_death_boundary ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/ra9_refinery_repair_liveness.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_refinery_repair_liveness-9209b1ead0e72b0d)
+
+running 2 tests
+test ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy ... FAILED
+test ra9_native_command_killed_depot_cannot_heal_or_charge_but_one_hp_depot_can ... ok
+
+failures:
+
+---- ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy stdout ----
+
+thread 'ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy' (13234762) panicked at crates/sim/tests/ra9_refinery_repair_liveness.rs:69:5:
+real free miner never entered a final native step arriving for same-tick unload
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra9_command_destroyed_refinery_cannot_pay_a_delivery_later_in_economy
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.84s
+
+error: test failed, to rerun pass `-p sim --test ra9_refinery_repair_liveness`
+     Running tests/ra9_remaining_props.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_remaining_props-3e7cbb7a1820299d)
+
+running 7 tests
+test ra9_full_sustained_native_temporal_erases_each_real_occupied_prop_and_releases_terrain ... ok
+test ra9_real_beam_break_keeps_each_same_occupied_host_alive_for_the_full_uninterrupted_erase_window ... ok
+test ra9_real_bombsight_approaches_from_detection_range_and_never_falls_back_after_another_real_defuse ... ok
+test ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins ... ok
+test ra9_real_explicit_defusekit_traverses_long_native_path_and_prevents_the_later_ivan_explosion ... ok
+test ra9_real_ivan_charge_survives_native_commands_source_death_and_later_deals_the_same_damage ... ok
+test ra9_real_ivan_expiry_deals_four_hundred_base_damage_with_independent_armour_controls ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.37s
+
+error: 1 target failed:
+    `-p sim --test ra9_refinery_repair_liveness`

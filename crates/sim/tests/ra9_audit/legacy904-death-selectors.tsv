@@ -1,0 +1,11 @@
+apocalypse	true	false	none	gun_120mmx
+crazy_ivan	true	false	none	ivan_bomber
+demolition_truck	true	false	demobomb	demobomb
+ifv	false	true	cr_nuke	hover_missile
+kirov	false	false	blimp_bomb	blimp_bomb
+naval_shipyard	true	false	none	none
+nuclear_reactor	true	false	nuke_payload	none
+oil_derrick	true	false	oil_explosion	none
+rocketeer	false	false	gun_20mm	gun_20mm
+soviet_naval_shipyard	true	false	none	none
+terrorist	true	false	terror_bomb	terror_bomb

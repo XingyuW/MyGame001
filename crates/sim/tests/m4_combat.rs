@@ -22,6 +22,7 @@ const HUMAN: PlayerId = PlayerId(0);
 const ENEMY: PlayerId = PlayerId(1);
 
 const ROCK: Cell = Cell {
+    water: false,
     passable: false,
     buildable: false,
     ore: 0,
@@ -459,7 +460,16 @@ fn extreme_scenario() -> App {
             "range: 384,\n            reload: 1,",
             1,
         )
-        .replacen("range: 1024,", "range: 4096,", 1)
+        .replacen(
+            "range: 1024,",
+            &format!("range: {},", sim::MAX_WEAPON_RANGE),
+            1,
+        )
+        .replacen(
+            "projectile_speed: 128,",
+            &format!("projectile_speed: {},", sim::MIN_PROJECTILE_SPEED),
+            1,
+        )
         .replacen(
             "armour: \"plate\", sight: 6,",
             "armour: \"plate\", sight: 16,",
@@ -543,12 +553,14 @@ fn the_shortest_range_reaches_every_neighbouring_cell_and_an_adjacent_building()
 }
 
 #[test]
-fn the_longest_range_with_the_slowest_projectile_flies_32_ticks() {
-    // A tank seeing 16 cells fires at a target exactly MAX_WEAPON_RANGE (16 cells) away; the shell
-    // at MIN_PROJECTILE_SPEED arrives MAX_WEAPON_RANGE / MIN_PROJECTILE_SPEED = 32 ticks later.
+fn the_longest_range_with_the_slowest_projectile_flies_480_ticks() {
+    // A tank fires at a target exactly MAX_WEAPON_RANGE (30 cells) away, which a crawler of its
+    // owner two cells from the target sees (a sight is at most 16 cells); the shell at
+    // MIN_PROJECTILE_SPEED arrives MAX_WEAPON_RANGE / MIN_PROJECTILE_SPEED = 480 ticks later.
     let mut app = extreme_scenario();
-    let tank = unit(&mut app, HUMAN, "tank", 4, 16);
-    let target = parked_harvester(&mut app, ENEMY, 20, 16);
+    let tank = unit(&mut app, HUMAN, "tank", 0, 16);
+    let target = parked_harvester(&mut app, ENEMY, 30, 16);
+    unit(&mut app, HUMAN, "crawler", 30, 18);
     tick(&mut app);
     let events = tick(&mut app);
     assert_eq!(shots_by(&events, tank), 1);
@@ -562,8 +574,8 @@ fn the_longest_range_with_the_slowest_projectile_flies_32_ticks() {
         shell.flight,
         sim::MAX_WEAPON_RANGE / sim::MIN_PROJECTILE_SPEED
     );
-    assert_eq!(shell.flight, 32);
-    for _ in 0..31 {
+    assert_eq!(shell.flight, 480);
+    for _ in 0..479 {
         tick(&mut app);
         assert_eq!(hit_points(&mut app, target), Some(200));
     }
@@ -573,11 +585,17 @@ fn the_longest_range_with_the_slowest_projectile_flies_32_ticks() {
         Some(175),
         "25 at 100 % against plate"
     );
-    // One subcell farther would be out of range: 17 cells away it does not fire at all.
+    // One subcell farther would be out of range: 31 cells away it does not fire at all.
     let mut far = extreme_scenario();
-    let tank = unit(&mut far, HUMAN, "tank", 4, 16);
-    parked_harvester(&mut far, ENEMY, 21, 16);
+    let tank = unit(&mut far, HUMAN, "tank", 0, 16);
+    let seen = parked_harvester(&mut far, ENEMY, 31, 16);
+    unit(&mut far, HUMAN, "crawler", 31, 18);
     assert_eq!(shots_by(&ticks(&mut far, 30), tank), 0);
+    let _ = seen;
+    assert!(
+        vision(&far, HUMAN).is_visible(CellPos::new(31, 16)),
+        "the target is seen, only out of range"
+    );
 }
 
 // --- Projectiles ---------------------------------------------------------------------------
@@ -1057,8 +1075,9 @@ fn a_destroyed_building_frees_its_cells() {
 
 #[test]
 fn a_destroyed_building_reports_the_free_units_lost_with_it() {
-    // A refinery placed while every cell of its ring is held keeps its free harvester pending;
-    // destroyed, it reports the harvester as lost (no silent loss, cf. M3 review 1 P2-1).
+    // A refinery placed while every cell of its ring is held, and no ground beyond the ring can
+    // be reached, keeps its free harvester pending; destroyed, it reports the harvester as lost
+    // (no silent loss, cf. M3 review 1 P2-1).
     let mut app = scenario();
     building(&mut app, HUMAN, "yard", 19, 14);
     building(&mut app, HUMAN, "power", 23, 14);
@@ -1069,6 +1088,24 @@ fn a_destroyed_building_reports_the_free_units_lost_with_it() {
         for x in 18..=22 {
             if !((19..=21).contains(&x) && (18..=19).contains(&y)) {
                 unit(&mut app, HUMAN, "crawler", x, y);
+            }
+        }
+    }
+    // Rock around the crawlers (where no building stands), or the harvester would come out
+    // beyond them.
+    let rock = Cell {
+        passable: false,
+        water: false,
+        buildable: false,
+        ore: 0,
+    };
+    for y in 16..=21 {
+        for x in 17..=23 {
+            let cell = CellPos::new(x, y);
+            let edge = [17, 23].contains(&x) || [16, 21].contains(&y);
+            let mut grid = app.world_mut().resource_mut::<sim::Grid>();
+            if edge && grid.building(cell).is_none() {
+                assert!(grid.set_terrain(cell, rock));
             }
         }
     }

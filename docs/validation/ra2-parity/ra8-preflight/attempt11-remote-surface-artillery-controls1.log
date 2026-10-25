@@ -1,0 +1,12 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 3 tests
+test ra8_surface_response_does_not_replace_the_existing_long_range_artillery_policy ... ok
+remote replacement healthytrue: queued[], artillery shots3, destroyedtrue, moving frontCellPos { x: 26, y: 13 }
+test ra8_artillery_uses_the_surface_tank_line_when_aircraft_share_its_wave ... ok
+remote replacement healthyfalse: queued[CellPos { x: 36, y: 14 }], artillery shots3, destroyedtrue, moving frontCellPos { x: 28, y: 14 }
+test ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 109 filtered out; finished in 0.41s
+

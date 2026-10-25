@@ -1,0 +1,28 @@
+[
+  {
+    "name": "attempt4-fmt1",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.8868240409938153
+  },
+  {
+    "name": "attempt4-clippy1",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 2.6673600829963107
+  }
+]

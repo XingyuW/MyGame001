@@ -1,0 +1,14 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 0  1420 s  cargo test --workspace --release  [529 passed, 0 failed, 0 ignored]
+05 exit 0  0 s  cargo build --release -p game
+06 exit 0  15 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  102 s  cargo run -p game -- --smoke-test 600
+08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark
+09 exit 0  1896 s  cargo run --release -p sim --example m7_soak
+10 exit 0  547 s  cargo run --release -p sim --example m14_duels -- full
+11 exit 0  18 s  sh scripts/package_macos.sh
+validation ra0-baseline: PASSED
+Composed from three invocations on the same tree (9 alone, then 1 to 8 and 10, then 11 again
+after the display was removed during its first attempt, first-run/11-package-monitor-removed.log).

@@ -1,0 +1,4 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.83s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/ra8_prop_profile`
+Frostline seed13 default ten players, 5000 ticks; props14342; measured 1.741916029s; mean 348.383µs; elapsed 11.032613583s; state 94f4c6583a68ff22; events 660/acbe6072fabd5e3a

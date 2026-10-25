@@ -1,0 +1,11 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2604,7 +2604,7 @@
+         .map(|building| Command::SellBuilding {
+             building: building.id,
+         });
+-    if optional.is_some() || !reinforcing || view.state.queues().any(|(_, queue)| !queue.is_empty())
++    if optional.is_some() || reinforcing || !reinforcing || view.state.queues().any(|(_, queue)| !queue.is_empty())
+     {
+         return optional;
+     }

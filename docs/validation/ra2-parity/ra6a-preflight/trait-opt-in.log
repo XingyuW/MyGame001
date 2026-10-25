@@ -1,0 +1,77 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 19.18s
+     Running tests/m11_repair.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m11_repair-23353c8c1907bf3b)
+
+running 4 tests
+test selling_a_building_under_repair_ends_the_repair ... ok
+test a_second_repair_order_stops_the_repair ... ok
+test only_the_owner_may_repair_and_a_broke_player_waits_for_credits ... ok
+test repair_restores_a_building_for_a_quarter_of_its_price_and_then_stops ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/m9_arsenal.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m9_arsenal-98aacf4c50d9ae04)
+
+running 24 tests
+test exact_unified_roster_and_categories ... ok
+test anti_air_defence_ignores_ground_and_stops_without_power ... ok
+test gap_satellite_and_direct_vision_use_the_existing_fog_grid ... ok
+test deterministic_extended_state_includes_abilities ... ok
+test carrier_launches_and_recovers_real_aircraft_without_airbase ... ok
+test lost_prerequisites_pause_queued_progress_and_refund_exactly ... ok
+test mind_control_reverts_when_controller_is_destroyed ... ok
+test mcv_deploys_and_new_yard_produces ... ok
+test aircraft_strike_returns_to_air_facility_and_rearms ... ok
+test cloning_produces_one_extra_infantry_without_recursive_clones ... ok
+test spy_infiltration_steals_refinery_credits_and_dogs_reveal_spies ... ok
+test power_loss_disables_defence_and_pauses_superweapon_charging ... ok
+test purifier_adds_income_and_radiation_spares_air_and_its_operator ... ok
+test prerequisites_refunds_ready_cancellation_and_low_power ... ok
+test timed_explosives_radiation_and_vehicle_disable_have_effects ... ok
+test transport_ifv_and_engineer_commands_execute ... ok
+test aircraft_fly_over_ground_units_and_ground_units_drive_under_them ... ok
+test a_clone_goes_to_the_rally_point_of_the_cloning_vats ... ok
+test shoreline_and_domain_navigation_are_enforced ... ok
+test collectors_deliver_and_chrono_miner_teleports ... ok
+test ore_attack_orders_repeat_deliveries_remember_field_and_stop_on_override ... ok
+test super_me_every_item_costs_one_and_finishes_in_tenth_time ... ok
+test superweapons_charge_activate_and_reset_without_resource_duplication ... ok
+test every_item_executes_queue_cost_completion_and_placement_or_spawn ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.79s
+
+     Running tests/ra3_damage.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_damage-13cc6a54580392dd)
+
+running 14 tests
+test a_suicide_unit_blows_up_with_its_own_weapon_where_it_stands ... ok
+test a_shell_with_a_spread_damages_everything_within_it_by_its_distance ... ok
+test an_effect_the_combat_file_does_not_list_keeps_the_rule_of_m9 ... ok
+test the_damage_of_an_impact_falls_linearly_to_the_percentage_at_the_edge ... ok
+test a_nuclear_strike_goes_through_its_warhead_and_the_armour_table ... ok
+test an_impact_deals_at_most_the_largest_damage_of_the_rules ... ok
+test an_impact_in_the_air_spares_the_ground_and_one_on_the_ground_the_air ... ok
+test a_building_takes_one_hit_for_every_cell_of_its_footprint_within_the_spread ... ok
+test only_a_warhead_for_walls_damages_a_wall ... ok
+test the_spread_ends_exactly_at_its_radius ... ok
+test only_a_warhead_for_wood_damages_trees ... ok
+test a_commandos_charge_and_a_radiation_zone_go_through_their_warheads ... ok
+test the_bolts_of_a_storm_go_through_their_warhead ... ok
+test a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead ... FAILED
+
+failures:
+
+---- a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead stdout ----
+
+thread 'a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead' (1950723) panicked at crates/sim/tests/ra3_damage.rs:428:5:
+assertion `left == right` failed: no shot of the sapper deals damage
+  left: Some(500)
+ right: Some(600)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead
+
+test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --test ra3_damage`

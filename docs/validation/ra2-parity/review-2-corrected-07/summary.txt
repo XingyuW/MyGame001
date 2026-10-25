@@ -1,0 +1,7 @@
+01 exit 0  2 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  2 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 0  10428 s  cargo test --workspace --release  [1843 passed, 0 failed, 0 ignored]
+05 exit 0  0 s  cargo build --release -p game
+06 exit 0  17 s  cargo run --release -p game -- --smoke-test 600
+07 exit 1  335 s  cargo run -p game -- --smoke-test 600

@@ -25,14 +25,14 @@
 //! reason.
 
 use std::fmt;
-use std::io::Read;
 use std::path::{Path, PathBuf};
 
-/// Largest accepted data file in bytes.
-pub const MAX_DATA_FILE_BYTES: u64 = 64 * 1024;
+/// Largest accepted data file in bytes. RA6 specialist metadata raises the shipped arsenal
+/// to about 145.5 KiB; the explicit 192 KiB bound retains pre-parse size rejection (R72).
+pub const MAX_DATA_FILE_BYTES: u64 = 192 * 1024;
 
 /// Longest accepted string value in bytes.
-pub const MAX_STRING_BYTES: usize = 64;
+pub const MAX_STRING_BYTES: usize = 256;
 
 /// The recursion limit given to `ron`. The deepest file the checker accepts nests six levels (five
 /// containers); the limit is a second line of defence.
@@ -140,23 +140,14 @@ impl fmt::Display for DataErrorKind {
     }
 }
 
-/// Reads a regular file without reading more than `max_bytes` + 1 bytes. Anything that is not a
-/// regular file (a directory, a device, or a named pipe, which would block the reader until a
-/// writer appears) is rejected before it is opened.
+/// Read a bounded regular opened handle; Unix FIFO opens cannot block before this check.
 pub(crate) fn read_bounded(path: &Path, max_bytes: u64) -> Result<Vec<u8>, DataErrorKind> {
-    let metadata = std::fs::metadata(path).map_err(|e| DataErrorKind::Read(e.to_string()))?;
-    if !metadata.is_file() {
-        return Err(DataErrorKind::Read("not a regular file".into()));
-    }
-    let file = std::fs::File::open(path).map_err(|e| DataErrorKind::Read(e.to_string()))?;
-    let mut bytes = Vec::new();
-    file.take(max_bytes.saturating_add(1))
-        .read_to_end(&mut bytes)
-        .map_err(|e| DataErrorKind::Read(e.to_string()))?;
-    if u64::try_from(bytes.len()).map_or(true, |len| len > max_bytes) {
-        return Err(DataErrorKind::FileTooLarge { max_bytes });
-    }
-    Ok(bytes)
+    crate::read_bounded_regular(path, max_bytes).map_err(|error| match error {
+        crate::BoundedFileError::Read(error) => DataErrorKind::Read(error.to_string()),
+        crate::BoundedFileError::TooLarge { max_bytes } => {
+            DataErrorKind::FileTooLarge { max_bytes }
+        }
+    })
 }
 
 // --- Schema ---------------------------------------------------------------------------------

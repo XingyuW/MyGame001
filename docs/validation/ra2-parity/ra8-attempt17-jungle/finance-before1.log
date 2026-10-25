@@ -1,0 +1,30 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 7.97s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 2 tests
+test ra8_optional_reinforcement_is_not_vetoed_by_observed_ore_without_workers ... independent recovery strategicfalse oretrue soldNone chargedfalse paidfalse fighter_shottrue recruit_shotfalse source_chargedfalse
+
+thread 'ra8_optional_reinforcement_is_not_vetoed_by_observed_ore_without_workers' (14322133) panicked at crates/sim/tests/ra8_ai.rs:12244:5:
+assertion `left == right` failed: independent recovery must not veto an unrelated optional reinforcement refund
+  left: None
+ right: Some(1250)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ra8_optional_reinforcement_preserves_strategic_sources_and_power ... independent recovery strategictrue orefalse soldNone chargedfalse paidfalse fighter_shottrue recruit_shotfalse source_chargedtrue
+
+thread 'ra8_optional_reinforcement_preserves_strategic_sources_and_power' (14322143) panicked at crates/sim/tests/ra8_ai.rs:12244:5:
+assertion `left == right` failed: independent recovery must not veto an unrelated optional reinforcement refund
+  left: None
+ right: Some(1250)
+FAILED
+
+failures:
+
+failures:
+    ra8_optional_reinforcement_is_not_vetoed_by_observed_ore_without_workers
+    ra8_optional_reinforcement_preserves_strategic_sources_and_power
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 131 filtered out; finished in 0.33s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

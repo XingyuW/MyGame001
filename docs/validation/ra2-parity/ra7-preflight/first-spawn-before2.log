@@ -1,0 +1,60 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+warning: unused import: `ProductionItem`
+ --> crates/sim/tests/ra7_vision.rs:8:14
+  |
+8 |     Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset, spawn_building,
+  |              ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `credits` is never used
+  --> crates/sim/tests/ra7_vision.rs:84:4
+   |
+84 | fn credits(app: &App, player: PlayerId) -> i64 {
+   |    ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `rejected` is never used
+  --> crates/sim/tests/ra7_vision.rs:92:4
+   |
+92 | fn rejected(events: &[SimEvent]) -> Vec<&SimEvent> {
+   |    ^^^^^^^^
+
+warning: function `entity` is never used
+  --> crates/sim/tests/ra7_vision.rs:99:4
+   |
+99 | fn entity(app: &mut App, id: SimId) -> Option<bevy_ecs::entity::Entity> {
+   |    ^^^^^^
+
+warning: function `owner` is never used
+   --> crates/sim/tests/ra7_vision.rs:107:4
+    |
+107 | fn owner(app: &mut App, id: SimId) -> Option<PlayerId> {
+    |    ^^^^^
+
+warning: function `hp` is never used
+   --> crates/sim/tests/ra7_vision.rs:111:4
+    |
+111 | fn hp(app: &mut App, id: SimId) -> i32 {
+    |    ^^
+
+warning: `sim` (test "ra7_vision") generated 6 warnings (run `cargo fix --test "ra7_vision" -p sim` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 0.98s
+     Running tests/ra7_vision.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_vision-43172b1ea6252b0f)
+
+running 1 test
+
+thread 'ra7_new_spy_is_concealed_before_first_combat_and_command' (2910783) panicked at crates/sim/tests/ra7_vision.rs:126:5:
+first command must not identify a new spy: [WeaponFired { attacker: SimId(0), target: SimId(1), weapon: WeaponKind(44) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra7_new_spy_is_concealed_before_first_combat_and_command ... FAILED
+
+failures:
+
+failures:
+    ra7_new_spy_is_concealed_before_first_combat_and_command
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p sim --test ra7_vision`

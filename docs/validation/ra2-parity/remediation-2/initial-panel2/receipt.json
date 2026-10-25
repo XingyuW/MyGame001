@@ -1,0 +1,87 @@
+{
+  "utc": "2026-10-22T19:43:09.267951+00:00",
+  "status": "FIVE_INITIAL_FULL_SLICES_PRESERVED_OPEN_ROUND2_REVISION_NOT_GO",
+  "candidate": "1cedaee83b9cb299869a581d13a25e2736c8c41f",
+  "source_files": 685,
+  "authority_spans": 64,
+  "unchanged_inputs_verified": true,
+  "reports": [
+    {
+      "role": "sim1",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-sim1.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-initial-sim1.md",
+      "bytes": 25876,
+      "sha256": "ca6fb2166f7835fe2dc1aefc265f0e8644c1c7cb8d1cfd0fcc069a6b0cdb5e17"
+    },
+    {
+      "role": "sim2",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-sim2.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-initial-sim2.md",
+      "bytes": 38958,
+      "sha256": "adbbe953f02257a73334d8a5857bc6b4af10085ece7737785faef076401cbecf"
+    },
+    {
+      "role": "client",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-client.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-initial-client.md",
+      "bytes": 26931,
+      "sha256": "443c25ca78a7ff802b4ba53eb2b489c216c27ce885a7406c4c34601d41ebcfe5"
+    },
+    {
+      "role": "data",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-data.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-initial-data.md",
+      "bytes": 21872,
+      "sha256": "705534565226d7237f7dbebdfbcf4b6f0c2b806c465578cdc860302ac875574f"
+    },
+    {
+      "role": "tests",
+      "source": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/round-2-tests.md",
+      "canonical": "docs/reviews/RA2-parity-review-2-initial-tests.md",
+      "bytes": 25639,
+      "sha256": "26c09fbeb688e159be3750d4300dcf2a541453b32fce7fa4efc122e9334227b9"
+    }
+  ],
+  "metadata_changes": [
+    {
+      "path": "README.md",
+      "before_sha256": "92611c831564f75b27425452b03149f34ff551610de4ba2c19be2a7cd79f4f09",
+      "after_sha256": "d1b06f29c9557c368b31ab79fce5c1be9a7bc90c66cd119b096fe7c807e8804a"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "47ef7b3ec29c2bb0b60d7dacf24dd0711aaf58fa97036675efb5e0f3c683f299",
+      "after_sha256": "605af21b6f1f2406de6bb5487f67f983fe9c688566fbe9d6019ae4443fd2b696"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "24c0f6c9621fafe0d77d901b7719674fd6ea1bec2519c27b674b4d59da1d3c98",
+      "after_sha256": "131bdeeee8269af3222bdd5b97a444302d1ef7108ab32e7d1a126232aa336ec8"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "2d35ff9e0d693512fcaa492b9b13984d917417d5900fe2f8d592e9426d5ab247",
+      "after_sha256": "fae2ad6b48885857d30649c75719df0bbd3f097bf7f8dd0b871e19bb2a628732"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "9404c44592ae2bf4c567ecc17658e4080bb0ed634fab1feee1e53b6f12b5dc5c",
+      "after_sha256": "2deb98d8fbdf6074ef463e02a6ca892192925c193bcb1da3295eb5a4b66076c0"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "before_sha256": "535683e2aa03685a5b2759f6261506ae5722d15a33d6204dc8fe5a8914ba4bb5",
+      "after_sha256": "d31dd8c6600d845f31f4f530d290bc0d1dfbf72f7d032bc76ec9cd1884bfb750"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "2bd8e708c0c8c4ac0d5595fdafc627f33032badcfdc0706cd16b128ed2ccd3a5",
+      "after_sha256": "c0ebf440ec9912e7adc61ae438c3153ece6b0bca41aa05ef6ee2204f1c16411f"
+    }
+  ],
+  "full13_started": false,
+  "binding_lead_decision": null,
+  "correction_pass_count": 2,
+  "user_preference": "Keep both projects running",
+  "next": "Fresh-agent correction with real before/after controls; new frozen inputs/full five independent updated cumulative reports/complete unchanged gates/fresh lead."
+}

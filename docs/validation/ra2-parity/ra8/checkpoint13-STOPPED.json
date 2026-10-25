@@ -1,0 +1,48 @@
+{
+  "utc": "2026-10-20T01:08:10.469542+00:00",
+  "freeze": "785cba25011e92f5de9f15b410d8ee680b183f53",
+  "runtime": "2d720e9b3cbde95dcd0b742dfe64e7e61e4f6fe8",
+  "phases1_to_3": "complete0;script1/0/1seconds",
+  "phase4": "interrupted known-failed partial command;unexpected M6 worker panic;not completed756",
+  "completed_rust_targets": 8,
+  "completed_rust_counts": [
+    248,
+    0,
+    0
+  ],
+  "partial_m6_companion_pass_lines": [
+    "test a_soviet_player_left_with_an_armed_miner_still_finishes_the_match ... ok",
+    "test the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first ... ok",
+    "test crossroads_armies_finish_after_new_terrain_changes ... ok",
+    "test ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes ... ok"
+  ],
+  "failure_lines": [
+    "thread '<unnamed>' (10643677) panicked at crates/game/tests/m6_production_matches.rs:161:21:",
+    "crossroads: russia (easy) against america (easy): None"
+  ],
+  "raw04_sha256": "843e0d9b93790d1dd40930b58b5db48362c44d1c15155ef53dc428ec0e7858b5",
+  "raw04_bytes": 26073,
+  "wrapper_monotonic_seconds": 448.007083125005,
+  "phase4_monotonic_interval_seconds": 446.26996716705617,
+  "script_exit": -15,
+  "tool_wrapper_exit": "0 is capture wrapper completion,NOT gate success",
+  "unrun_phases": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "stale_production_table": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596,
+    "bytes": 49763
+  },
+  "source_count": 495,
+  "source_mismatches": [],
+  "metadata_correction": "gate-process prior_attempt12_preservation value accidentally names historical checkpoint12-attempt11-preservation.json;actual prelaunch loop verifies attempt12/PRESERVED.json all35files across archive/current and current source snapshots. Preserve original gate-process bytes;correct binding is checkpoint13-attempt12-preservation.json."
+}

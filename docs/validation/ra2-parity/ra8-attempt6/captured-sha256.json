@@ -1,0 +1,42 @@
+{
+  "production-metrics.json": {
+    "sha256": "e5ec7895d09843068eda7fde226a1d10722674089b71187ccb4a8c1899c907fd",
+    "bytes": 767
+  },
+  "01-fmt.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "gate-process.json": {
+    "sha256": "904666cd305e81d611573e13d22b76930d555d0e347b9a845ebcfb15f1ebc161",
+    "bytes": 1180
+  },
+  "liveness.jsonl": {
+    "sha256": "8eb1fa77bec5700d0ac3b0f36503aee86dc9ba744979fea4ef4b102cc1a6456a",
+    "bytes": 1686
+  },
+  "production-lengths.tsv": {
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "bytes": 49763
+  },
+  "summary.txt": {
+    "sha256": "2057efadf0f95a60a86589fa232a9d4c2255b74d27988a5bdb878f8ffa8fafe6",
+    "bytes": 235
+  },
+  "03-clippy.log": {
+    "sha256": "3819f5a7ceecd9222e0fbd258fbc5b3461b920ebd412d521eff393866d195f71",
+    "bytes": 72
+  },
+  "02-diff-check.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "04-test.log": {
+    "sha256": "3e231c83c8aa413eee8be6d1f359e845dc57b0ad2eb4f2388aa42c91733fe1ab",
+    "bytes": 38306
+  },
+  "gate-process-output.log": {
+    "sha256": "2057efadf0f95a60a86589fa232a9d4c2255b74d27988a5bdb878f8ffa8fafe6",
+    "bytes": 235
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-18T23:21:29.755185+00:00",
+  "owned_pid": 22613,
+  "parent_pid": 22610,
+  "elapsed": "04:40",
+  "cpu_time": "4:47.50",
+  "command": "ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes --exact --nocapture --test-threads=1",
+  "kind": "bounded native ps metadata only; no sampling, source edits or competing simulation"
+}

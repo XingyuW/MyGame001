@@ -1,0 +1,9 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/game)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 31.70s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 1 test
+test selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 267 filtered out; finished in 0.42s
+

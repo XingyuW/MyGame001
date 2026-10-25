@@ -1,0 +1,182 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "passed": false,
+  "raw_only_diagnostic_count": 18,
+  "counts": {
+    "new blank line at EOF": 18
+  },
+  "source_data_test_document_errors": 0,
+  "stdout_sha256": "b5e283813107e573e1c77905fcb1e70d6a36fa43c2665d2d83ff608f8dc7030a",
+  "raw": "checkpoint10-staged-hygiene-raw.json",
+  "diagnostics": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-ai-final2.log",
+      "line": 158,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "4cc4d796f8d6ca29350e371d3d1abd1e81d9fe85cd382bf70c642563bfecb847",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "5e75ef17062d9f3c28539687b6dcc8a418cd997d",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-composition-after2.log",
+      "line": 39,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "592f177103d1df62f00cb9d2df4006c2c604b1a2fee9e81489a99bd3f866aa11",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "d198354eda2fb1d6d40ad3debf2827549a0e5064",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-default-demo10.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "98c05ed0957a996335422d1e2384dfbb12dbaa1d399555965814ba5be45d3185",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "bf41a6d8b7373a047185b1541b589607f08a43c7",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m13_ten_players.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "b7cba7372ddda772f17e6e3089c7d7e998d51fe2eaaab8a46a5743d83b7eaa8b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "deaba44f6d088e477d02f13f948e5b8b9a0a914e",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m14_duels.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "5ef54a680461677672c7ecc2b4fe6f619609119f9a7fb0531aa7d24a30986381",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "39a765efc79b40eac7e0b37209f4593bae8635e8",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-example-guard-m7_soak.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "a86b5345baf2d60e416f54193729f66208dbd42d74fa9b34102bd9c187e5e37e",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "4fba71edc91eb1a6265fe330171df24373f4ac73",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-failed-smallest-ten-player-and-neighbors.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "9a3a4d3503f11f37ac3847d5ef449ae808f01cdc6b4d8dbb51f94228780d9d2e",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "1f16d8c41349d028696d655279541fee9ea5c13c",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-attrition.log",
+      "line": 18,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "4711ca8229b658a3215c9854972440e179cb770c4249bc4fa550f755441d3255",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "9d41695dc265172154b2459b0f70c9efa965584f",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-composition.log",
+      "line": 21,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "127ac32710c96c8e52977c60d2ad66c1079683a497b58ec49738040cc4c9f46d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "cde9d3ce293a92aec73a3a33460754c744cbf9f6",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-ra4.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "97719aa6e7ba4085c837e14a434a0f2c4be1a230f8046895cd80b4a9a089c87d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "65a0a6b3bd01ec0b74edf1977707f49f44bd11cd",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-ra8-ai.log",
+      "line": 100,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "0b536e0589f0ef5e3b20c1f07c85435fc5ca59a50004ae08fee48d1587654358",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "7dae0d6ab7ed2564b91e2f41b11d98e94694050e",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-final1-focused-recovery.log",
+      "line": 27,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "743ccfa4cdc3635aca7de5cb0bcfa677dec73dc3c56ada8b765328efa2c7ce0f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "f0e988406280c491046a498776d69f7572bb73ea",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-global-patience-after2.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "b19ab670382fc2ef0aae22c917c2fe3d29a407a05651fd08f2edc07fa796685f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "f7868245c1a9b8cc41645f800bc32af04188fdd4",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-grown-half-patience-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "f89d9b56e405324930f8b8e2a6b6df0779f0cc7b69cf2e801fa079805ecc4c68",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "b566f19fbc042ae48725e4f8544db726b60d840a",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-mixed-cursor-after1.log",
+      "line": 18,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "95900b630331c8c0bdb48a23774f2455b54b24696148fbbb8d8266ab9a140f7b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "73a4fd27316bb3c9ba051add163a5d17648cc839",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-mixed-cursor-before1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "e20183711cba9c0f5a7904c430d29d6694bd553c36ecd6f290030102d2ded1eb",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "51da7bb0cadf5f8975ea3cf6ee50ac4910ade7b8",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-strategic-repair-after2.log",
+      "line": 26,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "810b78cd966973dd1cbba91ddc9de0ea649b64f21adaa47593e8b81f6ae0bd25",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "799ab49fad0953297293c4f3d2d1a5d9a2116f16",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt9-unpowered-repair-after3.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "file_sha256": "fbd15be85094b197d3f4935527c10d7de14b5f8e987adc0764cc426420a6a044",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "staged_blob": "b5c97a04cff346a9d2b4dbed065c55b733becbe6",
+      "classification": "Intentional verbatim captured native command output; preserve raw EOF bytes."
+    }
+  ],
+  "identical_final_staged_recheck_required": true
+}

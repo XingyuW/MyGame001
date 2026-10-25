@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0502]: cannot borrow `app` as mutable because it is also borrowed as immutable
+    --> crates/sim/tests/ra8_ai.rs:8448:21
+     |
+8447 |       assert!(shot, "the recovered source infantry must actually fire on the known enemy building; controller {:?}; units {:?}", app.wo...
+     |       -                                                                                                                          --- immutable borrow occurs here
+     |  _____|
+     | |
+8448 | |         let world = app.world_mut();
+     | |                     ^^^^^^^^^^^^^^^ mutable borrow occurs here
+8449 | |         world.query::<(&sim::SimId, &sim::Mobile, &sim::Weapon)>().iter(world).map(|(id, m, w)| (*id,m.clone(),w.clone())).collect::<...
+8450 | |     });
+     | |______- immutable borrow later used here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `sim` (test "ra8_ai") due to 1 previous error

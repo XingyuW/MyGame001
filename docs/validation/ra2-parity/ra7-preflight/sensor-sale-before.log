@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 0.79s
+     Running tests/ra7_vision.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra7_vision-43172b1ea6252b0f)
+
+running 1 test
+
+thread 'ra7_selling_the_only_sensor_hides_spy_from_later_same_tick_regular_commands' (3070896) panicked at crates/sim/tests/ra7_vision.rs:396:2:
+assertion `left == right` failed: Sensor sale must affect later same-batch commands: [BuildingSold { player: PlayerId(0), building: SimId(1), refund: 500 }, CrewEscaped { player: PlayerId(0), from: SimId(1), at: CellPos { x: 15, y: 14 }, units: [SimId(4)] }]
+  left: 0
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra7_selling_the_only_sensor_hides_spy_from_later_same_tick_regular_commands ... FAILED
+
+failures:
+
+failures:
+    ra7_selling_the_only_sensor_hides_spy_from_later_same_tick_regular_commands
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra7_vision`

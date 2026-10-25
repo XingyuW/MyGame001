@@ -1,0 +1,345 @@
+{
+  "status": "EXACT_FIVE_CURRENT_CONSUMER_SCOPE_NOT_NATIVE_OR_VISUAL_ACCEPTANCE",
+  "atoms": [
+    {
+      "file": "rules",
+      "section": "General",
+      "key": "AttackCursorOnDisguise",
+      "exact_value": "no",
+      "classification": "GAMEPLAY_HONEST_DETECTION_AND_CURSOR_POLICY",
+      "specific_reason": "Exact [General] AttackCursorOnDisguise=no: Actual shown/known/hidden cursor validator controls; no raw flag permission or hidden identity leak. Current implementation model: Actual detector/range/honest known-object/weapon reachability policy replaces occupant threat bonus, random difficulty disguise recognition and source cursor flag. Active scope: Three exact values; DisabledDisguiseDetectionPercent is exact3 whole tuple, not a parsed probability. Actual AI due observation/R174 readiness and client cursor privacy must survive.",
+      "consumer_bindings": "civilian_house.can_be_occupied=true;civilian_house.detect_disguise=false;civilian_house.disguise_when_still=false;civilian_house.domain=Land;civilian_house.role=Combat;mirage_tank.can_be_occupied=false;mirage_tank.detect_disguise=false;mirage_tank.disguise_when_still=true;mirage_tank.domain=Land;mirage_tank.elite_weapons=mirage_gun,mirage_gun_e;mirage_tank.role=Mirage;mirage_tank.weapons=mirage_gun;psychic_sensor.can_be_occupied=false;psychic_sensor.detect_disguise=true;psychic_sensor.disguise_when_still=false;psychic_sensor.domain=Land;psychic_sensor.role=Sensor;spy.can_be_occupied=false;spy.detect_disguise=false;spy.disguise_when_still=false;spy.domain=Land;spy.elite_weapons=makeup_kit;spy.role=Spy;spy.weapons=makeup_kit",
+      "model_guard_id": "model162:threat-score:General.AttackCursorOnDisguise",
+      "required_routes": "native/threat-score/General.AttackCursorOnDisguise",
+      "actual_source_observation": "shown_enemy_units rejects SpecialState.hidden even when a friendly-painted disguise view is rendered; preview_order obtains only that shown list/known buildings, so it does not query raw hidden actor identity. Original cursorflag not parsed.",
+      "qualified_current_evidence": [
+        "draw"
+      ],
+      "missing_actual_execution": [
+        "game::bin::selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target",
+        "ra7_vision::ra7_new_spy_is_concealed_before_first_combat_and_command",
+        "ra6_infantry::ra6_spy_disguise_default_copy_and_dog_detection"
+      ],
+      "status": "UNRUN_HARDBLOCKED_UNTIL_EXACT_FUTURE_DEPENDENCIES_EXECUTE"
+    },
+    {
+      "file": "rules",
+      "section": "General",
+      "key": "BlendedFog",
+      "exact_value": "yes",
+      "classification": "PRESENTATION_WITH_OBSERVER_PRIVACY",
+      "specific_reason": "Exact [General] BlendedFog=yes: Rendered fog/blink is distinct from real Vision/SpecialState concealment; no extra revelation or hidden-identity permission is inferred. Current implementation model: Generated fog/camera/bridge/death/disguise/spotlight look. No persistent building-burning or stochastic collapse hazard driven by these settings. Active scope: Split DamageDelay, CollapseChance, FireSupress as gameplay hazard/timing omissions; BlendedFog and InfantryBlinkDisguiseTime require observer/appearance distinction. Do not turn every row into cosmetic waiver.",
+      "consumer_bindings": "bridge_hut.domain=Land;bridge_hut.role=Combat;gi.domain=Land;gi.elite_weapons=m60_e,para_e;gi.role=Combat;gi.weapons=m60,para;global.options.fog_of_war=false;grizzly.domain=Land;grizzly.elite_weapons=gun_105mm_e;grizzly.role=Combat;grizzly.weapons=gun_105mm;spy.domain=Land;spy.elite_weapons=makeup_kit;spy.role=Spy;spy.weapons=makeup_kit",
+      "model_guard_id": "model162:fx-world:General.BlendedFog",
+      "required_routes": "native/fx-world/General.BlendedFog;client/fx-world/General.BlendedFog",
+      "actual_source_observation": "sight_of resolves actual Vision to Visible/Fog/Shroud and tint chooses fixed colors; minimap currentcellcolors/draw consume those visibility classes. No source blend switch or interpolation parameter; actual observer confidentiality must still hold under fog/Gap/power.",
+      "qualified_current_evidence": [
+        "draw"
+      ],
+      "missing_actual_execution": [
+        "game::bin::fog::tests::cells_are_tinted_by_what_the_human_player_sees",
+        "game::bin::fog::tests::enemies_are_shown_exactly_while_the_human_player_sees_them",
+        "ra7_vision::ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on"
+      ],
+      "status": "UNRUN_HARDBLOCKED_UNTIL_EXACT_FUTURE_DEPENDENCIES_EXECUTE"
+    },
+    {
+      "file": "rules",
+      "section": "General",
+      "key": "DisabledDisguiseDetectionPercent",
+      "exact_value": "15,5,2",
+      "classification": "GAMEPLAY_HONEST_DETECTION_AND_CURSOR_POLICY",
+      "specific_reason": "Exact [General] DisabledDisguiseDetectionPercent=15,5,2: Exact15,5,2 tuple is not a difficulty random-detection process; detector range and due observer knowledge remain real. Current implementation model: Actual detector/range/honest known-object/weapon reachability policy replaces occupant threat bonus, random difficulty disguise recognition and source cursor flag. Active scope: Three exact values; DisabledDisguiseDetectionPercent is exact3 whole tuple, not a parsed probability. Actual AI due observation/R174 readiness and client cursor privacy must survive.",
+      "consumer_bindings": "civilian_house.can_be_occupied=true;civilian_house.detect_disguise=false;civilian_house.disguise_when_still=false;civilian_house.domain=Land;civilian_house.role=Combat;mirage_tank.can_be_occupied=false;mirage_tank.detect_disguise=false;mirage_tank.disguise_when_still=true;mirage_tank.domain=Land;mirage_tank.elite_weapons=mirage_gun,mirage_gun_e;mirage_tank.role=Mirage;mirage_tank.weapons=mirage_gun;psychic_sensor.can_be_occupied=false;psychic_sensor.detect_disguise=true;psychic_sensor.disguise_when_still=false;psychic_sensor.domain=Land;psychic_sensor.role=Sensor;spy.can_be_occupied=false;spy.detect_disguise=false;spy.disguise_when_still=false;spy.domain=Land;spy.elite_weapons=makeup_kit;spy.role=Spy;spy.weapons=makeup_kit",
+      "model_guard_id": "model162:threat-score:General.DisabledDisguiseDetectionPercent",
+      "required_routes": "native/threat-score/General.DisabledDisguiseDetectionPercent",
+      "actual_source_observation": "refresh_with_definitions uses live detector/role/Sight/radius and owner/hostile/visibility conditions; AI observation uses its due view/current known state. No difficulty-based15,5,2 random-recognition process/field; fulltuple remains exact nonread policy, not3 probability trials.",
+      "qualified_current_evidence": [
+        "detector"
+      ],
+      "missing_actual_execution": [
+        "ra7_vision::ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power",
+        "ra7_vision::ra7_new_spy_is_concealed_before_first_combat_and_command",
+        "ra6_infantry::ra6_spy_disguise_default_copy_and_dog_detection"
+      ],
+      "status": "UNRUN_HARDBLOCKED_UNTIL_EXACT_FUTURE_DEPENDENCIES_EXECUTE"
+    },
+    {
+      "file": "rules",
+      "section": "General",
+      "key": "InfantryBlinkDisguiseTime",
+      "exact_value": "20",
+      "classification": "PRESENTATION_WITH_OBSERVER_PRIVACY",
+      "specific_reason": "Exact [General] InfantryBlinkDisguiseTime=20: Rendered fog/blink is distinct from real Vision/SpecialState concealment; no extra revelation or hidden-identity permission is inferred. Current implementation model: Generated fog/camera/bridge/death/disguise/spotlight look. No persistent building-burning or stochastic collapse hazard driven by these settings. Active scope: Split DamageDelay, CollapseChance, FireSupress as gameplay hazard/timing omissions; BlendedFog and InfantryBlinkDisguiseTime require observer/appearance distinction. Do not turn every row into cosmetic waiver.",
+      "consumer_bindings": "bridge_hut.domain=Land;bridge_hut.role=Combat;gi.domain=Land;gi.elite_weapons=m60_e,para_e;gi.role=Combat;gi.weapons=m60,para;global.options.fog_of_war=false;grizzly.domain=Land;grizzly.elite_weapons=gun_105mm_e;grizzly.role=Combat;grizzly.weapons=gun_105mm;spy.domain=Land;spy.elite_weapons=makeup_kit;spy.role=Spy;spy.weapons=makeup_kit",
+      "model_guard_id": "model162:fx-world:General.InfantryBlinkDisguiseTime",
+      "required_routes": "native/fx-world/General.InfantryBlinkDisguiseTime;client/fx-world/General.InfantryBlinkDisguiseTime",
+      "actual_source_observation": "place_unit_views obtains disguise_for to choose sprite/kind/friendlypaint; visibility still requires unit_shown and either nothidden or legitimate disguise. No20tickblink transition state. Real native concealment/copy/detection is separate from controlledUnitView consumer compatibility.",
+      "qualified_current_evidence": [
+        "draw"
+      ],
+      "missing_actual_execution": [
+        "game::bin::selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target",
+        "ra7_vision::ra7_new_spy_is_concealed_before_first_combat_and_command",
+        "ra7_vision::ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power",
+        "ra6_infantry::ra6_spy_disguise_default_copy_and_dog_detection"
+      ],
+      "status": "UNRUN_HARDBLOCKED_UNTIL_EXACT_FUTURE_DEPENDENCIES_EXECUTE"
+    },
+    {
+      "file": "rules",
+      "section": "General",
+      "key": "ThreatPerOccupant",
+      "exact_value": "10",
+      "classification": "GAMEPLAY_HONEST_DETECTION_AND_CURSOR_POLICY",
+      "specific_reason": "Exact [General] ThreatPerOccupant=10: Actual garrison/legal-target/weapon-reachability AI scoring has no per-occupant bonus10. Current implementation model: Actual detector/range/honest known-object/weapon reachability policy replaces occupant threat bonus, random difficulty disguise recognition and source cursor flag. Active scope: Three exact values; DisabledDisguiseDetectionPercent is exact3 whole tuple, not a parsed probability. Actual AI due observation/R174 readiness and client cursor privacy must survive.",
+      "consumer_bindings": "civilian_house.can_be_occupied=true;civilian_house.detect_disguise=false;civilian_house.disguise_when_still=false;civilian_house.domain=Land;civilian_house.role=Combat;mirage_tank.can_be_occupied=false;mirage_tank.detect_disguise=false;mirage_tank.disguise_when_still=true;mirage_tank.domain=Land;mirage_tank.elite_weapons=mirage_gun,mirage_gun_e;mirage_tank.role=Mirage;mirage_tank.weapons=mirage_gun;psychic_sensor.can_be_occupied=false;psychic_sensor.detect_disguise=true;psychic_sensor.disguise_when_still=false;psychic_sensor.domain=Land;psychic_sensor.role=Sensor;spy.can_be_occupied=false;spy.detect_disguise=false;spy.disguise_when_still=false;spy.domain=Land;spy.elite_weapons=makeup_kit;spy.role=Spy;spy.weapons=makeup_kit",
+      "model_guard_id": "model162:threat-score:General.ThreatPerOccupant",
+      "required_routes": "native/threat-score/General.ThreatPerOccupant",
+      "actual_source_observation": "run_ai represents each visible occupiedprop as a1cell BuildingSnap with kind/owner/hp, no occupantcount field; defence minimizes visible reachable threat distance/id, known building target selection minimizes footprintdistance/id with failures/eligibility. No bonus10 per occupant and no native count-weight matrix.",
+      "qualified_current_evidence": [
+        "targets"
+      ],
+      "missing_actual_execution": [
+        "ra8_ai::ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target"
+      ],
+      "status": "UNRUN_HARDBLOCKED_UNTIL_EXACT_FUTURE_DEPENDENCIES_EXECUTE"
+    }
+  ],
+  "actual_source_pins": [
+    {
+      "path": "crates/game/src/selection.rs",
+      "line": 645,
+      "exact_anchor": "fn shown_enemy_units(",
+      "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9"
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "line": 670,
+      "exact_anchor": "fn shown_enemy_building(",
+      "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9"
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "line": 773,
+      "exact_anchor": "pub(crate) fn preview_order(",
+      "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9"
+    },
+    {
+      "path": "crates/game/src/units.rs",
+      "line": 570,
+      "exact_anchor": "fn place_unit_views(",
+      "sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b"
+    },
+    {
+      "path": "crates/game/src/units.rs",
+      "line": 646,
+      "exact_anchor": "let disguise = world",
+      "sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b"
+    },
+    {
+      "path": "crates/game/src/units.rs",
+      "line": 702,
+      "exact_anchor": "let shown = if unit_shown(view.owner, mobile, players) && (!concealed || disguise.is_some())",
+      "sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b"
+    },
+    {
+      "path": "crates/sim/src/special/state.rs",
+      "line": 98,
+      "exact_anchor": "pub fn disguise_for(",
+      "sha256": "12ccc91ad6fb0d662da8a093c4dbee385453948424fa53bb9dbb45d3ca638f15"
+    },
+    {
+      "path": "crates/sim/src/special/reconnaissance.rs",
+      "line": 25,
+      "exact_anchor": "fn refresh_with_definitions(",
+      "sha256": "e4829306ac613d8c2b5563122eb47b07b84d3693ed5f0029c38fcec7f9e3ace2"
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "line": 1156,
+      "exact_anchor": "pub(crate) fn run_ai(",
+      "sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4"
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "line": 1233,
+      "exact_anchor": "for (id, g) in &special.garrisons {",
+      "sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4"
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "line": 3273,
+      "exact_anchor": "// Defence: the visible enemy nearest to the start position among those within the radius.",
+      "sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4"
+    },
+    {
+      "path": "crates/sim/src/ai.rs",
+      "line": 3602,
+      "exact_anchor": "fn choose_target_with_sweep(",
+      "sha256": "801abf7b8d6c5ee706b82c1bb5a1754602d6e310c6fb403338ee060be21344d4"
+    },
+    {
+      "path": "crates/game/src/fog.rs",
+      "line": 38,
+      "exact_anchor": "pub fn sight_of(",
+      "sha256": "f69f562c0e91d02784e2070cbfb68db601825cd36ebbbd995fe56db8046ca2dc"
+    },
+    {
+      "path": "crates/game/src/fog.rs",
+      "line": 49,
+      "exact_anchor": "pub fn tint(",
+      "sha256": "f69f562c0e91d02784e2070cbfb68db601825cd36ebbbd995fe56db8046ca2dc"
+    },
+    {
+      "path": "crates/game/src/minimap.rs",
+      "line": 373,
+      "exact_anchor": "pub fn cell_colours_with_looks(",
+      "sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d"
+    },
+    {
+      "path": "crates/game/src/minimap.rs",
+      "line": 639,
+      "exact_anchor": "pub(crate) fn draw_minimap(",
+      "sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d"
+    }
+  ],
+  "qualified_current_observations": {
+    "detector": {
+      "receipt": "105-qualified-ai-branch-controls.json",
+      "receipt_sha256": "7e82d686a2633eb13bf428bf502379994a7fb0e5053d07638c5d695278cb3871",
+      "log": "105-qualified-ai-branch-controls.log",
+      "log_sha256": "c60dff25d42b791b9b4815c10f4daf177ddc2103f422bce98c53ea6cbe2a6e6f",
+      "qualified_named_tests": [
+        "ra8_an_actual_loss_to_an_unseen_mirage_requests_a_detector"
+      ],
+      "scope": "Actual current AI detectorrequest after real unseenMirage loss; not randomdisguise recognition or cursor rendering.",
+      "status": "ACTUAL_PRELIMINARY_OBSERVATION_ONLY"
+    },
+    "targets": {
+      "receipt": "105-qualified-ai-branch-controls.json",
+      "receipt_sha256": "7e82d686a2633eb13bf428bf502379994a7fb0e5053d07638c5d695278cb3871",
+      "log": "105-qualified-ai-branch-controls.log",
+      "log_sha256": "c60dff25d42b791b9b4815c10f4daf177ddc2103f422bce98c53ea6cbe2a6e6f",
+      "qualified_named_tests": [
+        "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet"
+      ],
+      "scope": "Actual current reachable firingposition/target eligibility with typed/layer controls; does not compare occupant bonus10 or multiplecounts.",
+      "status": "ACTUAL_PRELIMINARY_OBSERVATION_ONLY"
+    },
+    "draw": {
+      "receipt": "60-game-native-controls.json",
+      "receipt_sha256": "81edcc45443a381fa9efe10c4881bd80ed418bd66bd15d3a3b87fff043abe0f8",
+      "log": "60-game-native-controls.log",
+      "log_sha256": "46d1ae3e188e3b5ae087e4b326bdf2a2a6e44e48758c004e34553fe1e925b9df",
+      "qualified_named_tests": [
+        "minimap::ra9_behavior87_routes::ra9_b87_gap_owner_allied_neutral_cloak_and_real_power_sales_reach_draw"
+      ],
+      "scope": "Actual generic owner/allied/neutral/Gap/cloak/power-sales\u2192hostsnapshot\u2192marker/drawstate; no original blend/blink fidelity.",
+      "status": "ACTUAL_PRELIMINARY_OBSERVATION_ONLY"
+    }
+  },
+  "minimum_future_selected_existing_cases": {
+    "game::bin::selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target": {
+      "target": "game::bin",
+      "test": "selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target",
+      "source": {
+        "path": "crates/game/src/selection.rs",
+        "line": 2082,
+        "exact_anchor": "fn ra7_visible_disguise_is_not_an_enemy_cursor_target(",
+        "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9"
+      },
+      "scope": "CONTROLLED hiddenid+UnitView, Visibility::Inherited fixture; runs real shown_enemy_units but does not instantiate/render real stockSpy.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "game::bin::fog::tests::cells_are_tinted_by_what_the_human_player_sees": {
+      "target": "game::bin",
+      "test": "fog::tests::cells_are_tinted_by_what_the_human_player_sees",
+      "source": {
+        "path": "crates/game/src/fog.rs",
+        "line": 122,
+        "exact_anchor": "fn cells_are_tinted_by_what_the_human_player_sees(",
+        "sha256": "f69f562c0e91d02784e2070cbfb68db601825cd36ebbbd995fe56db8046ca2dc"
+      },
+      "scope": "Legacy RulesNone fixture drives real CommandQueue/SimSchedule vision\u2192Sight/tint, generic current clientconsumer compatibility only; pair shippedfog native.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "game::bin::fog::tests::enemies_are_shown_exactly_while_the_human_player_sees_them": {
+      "target": "game::bin",
+      "test": "fog::tests::enemies_are_shown_exactly_while_the_human_player_sees_them",
+      "source": {
+        "path": "crates/game/src/fog.rs",
+        "line": 183,
+        "exact_anchor": "fn enemies_are_shown_exactly_while_the_human_player_sees_them(",
+        "sha256": "f69f562c0e91d02784e2070cbfb68db601825cd36ebbbd995fe56db8046ca2dc"
+      },
+      "scope": "Generic current owner/vision visibility consumer with fixture; not stockSpy appearance or renderquality.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "ra7_vision::ra7_new_spy_is_concealed_before_first_combat_and_command": {
+      "target": "ra7_vision",
+      "test": "ra7_new_spy_is_concealed_before_first_combat_and_command",
+      "source": {
+        "path": "crates/sim/tests/ra7_vision.rs",
+        "line": 7,
+        "exact_anchor": "fn ra7_new_spy_is_concealed_before_first_combat_and_command(",
+        "sha256": "94e278acc2712fa8602937a02a54ca1e1f3fd87950385179fc9afdc23f967b1f"
+      },
+      "scope": "Shipped Rules-present firstSpy concealment before real combat/publiccommand, no injectedVision.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "ra7_vision::ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power": {
+      "target": "ra7_vision",
+      "test": "ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power",
+      "source": {
+        "path": "crates/sim/tests/ra7_vision.rs",
+        "line": 208,
+        "exact_anchor": "fn ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power(",
+        "sha256": "94e278acc2712fa8602937a02a54ca1e1f3fd87950385179fc9afdc23f967b1f"
+      },
+      "scope": "Real stock sensor15/16 and power/observer eligibility; no original random15,5,2 probability.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "ra7_vision::ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on": {
+      "target": "ra7_vision",
+      "test": "ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on",
+      "source": {
+        "path": "crates/sim/tests/ra7_vision.rs",
+        "line": 39,
+        "exact_anchor": "fn ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on(",
+        "sha256": "94e278acc2712fa8602937a02a54ca1e1f3fd87950385179fc9afdc23f967b1f"
+      },
+      "scope": "Real shipped explored/currentvisible distinction and publicknown-object behavior under bothactualfogoptions.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "ra6_infantry::ra6_spy_disguise_default_copy_and_dog_detection": {
+      "target": "ra6_infantry",
+      "test": "ra6_spy_disguise_default_copy_and_dog_detection",
+      "source": {
+        "path": "crates/sim/tests/ra6_infantry.rs",
+        "line": 432,
+        "exact_anchor": "fn ra6_spy_disguise_default_copy_and_dog_detection(",
+        "sha256": "a14dfdb87e635894b0bad0fe2b3bf90cbcfd23e18fb38fc61ac7241db380de36"
+      },
+      "scope": "Real stock disguise copy/retention and dogdetector state; no original20tickblink/rate claim.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    },
+    "ra8_ai::ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target": {
+      "target": "ra8_ai",
+      "test": "ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target",
+      "source": {
+        "path": "crates/sim/tests/ra8_ai.rs",
+        "line": 1820,
+        "exact_anchor": "fn ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target(",
+        "sha256": "6f0bae19b180098e6d2cf2376a257c3ccec2c924c285a3c0d13ffc440bda42a8"
+      },
+      "scope": "Real AI/current hostileoccupiedtarget legaltype boundary; not a per-occupant weighting/count matrix.",
+      "status": "UNRUN_DEPENDENCY_NOT_SATISFIED_BY_SOURCE_PRESENCE"
+    }
+  },
+  "contract_sha256": "90ae0e2234efd08861352d0debb045555628fba0b72c2504738e14a45fad7514",
+  "acceptance_sha256_at_inspection": "ed166997ec616d827507f79413669b3269e922f76eafc28f0bcc05f86f617a44",
+  "scope_limits": "No originalpercent15,5,2/occupantbonus10/blink20/blend compliance, sourceTrue capability, weightedcountnative matrix or realSpy rendering claim from controlledview. Existing shared currentbranch tests qualify only stated premises; actual future dependencies must be observed and rehashed before these5UNRUN records are materialized. User visual/audioquality remains useronly.",
+  "write_scope": "One factual staticconsumer artifact only; no acceptance/contract/Rust/runtime change, no Cargo/native",
+  "new_directories": []
+}

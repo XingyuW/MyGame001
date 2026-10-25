@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 20.76s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+worker mission initial_shottrue saletrue paidtrue spawnedSome(SimId(13)) lost_membershiptrue redirectedtrue after_spawn_shottrue
+
+thread 'ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home' (10703651) panicked at crates/sim/tests/ra8_ai.rs:9998:5:
+a naturally serving living worker must retain its offensive mission and actual building fire after ordinary paid reinforcement arrives
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home ... FAILED
+
+failures:
+
+failures:
+    ra8_paid_reinforcements_do_not_send_an_active_empty_worker_wave_home
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

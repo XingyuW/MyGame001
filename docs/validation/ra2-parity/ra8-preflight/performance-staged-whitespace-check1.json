@@ -1,0 +1,22 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit_code": 2,
+  "check_passed": false,
+  "stdout_unfiltered": "docs/validation/ra2-parity/ra8-preflight/prop-boundaries-after1.log:219: new blank line at EOF.\n",
+  "stderr_unfiltered": "",
+  "classified_raw_evidence": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/prop-boundaries-after1.log",
+      "line": 219,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional preserved raw capture; no source/data/test exemption",
+      "raw_line": ""
+    }
+  ],
+  "unexpected": []
+}

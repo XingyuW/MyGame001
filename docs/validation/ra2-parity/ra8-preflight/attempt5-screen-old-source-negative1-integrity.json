@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1",
+    "ra8_distant_aa_clearance_fights_an_observed_interceptor_en_route",
+    "ra8_an_unreachable_ground_screen_does_not_hold_strike_aircraft_forever"
+  ],
+  "source": "crates/sim/src/ai/strategy.rs",
+  "before_sha256": "5f7a6945cd72401823bbe28c4179608deb72a2bb31a8476705ea1fbf30dce2eb",
+  "negative_source": "git show bbb09fe:crates/sim/src/ai/strategy.rs",
+  "negative_sha256": "2cc8c63d13836e13d63baee36c9ce6bfda4c5fc60272d6d1a5174475461be4f5",
+  "restored_sha256": "5f7a6945cd72401823bbe28c4179608deb72a2bb31a8476705ea1fbf30dce2eb",
+  "restored_immediately_in_finally": true,
+  "exit": 101,
+  "elapsed_seconds": 27.144475958979456,
+  "raw_log": "docs/validation/ra2-parity/ra8-preflight/attempt5-screen-old-source-negative1.log",
+  "scope": "one old-R114 source probe using corrected positive-controlled tests; existing extra snapshots are read-only/unused by old source; no subsequent check/build/commit before exact restoration"
+}

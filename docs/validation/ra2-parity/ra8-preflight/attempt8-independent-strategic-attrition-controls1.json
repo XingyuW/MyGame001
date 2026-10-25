@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-independent-strategic-attrition-controls1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Retain every R133 failed-ground-job, replacement, cargo/dock/freeze, real approach/loss, recharge and AA expiry boundary plus independent natural strategic proof.",
+  "start_utc": "2026-10-19T02:23:25.389252+00:00",
+  "elapsed_seconds": 3.200055249966681,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "log_sha256": "fc05ad17e053a6d78911f061d1bedcb22d63c2a6abe607847c7362153bddab38"
+}

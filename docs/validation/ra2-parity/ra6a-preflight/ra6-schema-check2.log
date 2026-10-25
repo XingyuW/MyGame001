@@ -1,0 +1,105 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 47.80s
+     Running tests/ra1_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra1_definitions-b7bb8656deb8636c)
+
+running 36 tests
+test a_plan_may_list_every_building_of_the_tree_of_its_side ... ok
+test a_faction_without_a_side_loads_with_its_roster_and_starting_lists ... ok
+test an_arsenal_that_names_countries_or_groups_needs_a_rules_file ... ok
+test every_field_of_the_ai_file_is_required ... ok
+test ai_plan_entries_can_be_obtained_through_the_build_order ... ok
+test ai_references_and_difficulty_values_are_checked ... ok
+test arsenal_limits_are_accepted_at_both_ends ... ok
+test every_field_of_the_skirmish_file_is_required ... ok
+test other_schema_versions_are_rejected_in_every_file ... ok
+test ai_plan_entries_are_built_by_every_country_of_the_side ... ok
+test ai_plans_are_checked_for_their_side ... ok
+test skirmish_and_ai_limits_are_accepted_at_both_ends ... ok
+test lists_longer_than_their_schema_allows_are_rejected ... ok
+test skirmish_countries_are_checked ... ok
+test skirmish_factions_without_a_side_are_checked ... ok
+test the_ai_file_needs_a_plan_for_the_side_of_every_faction ... ok
+test skirmish_values_outside_their_ranges_are_rejected ... ok
+test the_ai_fixture_loads_with_a_plan_per_side ... ok
+test rules_list_values_outside_their_ranges_are_rejected ... ok
+test rules_references_and_ids_are_checked ... ok
+test the_arsenal_fixture_loads_with_the_fields_of_schema_version_2 ... ok
+test the_army_of_a_plan_can_damage_every_building_type ... ok
+test the_rules_fixture_loads_with_every_field ... ok
+test the_skirmish_fixture_loads_with_sides_and_countries ... ok
+test the_cross_checks_of_the_rules_file_are_enforced ... ok
+test every_field_of_the_rules_file_is_required ... ok
+test unknown_and_duplicate_fields_are_rejected_in_every_file ... ok
+test skirmish_sides_are_checked ... ok
+test arsenal_references_and_ids_are_checked ... ok
+test the_base_unit_of_every_side_has_the_role_mcv ... ok
+test values_of_the_wrong_kind_are_syntax_errors_in_every_file ... ok
+test every_field_of_the_arsenal_file_is_required ... ok
+test arsenal_values_outside_their_ranges_are_rejected ... ok
+test every_scalar_rule_is_rejected_one_step_outside_its_range ... ok
+test the_limits_of_every_scalar_rule_are_accepted ... ok
+test truncations_of_the_fixtures_are_rejected_without_panic ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.84s
+
+     Running tests/ra2_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra2_definitions-d9514b93ec0293f8)
+
+running 7 tests
+test lanes_queues_refunds_and_reach_follow_the_traits_with_a_rules_file ... ok
+test the_fixture_loads_with_the_traits_of_schema_version_3 ... ok
+test without_a_rules_file_the_traits_are_not_read ... ok
+test the_limits_of_the_traits_are_accepted ... ok
+test building_only_traits_on_units_are_rejected_but_unit_build_limits_are_supported ... ok
+test traits_outside_their_ranges_are_rejected ... ok
+test every_trait_changes_the_state_hash ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/ra3_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra3_definitions-27d08f4cd8197329)
+
+running 6 tests
+test the_fixture_loads_with_the_traits_of_schema_version_4 ... ok
+test a_trait_of_a_unit_on_a_building_is_rejected ... ok
+test the_traits_load_at_the_ends_of_their_ranges ... ok
+test a_trait_on_a_unit_that_cannot_have_it_is_rejected ... ok
+test every_trait_of_a_unit_changes_the_state_hash ... ok
+test traits_of_a_unit_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/ra4_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra4_definitions-4d1cca4028220020)
+
+running 8 tests
+test the_fixture_loads_with_the_traits_of_schema_version_5 ... ok
+test the_effects_of_the_missiles_are_checked_like_every_effect ... ok
+test an_airport_bound_unit_is_an_aircraft_with_ammunition ... ok
+test abilities_must_be_known_and_listed_once ... ok
+test a_trait_of_a_unit_on_a_building_and_docks_on_a_unit_are_rejected ... ok
+test every_trait_of_schema_version_5_is_hashed ... ok
+test the_terms_of_a_spawner_must_fit_together ... ok
+test flags_outside_0_and_1_and_numbers_outside_their_ranges_are_rejected ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+
+     Running tests/ra6_definitions.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_definitions-d2e05aa04dbf1c70)
+
+running 2 tests
+
+thread 'ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded' (1598509) panicked at crates/sim/tests/ra6_definitions.rs:20:55:
+called `Result::unwrap()` on an `Err` value: Os { code: 63, kind: InvalidFilename, message: "File name too long" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded ... FAILED
+
+thread 'ra6_each_new_flag_is_required_bounded_and_hashed' (1598510) panicked at crates/sim/tests/ra6_definitions.rs:12:5:
+combat.ron: suicide: 1,
+test ra6_each_new_flag_is_required_bounded_and_hashed ... FAILED
+
+failures:
+
+failures:
+    ra6_area_fire_one_cell_minimum_is_narrow_and_new_numbers_are_bounded
+    ra6_each_new_flag_is_required_bounded_and_hashed
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.80s
+
+error: test failed, to rerun pass `-p sim --test ra6_definitions`

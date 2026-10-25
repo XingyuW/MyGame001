@@ -1,0 +1,119 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9027410419948865,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt4.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.014698916987981647,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-diff4.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 7.874290249979822,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy4.log",
+    "sha256": "46a4a474e664823f7871bda51b14514633aba403f96cc1a36faa815dbdaa1379"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/generate_ra2_data.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08526416702079587,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-generated4.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/ra2_reference.py",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.08446941699367017,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-reference4.log",
+    "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_land_defenders_use_reachable_firing_positions_and_leave_isolated_ships_to_the_fleet",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 24.638150791986845,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-shore-after4.log",
+    "sha256": "1e49dc244170657b5936c59df707d1fab4baa93247203f0cfc769299066eeb6a"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_a_specialist_repair_reservation_removes_the_overlapping_defence_attack",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.11060154199367389,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-defence-reserved-after3.log",
+    "sha256": "39c12b7fde3c9b95cff03039d3cfc5a02c3c82b401c630d6670aeadff15e3e9c"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--all-targets",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 869.8017436249938,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all4.log",
+    "sha256": "018b183a62da302456dfdd59ef6eeeb3f7f840bd66228b120e23d394a990e409"
+  }
+]

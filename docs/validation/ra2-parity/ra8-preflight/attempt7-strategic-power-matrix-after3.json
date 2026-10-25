@@ -1,0 +1,59 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8726337080006488,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-format6.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "command::ra8_intent_tests",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 17.23061245799181,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra1_commands",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 16.15951783300261,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-public-after3.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 101,
+    "seconds": 4.4600808750255965,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-clippy3.log"
+  }
+]

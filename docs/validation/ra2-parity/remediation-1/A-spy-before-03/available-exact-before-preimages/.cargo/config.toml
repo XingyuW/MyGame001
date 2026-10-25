@@ -1,0 +1,4 @@
+# Bevy resolves asset paths from BEVY_ASSET_ROOT, then CARGO_MANIFEST_DIR. Under `cargo run -p game`
+# the latter would be crates/game, but assets live at the workspace root (PLAN.md section 4).
+[env]
+BEVY_ASSET_ROOT = { value = ".", relative = true }

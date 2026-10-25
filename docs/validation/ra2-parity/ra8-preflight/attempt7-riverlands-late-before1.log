@@ -1,0 +1,970 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.29s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+test ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes ... service shot tick58399 SimId(135) Some("v3_launcher") -> SimId(34) Some("sentry_gun")
+service birth tick58400 SimId(152) Owner(PlayerId(0)) v3_rocket cellCellPos { x: 34, y: 23 }
+service tick58565 Impact { warhead: WarheadKind(38), at: SubPos { x: 13184, y: 7040 }, air: false }
+service decision tick58600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(135)], target: CellPos { x: 51, y: 24 } } }
+service shot tick59097 SimId(135) Some("v3_launcher") -> SimId(149) Some("conscript")
+service birth tick59098 SimId(153) Owner(PlayerId(0)) v3_rocket cellCellPos { x: 35, y: 23 }
+service tick59208 Impact { warhead: WarheadKind(38), at: SubPos { x: 12096, y: 6208 }, air: false }
+service tick59208 UnitDestroyed { player: PlayerId(1), unit: SimId(149) }
+service tick59208 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Red }
+service decision tick59441 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(150)], target: CellPos { x: 12, y: 25 } } }
+service shot tick59638 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59677 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59716 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59740 SimId(135) Some("v3_launcher") -> SimId(40) Some("sentry_gun")
+service birth tick59741 SimId(154) Owner(PlayerId(0)) v3_rocket cellCellPos { x: 35, y: 23 }
+service shot tick59755 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59794 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59833 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59872 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service tick59886 Impact { warhead: WarheadKind(38), at: SubPos { x: 13184, y: 6272 }, air: false }
+service tick59886 DamageStateChanged { player: PlayerId(1), id: SimId(40), state: Yellow }
+service shot tick59911 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59950 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick59989 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+snapshot tick SimTick(60000)
+queued CommandQueue { pending: [] }
+player PlayerId(0) credits 0 queues [(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(13)), progress: 354, charged: 354, fraction: 500 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(20)), progress: 308, charged: 308, fraction: 500 }, QueueItem { item: Unit(UnitKind(33)), progress: 0, charged: 0, fraction: 0 }])]
+player PlayerId(1) credits 0 queues [(QueueKey { producer: BuildingKind(0), lane: Main }, [QueueItem { item: Building(BuildingKind(6)), progress: 139, charged: 139, fraction: 0 }]), (QueueKey { producer: BuildingKind(0), lane: Defences }, [QueueItem { item: Building(BuildingKind(28)), progress: 386, charged: 386, fraction: 0 }]), (QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(12)), progress: 827, charged: 827, fraction: 0 }, QueueItem { item: Unit(UnitKind(3)), progress: 0, charged: 0, fraction: 0 }]), (QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(33)), progress: 644, charged: 644, fraction: 0 }, QueueItem { item: Unit(UnitKind(26)), progress: 0, charged: 0, fraction: 0 }])]
+AiPlayers { definitions: Some(AiDefinitions { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, plans: [SidePlan { side: Some(Allied), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(15), BuildingKind(1), BuildingKind(2), BuildingKind(15), BuildingKind(4), BuildingKind(3), BuildingKind(1), BuildingKind(15)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(19)] }, SidePlan { side: Some(Soviet), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(16), BuildingKind(6), BuildingKind(30), BuildingKind(16), BuildingKind(32), BuildingKind(31), BuildingKind(6), BuildingKind(16)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(0)] }, SidePlan { side: Some(Allied), country: Some(CountryId(0)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(34), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(1)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(31), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(2)), defences: [BuildingKind(21), BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(3)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(27), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(4)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(8), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(8)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(6)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(7)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(5)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }], difficulties: [Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 6000, wave_patience: 3600, defence_radius: 8 }, Difficulty { id: "medium", think_interval: 20, harvesters_per_refinery: 2, max_army: 24, wave_size: 12, first_wave: 3600, wave_patience: 2400, defence_radius: 10 }, Difficulty { id: "brutal", think_interval: 10, harvesters_per_refinery: 2, max_army: 36, wave_size: 16, first_wave: 2400, wave_patience: 1800, defence_radius: 12 }] }), controllers: {PlayerId(0): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 3600, defence_radius: 8 }, start: CellPos { x: 8, y: 21 }, gather: CellPos { x: 14, y: 21 }, waypoints: <omitted>
+known: {SimId(1): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 53, y: 24 }, width: 3, height: 3 }, kind: BuildingKind(29) }, SimId(40): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 51, y: 24 }, width: 1, height: 1 }, kind: BuildingKind(16) }}, repair_huts: {}, broken_bridges: {}, wave: {SimId(135)}, target: Some(Building(SimId(40))), failures: {}, next_army: 8, patience_until: 58400, next_harvest: 0, fall_back_exempt: true, liquidating: false, issued: 430, flank: false, staging: None, waves_sent: 0, stalled: (0, 59960), last_stand: false, next_wave: 59467, seen_air: false, unseen_loss: true, observed_units: {SimId(135): CellPos { x: 35, y: 23 }}, reserved: {}, naval_goal: Some(CellPos { x: 33, y: 9 }), naval_site: Some(CellPos { x: 30, y: 19 }), next_naval_scan: 60000, air_screens: {} }, PlayerId(1): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 3600, defence_radius: 8 }, start: CellPos { x: 53, y: 24 }, gather: CellPos { x: 47, y: 24 }, waypoints: <omitted>
+known: {SimId(39): KnownBuilding { owner: PlayerId(0), footprint: Footprint { origin: CellPos { x: 10, y: 25 }, width: 3, height: 3 }, kind: BuildingKind(32) }, SimId(124): KnownBuilding { owner: PlayerId(0), footprint: Footprint { origin: CellPos { x: 9, y: 18 }, width: 2, height: 2 }, kind: BuildingKind(36) }}, repair_huts: {}, broken_bridges: {}, wave: {SimId(150)}, target: Some(Building(SimId(39))), failures: {}, next_army: 4, patience_until: 63041, next_harvest: 16481, fall_back_exempt: true, liquidating: false, issued: 169, flank: false, staging: None, waves_sent: 0, stalled: (0, 59961), last_stand: false, next_wave: 64108, seen_air: true, unseen_loss: true, observed_units: {SimId(150): CellPos { x: 38, y: 24 }}, reserved: {}, naval_goal: Some(CellPos { x: 30, y: 26 }), naval_site: Some(CellPos { x: 31, y: 26 }), next_naval_scan: 60001, air_screens: {} }} }
+unit SimId(135) Owner(PlayerId(0)) v3_launcher Mobile { speed: 8, cell: CellPos { x: 35, y: 23 }, step: None } Health { hit_points: 80 } moveNone Some(Weapon { kind: WeaponKind(85), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(85), target: Some(SimId(40)), order: Some(AttackMove { destination: CellPos { x: 51, y: 23 }, moving: false }) }) None
+unit SimId(150) Owner(PlayerId(1)) conscript Mobile { speed: 11, cell: CellPos { x: 38, y: 24 }, step: None } Health { hit_points: 25 } moveNone Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 29, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(135)), order: Some(AttackMove { destination: CellPos { x: 12, y: 24 }, moving: false }) }) None
+building SimId(30) Owner(PlayerId(1)) soviet_barracks CellPos { x: 57, y: 24 } Health { hit_points: 500 }
+building SimId(31) Owner(PlayerId(0)) soviet_barracks CellPos { x: 5, y: 21 } Health { hit_points: 500 }
+building SimId(38) Owner(PlayerId(1)) soviet_war_factory CellPos { x: 55, y: 28 } Health { hit_points: 585 }
+building SimId(39) Owner(PlayerId(0)) soviet_war_factory CellPos { x: 10, y: 25 } Health { hit_points: 1000 }
+building SimId(1) Owner(PlayerId(1)) soviet_construction_yard CellPos { x: 53, y: 24 } Health { hit_points: 1000 }
+building SimId(124) Owner(PlayerId(0)) soviet_battle_lab CellPos { x: 9, y: 18 } Health { hit_points: 500 }
+building SimId(45) Owner(PlayerId(0)) radar_tower CellPos { x: 8, y: 15 } Health { hit_points: 1000 }
+building SimId(89) Owner(PlayerId(1)) soviet_battle_lab CellPos { x: 61, y: 24 } Health { hit_points: 500 }
+building SimId(40) Owner(PlayerId(1)) sentry_gun CellPos { x: 51, y: 24 } Health { hit_points: 200 }
+building SimId(36) Owner(PlayerId(1)) sentry_gun CellPos { x: 56, y: 21 } Health { hit_points: 400 }
+special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {}, outages: {}, docked: {}, ammo: {}, reloading: {}, docks: {}, bays: {SimId(135): Bay { slots: [Lost(419)], target: Some(SimId(40)), pending: 0, wait: 0 }}, spawned: {}, missiles: {}, surfaced: {} }
+economy window 0..59999 {"P0 cancelled Building(BuildingKind(20)) refund375": 1, "P0 lost attack_dog": 1, "P0 lost conscript": 27, "P0 lost desolator": 6, "P0 lost rhino": 8, "P0 lost tesla_trooper": 2, "P0 lost v3_launcher": 1, "P0 lost war_miner": 1, "P0 lost_building sentry_gun": 1, "P0 ore_credits": 10000, "P0 placed radar_tower": 1, "P0 placed sentry_gun": 4, "P0 placed soviet_barracks": 1, "P0 placed soviet_battle_lab": 1, "P0 placed soviet_construction_yard": 1, "P0 placed soviet_refinery": 1, "P0 placed soviet_service_depot": 1, "P0 placed soviet_war_factory": 1, "P0 placed tesla_coil": 1, "P0 placed tesla_reactor": 3, "P0 produced Building(BuildingKind(12))": 1, "P0 produced Building(BuildingKind(16))": 4, "P0 produced Building(BuildingKind(20))": 1, "P0 produced Building(BuildingKind(30))": 1, "P0 produced Building(BuildingKind(31))": 1, "P0 produced Building(BuildingKind(32))": 1, "P0 produced Building(BuildingKind(35))": 1, "P0 produced Building(BuildingKind(36))": 1, "P0 produced Building(BuildingKind(6))": 3, "P0 produced Unit(UnitKind(0))": 3, "P0 produced Unit(UnitKind(10))": 2, "P0 produced Unit(UnitKind(13))": 6, "P0 produced Unit(UnitKind(18))": 4, "P0 produced Unit(UnitKind(22))": 2, "P0 produced Unit(UnitKind(3))": 1, "P0 queued_attack SimId(105) flak_cannon": 32, "P0 queued_attack SimId(107) ?": 1, "P0 queued_attack SimId(111) nuclear_reactor": 141, "P0 queued_attack SimId(123) ?": 6, "P0 queued_attack SimId(14) ?": 4, "P0 queued_attack SimId(18) ?": 4, "P0 queued_attack SimId(22) ?": 4, "P0 queued_attack SimId(27) ?": 5, "P0 queued_attack SimId(32) sentry_gun": 3, "P0 queued_attack SimId(34) sentry_gun": 1, "P0 queued_attack SimId(44) radar_tower": 35, "P0 queued_attack SimId(65) tesla_reactor": 71, "P0 queued_attack SimId(83) ?": 6, "P0 queued_attack SimId(98) ?": 7, "P0 queued_attack_actors SimId(105)": 64, "P0 queued_attack_actors SimId(107)": 1, "P0 queued_attack_actors SimId(111)": 282, "P0 queued_attack_actors SimId(123)": 6, "P0 queued_attack_actors SimId(14)": 4, "P0 queued_attack_actors SimId(18)": 4, "P0 queued_attack_actors SimId(22)": 4, "P0 queued_attack_actors SimId(27)": 5, "P0 queued_attack_actors SimId(32)": 14, "P0 queued_attack_actors SimId(34)": 1, "P0 queued_attack_actors SimId(44)": 38, "P0 queued_attack_actors SimId(65)": 155, "P0 queued_attack_actors SimId(83)": 6, "P0 queued_attack_actors SimId(98)": 7, "P0 repaired_hp sentry_gun": 48, "P0 repaired_hp soviet_refinery": 32, "P0 repaired_hp soviet_war_factory": 90, "P0 sales_refund": 4600, "P1 cancelled Building(BuildingKind(12)) refund279": 1, "P1 cancelled Unit(UnitKind(14)) refund29": 1, "P1 lost conscript": 33, "P1 lost flak_track": 1, "P1 lost rhino": 10, "P1 lost terrorist": 4, "P1 lost tesla_trooper": 4, "P1 lost war_miner": 1, "P1 lost yuri": 1, "P1 lost_building nuclear_reactor": 1, "P1 lost_building radar_tower": 1, "P1 lost_building sentry_gun": 2, "P1 lost_building soviet_refinery": 1, "P1 lost_building tesla_reactor": 1, "P1 ore_credits": 17000, "P1 placed flak_cannon": 1, "P1 placed nuclear_reactor": 1, "P1 placed psychic_sensor": 1, "P1 placed radar_tower": 1, "P1 placed sentry_gun": 4, "P1 placed soviet_barracks": 1, "P1 placed soviet_battle_lab": 1, "P1 placed soviet_construction_yard": 1, "P1 placed soviet_refinery": 1, "P1 placed soviet_service_depot": 1, "P1 placed soviet_war_factory": 1, "P1 placed tesla_coil": 1, "P1 placed tesla_reactor": 4, "P1 produced Building(BuildingKind(12))": 1, "P1 produced Building(BuildingKind(16))": 4, "P1 produced Building(BuildingKind(18))": 1, "P1 produced Building(BuildingKind(20))": 1, "P1 produced Building(BuildingKind(24))": 1, "P1 produced Building(BuildingKind(30))": 1, "P1 produced Building(BuildingKind(31))": 1, "P1 produced Building(BuildingKind(32))": 1, "P1 produced Building(BuildingKind(35))": 1, "P1 produced Building(BuildingKind(36))": 1, "P1 produced Building(BuildingKind(6))": 4, "P1 produced Building(BuildingKind(8))": 1, "P1 produced Unit(UnitKind(0))": 6, "P1 produced Unit(UnitKind(10))": 4, "P1 produced Unit(UnitKind(12))": 1, "P1 produced Unit(UnitKind(14))": 4, "P1 produced Unit(UnitKind(18))": 6, "P1 produced Unit(UnitKind(20))": 1, "P1 queued_attack SimId(106) ?": 2, "P1 queued_attack SimId(107) ?": 1, "P1 queued_attack SimId(108) ?": 2, "P1 queued_attack SimId(125) ?": 2, "P1 queued_attack SimId(128) ?": 2, "P1 queued_attack SimId(129) ?": 2, "P1 queued_attack SimId(134) ?": 4, "P1 queued_attack SimId(29) ?": 2, "P1 queued_attack SimId(39) soviet_war_factory": 7, "P1 queued_attack SimId(41) sentry_gun": 2, "P1 queued_attack SimId(55) ?": 5, "P1 queued_attack SimId(57) ?": 3, "P1 queued_attack SimId(66) ?": 2, "P1 queued_attack SimId(72) ?": 2, "P1 queued_attack SimId(75) ?": 1, "P1 queued_attack SimId(96) ?": 2, "P1 queued_attack SimId(97) ?": 2, "P1 queued_attack_actors SimId(106)": 2, "P1 queued_attack_actors SimId(107)": 1, "P1 queued_attack_actors SimId(108)": 2, "P1 queued_attack_actors SimId(125)": 2, "P1 queued_attack_actors SimId(128)": 2, "P1 queued_attack_actors SimId(129)": 2, "P1 queued_attack_actors SimId(134)": 4, "P1 queued_attack_actors SimId(29)": 2, "P1 queued_attack_actors SimId(39)": 8, "P1 queued_attack_actors SimId(41)": 3, "P1 queued_attack_actors SimId(55)": 5, "P1 queued_attack_actors SimId(57)": 3, "P1 queued_attack_actors SimId(66)": 2, "P1 queued_attack_actors SimId(72)": 2, "P1 queued_attack_actors SimId(75)": 1, "P1 queued_attack_actors SimId(96)": 2, "P1 queued_attack_actors SimId(97)": 2, "P1 repaired_hp flak_cannon": 272, "P1 repaired_hp nuclear_reactor": 87, "P1 repaired_hp radar_tower": 81, "P1 repaired_hp sentry_gun": 551, "P1 repaired_hp soviet_construction_yard": 96, "P1 repaired_hp soviet_war_factory": 248, "P1 repaired_hp tesla_reactor": 202, "P1 sales_refund": 3050, "ended SimId(100)->SimId(27) TargetHidden": 1, "ended SimId(101)->SimId(83) TargetGone": 1, "ended SimId(102)->SimId(83) TargetGone": 1, "ended SimId(103)->SimId(83) TargetGone": 1, "ended SimId(104)->SimId(83) TargetGone": 1, "ended SimId(106)->SimId(65) TargetGone": 1, "ended SimId(106)->SimId(98) TargetGone": 1, "ended SimId(107)->SimId(108) TargetGone": 1, "ended SimId(107)->SimId(65) TargetGone": 1, "ended SimId(107)->SimId(98) TargetGone": 1, "ended SimId(108)->SimId(105) NoDamage": 16, "ended SimId(108)->SimId(111) NoDamage": 57, "ended SimId(108)->SimId(65) NoDamage": 11, "ended SimId(108)->SimId(65) TargetGone": 1, "ended SimId(108)->SimId(98) TargetGone": 1, "ended SimId(110)->SimId(106) TargetGone": 1, "ended SimId(112)->SimId(107) TargetHidden": 1, "ended SimId(112)->SimId(108) TargetGone": 1, "ended SimId(112)->SimId(39) NoDamage": 1, "ended SimId(115)->SimId(27) OutOfReach": 2, "ended SimId(115)->SimId(27) TargetGone": 1, "ended SimId(116)->SimId(107) TargetGone": 1, "ended SimId(125)->SimId(123) TargetGone": 1, "ended SimId(126)->SimId(123) TargetGone": 1, "ended SimId(127)->SimId(123) TargetGone": 1, "ended SimId(128)->SimId(123) TargetGone": 1, "ended SimId(129)->SimId(123) TargetGone": 1, "ended SimId(130)->SimId(123) TargetGone": 1, "ended SimId(134)->SimId(32) NoDamage": 2, "ended SimId(135)->SimId(32) TargetGone": 1, "ended SimId(135)->SimId(34) TargetGone": 1, "ended SimId(137)->SimId(125) TargetGone": 1, "ended SimId(138)->SimId(125) TargetGone": 1, "ended SimId(138)->SimId(128) TargetGone": 1, "ended SimId(140)->SimId(134) OutOfReach": 1, "ended SimId(141)->SimId(134) OutOfReach": 1, "ended SimId(144)->SimId(129) TargetGone": 1, "ended SimId(144)->SimId(134) TargetGone": 1, "ended SimId(145)->SimId(129) TargetGone": 1, "ended SimId(145)->SimId(134) TargetGone": 1, "ended SimId(42)->SimId(14) TargetGone": 1, "ended SimId(42)->SimId(18) TargetGone": 1, "ended SimId(42)->SimId(22) TargetGone": 1, "ended SimId(46)->SimId(18) TargetGone": 1, "ended SimId(46)->SimId(22) TargetGone": 1, "ended SimId(48)->SimId(14) TargetGone": 1, "ended SimId(48)->SimId(18) TargetGone": 1, "ended SimId(48)->SimId(22) TargetGone": 1, "ended SimId(49)->SimId(14) TargetGone": 1, "ended SimId(49)->SimId(18) TargetGone": 1, "ended SimId(49)->SimId(22) TargetGone": 1, "ended SimId(50)->SimId(29) TargetGone": 1, "ended SimId(50)->SimId(55) TargetGone": 1, "ended SimId(50)->SimId(57) TargetGone": 1, "ended SimId(66)->SimId(44) NoDamage": 1, "ended SimId(68)->SimId(55) TargetGone": 1, "ended SimId(70)->SimId(55) TargetGone": 1, "ended SimId(71)->SimId(55) TargetGone": 1, "ended SimId(76)->SimId(72) TargetGone": 1, "ended SimId(77)->SimId(72) TargetGone": 1, "ended SimId(78)->SimId(44) TargetGone": 1, "ended SimId(83)->SimId(41) TargetGone": 1, "ended SimId(83)->SimId(75) TargetGone": 1, "ended SimId(83)->SimId(96) TargetGone": 1, "ended SimId(83)->SimId(97) TargetGone": 1, "ended SimId(98)->SimId(41) TargetGone": 1, "ended SimId(98)->SimId(97) TargetGone": 1, "ended SimId(99)->SimId(27) TargetHidden": 1, "shots attack_dog->conscript": 1, "shots attack_dog->yuri": 1, "shots conscript->conscript": 137, "shots conscript->desolator": 17, "shots conscript->flak_cannon": 57, "shots conscript->nuclear_reactor": 230, "shots conscript->rhino": 410, "shots conscript->sentry_gun": 31, "shots conscript->soviet_refinery": 2, "shots conscript->soviet_war_factory": 2, "shots conscript->tesla_reactor": 84, "shots conscript->tesla_trooper": 4, "shots conscript->v3_launcher": 32, "shots conscript->war_miner": 14, "shots desolator->conscript": 13, "shots desolator->flak_cannon": 16, "shots desolator->flak_track": 2, "shots desolator->nuclear_reactor": 57, "shots desolator->radar_tower": 1, "shots desolator->rhino": 45, "shots desolator->sentry_gun": 2, "shots desolator->terrorist": 3, "shots desolator->tesla_reactor": 11, "shots desolator->tesla_trooper": 3, "shots flak_track->rhino": 3, "shots rhino->attack_dog": 2, "shots rhino->conscript": 114, "shots rhino->desolator": 23, "shots rhino->flak_track": 2, "shots rhino->rhino": 64, "shots rhino->sentry_gun": 10, "shots rhino->soviet_refinery": 12, "shots rhino->soviet_war_factory": 1, "shots rhino->terrorist": 2, "shots rhino->tesla_trooper": 8, "shots rhino->war_miner": 20, "shots sentry_gun->attack_dog": 2, "shots sentry_gun->conscript": 29, "shots sentry_gun->desolator": 8, "shots sentry_gun->war_miner": 15, "shots terrorist->war_miner": 1, "shots tesla_coil->tesla_trooper": 1, "shots tesla_coil->war_miner": 3, "shots tesla_trooper->conscript": 2, "shots tesla_trooper->desolator": 1, "shots tesla_trooper->radar_tower": 1, "shots tesla_trooper->rhino": 4, "shots tesla_trooper->tesla_trooper": 2, "shots v3_launcher->conscript": 6, "shots v3_launcher->radar_tower": 4, "shots v3_launcher->rhino": 4, "shots v3_launcher->sentry_gun": 5, "shots war_miner->conscript": 6, "shots war_miner->desolator": 7, "shots war_miner->rhino": 16, "shots war_miner->war_miner": 10, "shots yuri->conscript": 1, "shots yuri->rhino": 1}
+service tick60000 P0 SimId(135) v3_launcher cellCellPos { x: 35, y: 23 } moveNone weaponSome(Weapon { kind: WeaponKind(85), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(85), target: Some(SimId(40)), order: Some(AttackMove { destination: CellPos { x: 51, y: 23 }, moving: false }) }) dockNone wavetrue
+service tick60000 P1 SimId(150) conscript cellCellPos { x: 38, y: 24 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 28, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(135)), order: Some(AttackMove { destination: CellPos { x: 12, y: 24 }, moving: false }) }) dockNone wavetrue
+service shot tick60028 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service tick60028 DamageStateChanged { player: PlayerId(0), id: SimId(135), state: Yellow }
+service shot tick60067 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60106 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60145 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60184 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60223 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60262 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service tick60262 DamageStateChanged { player: PlayerId(0), id: SimId(135), state: Red }
+service shot tick60301 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60340 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60379 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service shot tick60418 SimId(135) Some("v3_launcher") -> SimId(40) Some("sentry_gun")
+service shot tick60418 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service birth tick60419 SimId(155) Owner(PlayerId(0)) v3_rocket cellCellPos { x: 35, y: 23 }
+service shot tick60457 SimId(150) Some("conscript") -> SimId(135) Some("v3_launcher")
+service tick60457 UnitDestroyed { player: PlayerId(0), unit: SimId(135) }
+service decision tick60481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service tick60564 Impact { warhead: WarheadKind(38), at: SubPos { x: 13184, y: 6272 }, air: false }
+service tick60572 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Yellow }
+service decision tick60601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60721 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60761 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60801 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service decision tick60841 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick60869 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick60881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick60892 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick60915 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick60921 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick60938 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick60961 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick60961 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick60984 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61001 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61007 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61030 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61041 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61053 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61076 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61081 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61099 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61121 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61122 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61145 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service tick61161 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Green }
+service decision tick61161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61168 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61191 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61201 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61214 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61237 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61260 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61281 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61283 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61306 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61329 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61352 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61361 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61375 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61398 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61401 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61421 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61444 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61467 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61481 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61490 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61513 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61521 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61536 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61559 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61561 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61582 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service tick61582 DamageStateChanged { player: PlayerId(0), id: SimId(39), state: Yellow }
+service decision tick61601 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61605 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61628 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61641 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(39) } }
+service shot tick61651 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service shot tick61674 SimId(150) Some("conscript") -> SimId(39) Some("soviet_war_factory")
+service decision tick61680 IssuedCommand { player: PlayerId(0), command: SellBuilding { building: SimId(39) } }
+service birth tick61681 SimId(156) Owner(PlayerId(0)) conscript cellCellPos { x: 10, y: 25 }
+service birth tick61681 SimId(157) Owner(PlayerId(0)) conscript cellCellPos { x: 10, y: 25 }
+service birth tick61681 SimId(158) Owner(PlayerId(0)) conscript cellCellPos { x: 10, y: 25 }
+service birth tick61681 SimId(159) Owner(PlayerId(0)) conscript cellCellPos { x: 11, y: 25 }
+service tick61681 BuildingSold { player: PlayerId(0), building: SimId(39), refund: 1000 }
+service tick61681 CrewEscaped { player: PlayerId(0), from: SimId(39), at: CellPos { x: 10, y: 25 }, units: [SimId(156), SimId(157), SimId(158), SimId(159)] }
+service decision tick61681 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(150)], target: CellPos { x: 10, y: 18 } } }
+service decision tick61681 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(150)], target: SimId(124) } }
+service decision tick61720 IssuedCommand { player: PlayerId(0), command: CancelProduction { item: Unit(UnitKind(20)) } }
+service decision tick61720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(156)], target: SimId(150) } }
+service decision tick61720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(157)], target: SimId(150) } }
+service decision tick61720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(150) } }
+service decision tick61720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(159)], target: SimId(150) } }
+service shot tick61746 SimId(159) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61747 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61752 SimId(157) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61756 SimId(156) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61758 SimId(158) Some("conscript") -> SimId(150) Some("conscript")
+service tick61758 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Yellow }
+service decision tick61760 IssuedCommand { player: PlayerId(0), command: CancelProduction { item: Unit(UnitKind(33)) } }
+service decision tick61760 IssuedCommand { player: PlayerId(0), command: RepairBuilding { building: SimId(124) } }
+service tick61769 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Green }
+service shot tick61770 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61785 SimId(159) Some("conscript") -> SimId(150) Some("conscript")
+service tick61785 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Yellow }
+service shot tick61791 SimId(157) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61793 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61795 SimId(156) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61797 SimId(158) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61816 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61824 SimId(159) Some("conscript") -> SimId(150) Some("conscript")
+service tick61824 DamageStateChanged { player: PlayerId(1), id: SimId(150), state: Red }
+service shot tick61830 SimId(157) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61834 SimId(156) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61836 SimId(158) Some("conscript") -> SimId(150) Some("conscript")
+service shot tick61839 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61862 SimId(150) Some("conscript") -> SimId(124) Some("soviet_battle_lab")
+service shot tick61863 SimId(159) Some("conscript") -> SimId(150) Some("conscript")
+service tick61863 UnitDestroyed { player: PlayerId(1), unit: SimId(150) }
+service decision tick61880 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(156), SimId(157), SimId(158), SimId(159)], target: CellPos { x: 53, y: 24 } } }
+service decision tick61880 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(156), SimId(157), SimId(158), SimId(159)], target: SimId(1) } }
+service decision tick61881 IssuedCommand { player: PlayerId(1), command: SellBuilding { building: SimId(36) } }
+service tick61882 BuildingSold { player: PlayerId(1), building: SimId(36), refund: 250 }
+service decision tick61920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(156), SimId(157), SimId(158), SimId(159)], target: SimId(1) } }
+service decision tick61921 IssuedCommand { player: PlayerId(1), command: SellBuilding { building: SimId(1) } }
+service birth tick61922 SimId(160) Owner(PlayerId(1)) conscript cellCellPos { x: 53, y: 24 }
+service birth tick61922 SimId(161) Owner(PlayerId(1)) conscript cellCellPos { x: 53, y: 24 }
+service birth tick61922 SimId(162) Owner(PlayerId(1)) conscript cellCellPos { x: 53, y: 24 }
+service birth tick61922 SimId(163) Owner(PlayerId(1)) conscript cellCellPos { x: 54, y: 24 }
+service birth tick61922 SimId(164) Owner(PlayerId(1)) conscript cellCellPos { x: 54, y: 24 }
+service birth tick61922 SimId(165) Owner(PlayerId(1)) conscript cellCellPos { x: 54, y: 24 }
+service tick61922 BuildingSold { player: PlayerId(1), building: SimId(1), refund: 1500 }
+service tick61922 CrewEscaped { player: PlayerId(1), from: SimId(1), at: CellPos { x: 53, y: 24 }, units: [SimId(160), SimId(161), SimId(162), SimId(163), SimId(164), SimId(165)] }
+service decision tick61960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(156), SimId(157), SimId(158), SimId(159)], target: CellPos { x: 53, y: 21 } } }
+service decision tick61961 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Building(BuildingKind(6)) } }
+service decision tick61961 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(160), SimId(161), SimId(162), SimId(163), SimId(164), SimId(165)], target: CellPos { x: 47, y: 24 } } }
+service birth tick61980 SimId(166) Owner(PlayerId(0)) desolator cellCellPos { x: 7, y: 21 }
+service tick61980 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(13)) }
+service tick61980 UnitSpawned { player: PlayerId(0), unit: SimId(166), building: SimId(31) }
+service decision tick62000 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(13)) } }
+service decision tick62001 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Building(BuildingKind(28)) } }
+service birth tick62243 SimId(167) Owner(PlayerId(1)) yuri cellCellPos { x: 56, y: 24 }
+service tick62243 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(12)) }
+service tick62243 UnitSpawned { player: PlayerId(1), unit: SimId(167), building: SimId(30) }
+service decision tick62281 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(10)) } }
+service birth tick62316 SimId(168) Owner(PlayerId(0)) attack_dog cellCellPos { x: 7, y: 21 }
+service tick62316 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(3)) }
+service tick62316 UnitSpawned { player: PlayerId(0), unit: SimId(168), building: SimId(31) }
+service decision tick62320 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(12)) } }
+service shot tick62572 SimId(167) Some("yuri") -> SimId(156) Some("conscript")
+service shot tick62573 SimId(156) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62573 SimId(157) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62573 SimId(158) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62573 SimId(159) Some("conscript") -> SimId(156) Some("conscript")
+service birth tick62579 SimId(169) Owner(PlayerId(1)) attack_dog cellCellPos { x: 56, y: 24 }
+service tick62579 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(3)) }
+service tick62579 UnitSpawned { player: PlayerId(1), unit: SimId(169), building: SimId(30) }
+service decision tick62601 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(12)) } }
+service decision tick62601 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(156)], target: CellPos { x: 47, y: 24 } } }
+service shot tick62612 SimId(156) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick62612 SimId(158) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62612 SimId(159) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62637 SimId(157) Some("conscript") -> SimId(156) Some("conscript")
+service tick62637 DamageStateChanged { player: PlayerId(1), id: SimId(156), state: Yellow }
+service shot tick62651 SimId(156) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick62651 SimId(158) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62651 SimId(159) Some("conscript") -> SimId(156) Some("conscript")
+service tick62651 DamageStateChanged { player: PlayerId(1), id: SimId(156), state: Red }
+service shot tick62676 SimId(157) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62690 SimId(156) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick62690 SimId(158) Some("conscript") -> SimId(156) Some("conscript")
+service shot tick62690 SimId(159) Some("conscript") -> SimId(156) Some("conscript")
+service tick62690 UnitDestroyed { player: PlayerId(1), unit: SimId(156) }
+service shot tick62753 SimId(158) Some("conscript") -> SimId(167) Some("yuri")
+service shot tick62770 SimId(159) Some("conscript") -> SimId(167) Some("yuri")
+service shot tick62774 SimId(163) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62792 SimId(158) Some("conscript") -> SimId(167) Some("yuri")
+service shot tick62809 SimId(159) Some("conscript") -> SimId(167) Some("yuri")
+service tick62809 DamageStateChanged { player: PlayerId(1), id: SimId(167), state: Yellow }
+service shot tick62813 SimId(163) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62816 SimId(157) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62831 SimId(158) Some("conscript") -> SimId(167) Some("yuri")
+service tick62831 DamageStateChanged { player: PlayerId(1), id: SimId(167), state: Red }
+service shot tick62848 SimId(159) Some("conscript") -> SimId(167) Some("yuri")
+service shot tick62852 SimId(163) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62855 SimId(157) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62870 SimId(158) Some("conscript") -> SimId(167) Some("yuri")
+service tick62870 UnitDestroyed { player: PlayerId(1), unit: SimId(167) }
+service shot tick62887 SimId(159) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62891 SimId(163) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62894 SimId(157) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62909 SimId(158) Some("conscript") -> SimId(163) Some("conscript")
+service tick62909 DamageStateChanged { player: PlayerId(1), id: SimId(163), state: Yellow }
+service shot tick62926 SimId(159) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62930 SimId(163) Some("conscript") -> SimId(159) Some("conscript")
+service tick62930 DamageStateChanged { player: PlayerId(0), id: SimId(159), state: Yellow }
+service shot tick62932 SimId(158) Some("conscript") -> SimId(163) Some("conscript")
+service tick62932 DamageStateChanged { player: PlayerId(1), id: SimId(163), state: Red }
+service shot tick62933 SimId(157) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62955 SimId(158) Some("conscript") -> SimId(163) Some("conscript")
+service shot tick62965 SimId(159) Some("conscript") -> SimId(163) Some("conscript")
+service tick62965 UnitDestroyed { player: PlayerId(1), unit: SimId(163) }
+service shot tick62969 SimId(165) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62970 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick62972 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick62973 SimId(160) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick62978 SimId(158) Some("conscript") -> SimId(169) Some("attack_dog")
+service tick63000 P0 SimId(159) conscript cellCellPos { x: 45, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 4, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(165)), order: Some(AttackMove { destination: CellPos { x: 53, y: 21 }, moving: false }) }) dockNone wavetrue
+service tick63000 P0 SimId(166) desolator cellCellPos { x: 14, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 0, burst_left: 0, volley: WeaponKind(18), target: None, order: None }) dockNone wavefalse
+service tick63000 P0 SimId(157) conscript cellCellPos { x: 46, y: 20 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 11, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(164)), order: Some(AttackMove { destination: CellPos { x: 53, y: 20 }, moving: false }) }) dockNone wavetrue
+service tick63000 P0 SimId(158) conscript cellCellPos { x: 43, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(15), secondary: None, cooldown: 1, burst_left: 0, volley: WeaponKind(15), target: Some(SimId(169)), order: Some(AttackMove { destination: CellPos { x: 53, y: 21 }, moving: false }) }) dockNone wavetrue
+service tick63000 P1 SimId(160) conscript cellCellPos { x: 47, y: 24 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 12, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(159)), order: None }) dockNone wavefalse
+service tick63000 P1 SimId(161) conscript cellCellPos { x: 47, y: 24 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: None, order: None }) dockNone wavefalse
+service tick63000 P1 SimId(162) conscript cellCellPos { x: 47, y: 24 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: None, order: None }) dockNone wavefalse
+service tick63000 P1 SimId(165) conscript cellCellPos { x: 47, y: 23 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 8, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(159)), order: None }) dockNone wavefalse
+service tick63000 P1 SimId(164) conscript cellCellPos { x: 47, y: 23 } moveNone weaponSome(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 9, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(157)), order: None }) dockNone wavefalse
+service tick63000 P0 SimId(168) attack_dog cellCellPos { x: 14, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(6), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(6), target: None, order: None }) dockNone wavefalse
+service tick63000 P1 SimId(169) attack_dog cellCellPos { x: 46, y: 24 } moveNone weaponSome(Weapon { kind: WeaponKind(6), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(6), target: None, order: None }) dockNone wavefalse
+service shot tick63001 SimId(158) Some("conscript") -> SimId(169) Some("attack_dog")
+service shot tick63004 SimId(159) Some("conscript") -> SimId(165) Some("conscript")
+service shot tick63008 SimId(165) Some("conscript") -> SimId(159) Some("conscript")
+service tick63008 DamageStateChanged { player: PlayerId(0), id: SimId(159), state: Red }
+service shot tick63009 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63011 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63012 SimId(160) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick63024 SimId(158) Some("conscript") -> SimId(169) Some("attack_dog")
+service tick63024 DamageStateChanged { player: PlayerId(1), id: SimId(169), state: Yellow }
+service shot tick63027 SimId(159) Some("conscript") -> SimId(165) Some("conscript")
+service shot tick63047 SimId(158) Some("conscript") -> SimId(169) Some("attack_dog")
+service shot tick63047 SimId(165) Some("conscript") -> SimId(159) Some("conscript")
+service tick63047 DamageStateChanged { player: PlayerId(1), id: SimId(169), state: Red }
+service shot tick63048 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63050 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63050 SimId(159) Some("conscript") -> SimId(165) Some("conscript")
+service shot tick63051 SimId(160) Some("conscript") -> SimId(159) Some("conscript")
+service shot tick63070 SimId(158) Some("conscript") -> SimId(169) Some("attack_dog")
+service tick63070 UnitDestroyed { player: PlayerId(1), unit: SimId(169) }
+service shot tick63073 SimId(159) Some("conscript") -> SimId(165) Some("conscript")
+service decision tick63081 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(3)) } }
+service shot tick63086 SimId(165) Some("conscript") -> SimId(159) Some("conscript")
+service tick63086 UnitDestroyed { player: PlayerId(0), unit: SimId(159) }
+service shot tick63087 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63089 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63093 SimId(158) Some("conscript") -> SimId(165) Some("conscript")
+service tick63093 DamageStateChanged { player: PlayerId(1), id: SimId(165), state: Yellow }
+service shot tick63116 SimId(158) Some("conscript") -> SimId(165) Some("conscript")
+service shot tick63125 SimId(165) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63126 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service tick63126 DamageStateChanged { player: PlayerId(0), id: SimId(157), state: Yellow }
+service shot tick63128 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63139 SimId(158) Some("conscript") -> SimId(165) Some("conscript")
+service tick63139 DamageStateChanged { player: PlayerId(1), id: SimId(165), state: Red }
+service shot tick63162 SimId(158) Some("conscript") -> SimId(165) Some("conscript")
+service shot tick63164 SimId(165) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63165 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service tick63165 DamageStateChanged { player: PlayerId(0), id: SimId(157), state: Red }
+service shot tick63167 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service tick63167 DamageStateChanged { player: PlayerId(1), id: SimId(164), state: Yellow }
+service shot tick63185 SimId(158) Some("conscript") -> SimId(165) Some("conscript")
+service tick63185 UnitDestroyed { player: PlayerId(1), unit: SimId(165) }
+service shot tick63204 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63206 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63208 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service shot tick63231 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service shot tick63243 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service shot tick63245 SimId(157) Some("conscript") -> SimId(164) Some("conscript")
+service tick63245 DamageStateChanged { player: PlayerId(1), id: SimId(164), state: Red }
+service shot tick63254 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service shot tick63277 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service tick63277 DamageStateChanged { player: PlayerId(1), id: SimId(160), state: Yellow }
+service shot tick63282 SimId(164) Some("conscript") -> SimId(157) Some("conscript")
+service tick63282 UnitDestroyed { player: PlayerId(0), unit: SimId(157) }
+service shot tick63300 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service shot tick63323 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service tick63323 DamageStateChanged { player: PlayerId(1), id: SimId(160), state: Red }
+service birth tick63324 SimId(170) Owner(PlayerId(0)) desolator cellCellPos { x: 7, y: 21 }
+service tick63324 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(13)) }
+service tick63324 UnitSpawned { player: PlayerId(0), unit: SimId(170), building: SimId(31) }
+service shot tick63346 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service decision tick63360 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(0)) } }
+service shot tick63369 SimId(158) Some("conscript") -> SimId(160) Some("conscript")
+service tick63369 UnitDestroyed { player: PlayerId(1), unit: SimId(160) }
+service shot tick63392 SimId(158) Some("conscript") -> SimId(164) Some("conscript")
+service shot tick63415 SimId(158) Some("conscript") -> SimId(164) Some("conscript")
+service tick63415 UnitDestroyed { player: PlayerId(1), unit: SimId(164) }
+service birth tick63419 SimId(171) Owner(PlayerId(1)) tesla_trooper cellCellPos { x: 56, y: 24 }
+service tick63419 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(10)) }
+service tick63419 UnitSpawned { player: PlayerId(1), unit: SimId(171), building: SimId(30) }
+service shot tick63438 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service shot tick63461 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service shot tick63484 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service shot tick63507 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service tick63507 DamageStateChanged { player: PlayerId(1), id: SimId(162), state: Yellow }
+service shot tick63530 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service shot tick63553 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service tick63553 DamageStateChanged { player: PlayerId(1), id: SimId(162), state: Red }
+service shot tick63576 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service shot tick63599 SimId(158) Some("conscript") -> SimId(162) Some("conscript")
+service tick63599 UnitDestroyed { player: PlayerId(1), unit: SimId(162) }
+service shot tick63622 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service shot tick63645 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service shot tick63668 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service shot tick63691 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service tick63691 DamageStateChanged { player: PlayerId(1), id: SimId(161), state: Yellow }
+service shot tick63714 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service shot tick63737 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service tick63737 DamageStateChanged { player: PlayerId(1), id: SimId(161), state: Red }
+service shot tick63760 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service shot tick63783 SimId(158) Some("conscript") -> SimId(161) Some("conscript")
+service tick63783 UnitDestroyed { player: PlayerId(1), unit: SimId(161) }
+service shot tick63806 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63829 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63852 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63875 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63898 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service tick63898 DamageStateChanged { player: PlayerId(1), id: SimId(171), state: Yellow }
+service shot tick63921 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63944 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service tick63944 DamageStateChanged { player: PlayerId(1), id: SimId(171), state: Red }
+service shot tick63967 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service shot tick63990 SimId(158) Some("conscript") -> SimId(171) Some("tesla_trooper")
+service tick63990 UnitDestroyed { player: PlayerId(1), unit: SimId(171) }
+service decision tick64080 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 57, y: 21 } } }
+service decision tick64160 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 57, y: 17 } } }
+service shot tick64170 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64193 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64200 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 57, y: 24 } } }
+service decision tick64200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64216 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64239 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64240 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64262 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64280 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64285 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64308 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64320 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64331 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64354 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64360 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64377 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64400 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64400 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64423 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64440 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64446 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64469 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64480 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64492 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64515 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64520 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64538 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64560 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64561 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64584 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64600 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64607 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64630 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64640 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64653 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64676 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service tick64676 DamageStateChanged { player: PlayerId(1), id: SimId(30), state: Yellow }
+service decision tick64680 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64699 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64722 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64745 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64760 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64768 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64791 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64800 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64814 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64837 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64840 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64860 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64880 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64883 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64906 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick64920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64929 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64952 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service tick64952 DamageStateChanged { player: PlayerId(1), id: SimId(30), state: Red }
+service decision tick64960 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick64975 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick64998 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65000 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick65021 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65040 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick65044 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick65067 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65080 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick65090 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick65113 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65120 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick65136 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service shot tick65159 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65160 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service shot tick65182 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service decision tick65200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(30) } }
+service birth tick65205 SimId(172) Owner(PlayerId(1)) conscript cellCellPos { x: 57, y: 24 }
+service shot tick65205 SimId(158) Some("conscript") -> SimId(30) Some("soviet_barracks")
+service tick65205 CrewEscaped { player: PlayerId(1), from: SimId(30), at: CellPos { x: 57, y: 24 }, units: [SimId(172)] }
+service shot tick65228 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service decision tick65240 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 57, y: 25 } } }
+service decision tick65241 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Unit(UnitKind(12)) } }
+service decision tick65241 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(172)], target: SimId(158) } }
+service shot tick65246 SimId(172) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick65251 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service shot tick65274 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service decision tick65280 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 61, y: 21 } } }
+service decision tick65281 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Unit(UnitKind(3)) } }
+service shot tick65285 SimId(172) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick65297 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service tick65297 DamageStateChanged { player: PlayerId(1), id: SimId(172), state: Yellow }
+service shot tick65320 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service decision tick65320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 61, y: 17 } } }
+service shot tick65324 SimId(172) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick65343 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service tick65343 DamageStateChanged { player: PlayerId(1), id: SimId(172), state: Red }
+service decision tick65360 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 61, y: 25 } } }
+service shot tick65363 SimId(172) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick65366 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service shot tick65389 SimId(158) Some("conscript") -> SimId(172) Some("conscript")
+service tick65389 UnitDestroyed { player: PlayerId(1), unit: SimId(172) }
+service decision tick65400 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 61, y: 24 } } }
+service decision tick65400 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65412 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65435 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65440 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service decision tick65441 IssuedCommand { player: PlayerId(1), command: RepairBuilding { building: SimId(89) } }
+service shot tick65458 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65480 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65481 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65504 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65520 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65527 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65550 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65560 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65573 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65596 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65600 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65619 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65640 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65642 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65665 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65680 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65688 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65711 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65734 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65757 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65760 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65780 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65800 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65803 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65826 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65840 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65849 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65872 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65880 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65895 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65918 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick65920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65941 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service tick65941 DamageStateChanged { player: PlayerId(1), id: SimId(89), state: Yellow }
+service decision tick65960 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick65964 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick65987 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service tick66000 P0 SimId(170) desolator cellCellPos { x: 14, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 0, burst_left: 0, volley: WeaponKind(18), target: None, order: None }) dockNone wavefalse
+service tick66000 P0 SimId(166) desolator cellCellPos { x: 14, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 0, burst_left: 0, volley: WeaponKind(18), target: None, order: None }) dockNone wavefalse
+service tick66000 P0 SimId(158) conscript cellCellPos { x: 58, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(15), secondary: None, cooldown: 10, burst_left: 0, volley: WeaponKind(15), target: Some(SimId(89)), order: Some(Attack { target: SimId(89), chases: 0 }) }) dockNone wavetrue
+service tick66000 P0 SimId(168) attack_dog cellCellPos { x: 14, y: 21 } moveNone weaponSome(Weapon { kind: WeaponKind(6), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(6), target: None, order: None }) dockNone wavefalse
+service decision tick66000 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66010 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick66033 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66040 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66056 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick66079 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66080 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66102 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service tick66102 DamageStateChanged { player: PlayerId(1), id: SimId(89), state: Red }
+service decision tick66120 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66125 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick66148 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66160 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66171 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick66194 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66217 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service shot tick66240 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66240 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service shot tick66263 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service decision tick66280 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(158)], target: SimId(89) } }
+service birth tick66286 SimId(173) Owner(PlayerId(1)) conscript cellCellPos { x: 61, y: 24 }
+service birth tick66286 SimId(174) Owner(PlayerId(1)) conscript cellCellPos { x: 61, y: 24 }
+service birth tick66286 SimId(175) Owner(PlayerId(1)) conscript cellCellPos { x: 61, y: 24 }
+service birth tick66286 SimId(176) Owner(PlayerId(1)) conscript cellCellPos { x: 62, y: 24 }
+service shot tick66286 SimId(158) Some("conscript") -> SimId(89) Some("soviet_battle_lab")
+service tick66286 CrewEscaped { player: PlayerId(1), from: SimId(89), at: CellPos { x: 61, y: 24 }, units: [SimId(173), SimId(174), SimId(175), SimId(176)] }
+service shot tick66287 SimId(173) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66309 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service decision tick66320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(158)], target: CellPos { x: 57, y: 29 } } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Unit(UnitKind(33)) } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(173)], target: SimId(158) } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(174)], target: SimId(158) } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(175)], target: SimId(158) } }
+service decision tick66321 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(176)], target: SimId(158) } }
+service shot tick66325 SimId(175) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66326 SimId(173) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66327 SimId(174) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66330 SimId(176) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66332 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service shot tick66355 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service decision tick66361 IssuedCommand { player: PlayerId(1), command: CancelProduction { item: Unit(UnitKind(26)) } }
+service decision tick66361 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(18)) } }
+service shot tick66364 SimId(175) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66365 SimId(173) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66366 SimId(174) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66369 SimId(176) Some("conscript") -> SimId(158) Some("conscript")
+service tick66369 DamageStateChanged { player: PlayerId(0), id: SimId(158), state: Yellow }
+service shot tick66378 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service tick66378 DamageStateChanged { player: PlayerId(1), id: SimId(173), state: Yellow }
+service shot tick66401 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service decision tick66401 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(18)) } }
+service shot tick66403 SimId(175) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66404 SimId(173) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66405 SimId(174) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66408 SimId(176) Some("conscript") -> SimId(158) Some("conscript")
+service tick66408 DamageStateChanged { player: PlayerId(0), id: SimId(158), state: Red }
+service shot tick66424 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service tick66424 DamageStateChanged { player: PlayerId(1), id: SimId(173), state: Red }
+service shot tick66442 SimId(175) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66443 SimId(173) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66444 SimId(174) Some("conscript") -> SimId(158) Some("conscript")
+service shot tick66447 SimId(158) Some("conscript") -> SimId(173) Some("conscript")
+service shot tick66447 SimId(176) Some("conscript") -> SimId(158) Some("conscript")
+service tick66447 UnitDestroyed { player: PlayerId(0), unit: SimId(158) }
+service decision tick66481 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(173), SimId(174), SimId(175), SimId(176)], target: CellPos { x: 47, y: 24 } } }
+service decision tick66481 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(173), SimId(174), SimId(175), SimId(176)], target: CellPos { x: 10, y: 18 } } }
+service decision tick66560 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 57, y: 29 } } }
+service decision tick67000 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 55, y: 28 } } }
+service shot tick67030 SimId(166) Some("desolator") -> SimId(175) Some("conscript")
+service tick67030 UnitDestroyed { player: PlayerId(1), unit: SimId(175) }
+service shot tick67038 SimId(170) Some("desolator") -> SimId(173) Some("conscript")
+service tick67038 UnitDestroyed { player: PlayerId(1), unit: SimId(173) }
+service shot tick67090 SimId(174) Some("conscript") -> SimId(166) Some("desolator")
+service shot tick67110 SimId(166) Some("desolator") -> SimId(174) Some("conscript")
+service tick67110 UnitDestroyed { player: PlayerId(1), unit: SimId(174) }
+service shot tick67118 SimId(170) Some("desolator") -> SimId(176) Some("conscript")
+service tick67118 UnitDestroyed { player: PlayerId(1), unit: SimId(176) }
+service decision tick67120 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67121 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67160 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67169 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67217 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67240 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67265 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67280 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67313 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67320 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick67360 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67361 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67400 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67409 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67440 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67457 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67480 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67501 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67505 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick67507 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67520 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 55, y: 28 } } }
+service decision tick67520 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67553 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67560 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67581 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67587 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(170)], target: CellPos { x: 55, y: 28 } } }
+service decision tick67600 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67601 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67640 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67649 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick67661 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67667 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67680 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 55, y: 28 } } }
+service decision tick67680 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67697 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67741 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67745 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick67747 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67760 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 57, y: 13 } } }
+service decision tick67760 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67793 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick67800 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 57, y: 13 } } }
+service decision tick67800 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67821 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67827 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67840 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(170)], target: CellPos { x: 57, y: 13 } } }
+service decision tick67840 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(166), SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick67841 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service birth tick67873 SimId(177) Owner(PlayerId(1)) rhino cellCellPos { x: 54, y: 27 }
+service tick67873 ProductionComplete { player: PlayerId(1), item: Unit(UnitKind(18)) }
+service tick67873 UnitSpawned { player: PlayerId(1), unit: SimId(177), building: SimId(38) }
+service decision tick67880 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 57, y: 13 } } }
+service decision tick67881 IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(20)) } }
+service decision tick67881 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(177)], target: SimId(168) } }
+service shot tick67882 SimId(177) Some("rhino") -> SimId(168) Some("attack_dog")
+service shot tick67901 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick67907 SimId(166) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick67920 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(170)], target: CellPos { x: 57, y: 13 } } }
+service decision tick67960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 53, y: 37 } } }
+service shot tick67981 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick67986 SimId(177) Some("rhino") -> SimId(168) Some("attack_dog")
+service shot tick67987 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68061 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68067 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick68080 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 49, y: 37 } } }
+service shot tick68090 SimId(177) Some("rhino") -> SimId(168) Some("attack_dog")
+service tick68108 DamageStateChanged { player: PlayerId(0), id: SimId(168), state: Yellow }
+service decision tick68120 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 41, y: 37 } } }
+service shot tick68141 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68147 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick68160 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 41, y: 41 } } }
+service decision tick68161 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(177)], target: SimId(166) } }
+service shot tick68194 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service decision tick68200 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 37, y: 37 } } }
+service decision tick68240 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 34, y: 36 } } }
+service decision tick68280 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 37, y: 45 } } }
+service decision tick68320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 53, y: 45 } } }
+service decision tick68440 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 57, y: 41 } } }
+service decision tick68441 IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(177)], target: SimId(166) } }
+service decision tick68520 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 61, y: 37 } } }
+service shot tick68560 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68565 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick68570 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick68600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 61, y: 45 } } }
+service decision tick68640 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 29, y: 45 } } }
+service shot tick68680 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68687 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68713 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick68760 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68767 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68817 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick68840 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68847 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick68920 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick68920 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 25, y: 41 } } }
+service shot tick68921 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick68927 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick68960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 21, y: 41 } } }
+service shot tick69000 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service tick69000 DamageStateChanged { player: PlayerId(1), id: SimId(177), state: Yellow }
+service tick69000 P0 SimId(170) desolator cellCellPos { x: 51, y: 41 } moveNone weaponSome(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 7, burst_left: 0, volley: WeaponKind(18), target: Some(SimId(177)), order: Some(AttackMove { destination: CellPos { x: 21, y: 41 }, moving: false }) }) dockNone wavetrue
+service tick69000 P0 SimId(166) desolator cellCellPos { x: 50, y: 41 } moveNone weaponSome(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 80, burst_left: 0, volley: WeaponKind(18), target: Some(SimId(177)), order: Some(AttackMove { destination: CellPos { x: 21, y: 41 }, moving: false }) }) dockNone wavetrue
+service tick69000 P1 SimId(177) rhino cellCellPos { x: 51, y: 37 } moveNone weaponSome(Weapon { kind: WeaponKind(63), secondary: None, cooldown: 25, burst_left: 0, volley: WeaponKind(63), target: Some(SimId(166)), order: Some(Attack { target: SimId(166), chases: 0 }) }) dockNone wavefalse
+service tick69000 P0 SimId(168) attack_dog cellCellPos { x: 29, y: 41 } moveSome((CellPos { x: 21, y: 41 }, 70, Following)) weaponSome(Weapon { kind: WeaponKind(6), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(6), target: None, order: Some(AttackMove { destination: CellPos { x: 21, y: 41 }, moving: true }) }) dockNone wavetrue
+service decision tick69000 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 17, y: 41 } } }
+service shot tick69007 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69025 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service tick69040 DamageStateChanged { player: PlayerId(0), id: SimId(166), state: Yellow }
+service decision tick69040 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 17, y: 45 } } }
+service shot tick69080 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick69080 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 13, y: 41 } } }
+service shot tick69087 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick69120 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 9, y: 41 } } }
+service shot tick69129 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick69160 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick69160 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(166), SimId(168), SimId(170)], target: CellPos { x: 34, y: 12 } } }
+service shot tick69167 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69233 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick69240 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69247 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service tick69250 DamageStateChanged { player: PlayerId(0), id: SimId(166), state: Red }
+service shot tick69320 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service tick69320 DamageStateChanged { player: PlayerId(1), id: SimId(177), state: Red }
+service shot tick69327 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69337 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service shot tick69400 SimId(166) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69407 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69441 SimId(177) Some("rhino") -> SimId(166) Some("desolator")
+service tick69458 UnitDestroyed { player: PlayerId(0), unit: SimId(166) }
+service decision tick69481 IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(177)], target: CellPos { x: 47, y: 24 } } }
+service shot tick69487 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick69520 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 40, y: 12 } } }
+service shot tick69545 SimId(177) Some("rhino") -> SimId(170) Some("desolator")
+service decision tick69560 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 45, y: 9 } } }
+service shot tick69567 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service decision tick69600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 55, y: 11 } } }
+service decision tick69632 IssuedCommand { player: PlayerId(0), command: SellBuilding { building: SimId(124) } }
+service birth tick69633 SimId(178) Owner(PlayerId(0)) conscript cellCellPos { x: 9, y: 18 }
+service birth tick69633 SimId(179) Owner(PlayerId(0)) conscript cellCellPos { x: 9, y: 18 }
+service birth tick69633 SimId(180) Owner(PlayerId(0)) conscript cellCellPos { x: 9, y: 18 }
+service birth tick69633 SimId(181) Owner(PlayerId(0)) conscript cellCellPos { x: 10, y: 18 }
+service tick69633 BuildingSold { player: PlayerId(0), building: SimId(124), refund: 1000 }
+service tick69633 CrewEscaped { player: PlayerId(0), from: SimId(124), at: CellPos { x: 9, y: 18 }, units: [SimId(178), SimId(179), SimId(180), SimId(181)] }
+service decision tick69640 IssuedCommand { player: PlayerId(0), command: CancelProduction { item: Unit(UnitKind(12)) } }
+service decision tick69640 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(178), SimId(179), SimId(180)], target: CellPos { x: 14, y: 21 } } }
+service shot tick69647 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69649 SimId(177) Some("rhino") -> SimId(170) Some("desolator")
+service decision tick69680 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(13)) } }
+service decision tick69720 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 57, y: 9 } } }
+service shot tick69727 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service shot tick69753 SimId(177) Some("rhino") -> SimId(170) Some("desolator")
+service decision tick69760 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 61, y: 9 } } }
+service shot tick69807 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service birth tick69808 SimId(182) Owner(PlayerId(0)) conscript cellCellPos { x: 7, y: 21 }
+service tick69808 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(0)) }
+service tick69808 UnitSpawned { player: PlayerId(0), unit: SimId(182), building: SimId(31) }
+service decision tick69840 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(13)) } }
+service decision tick69840 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 57, y: 5 } } }
+service shot tick69857 SimId(177) Some("rhino") -> SimId(170) Some("desolator")
+service decision tick69880 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 53, y: 1 } } }
+service shot tick69887 SimId(170) Some("desolator") -> SimId(177) Some("rhino")
+service tick69887 UnitDestroyed { player: PlayerId(1), unit: SimId(177) }
+service decision tick69920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick69960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 49, y: 1 } } }
+service decision tick69960 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick69967 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70000 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(170)], target: CellPos { x: 49, y: 1 } } }
+service decision tick70000 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70040 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70047 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70080 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(170)], target: CellPos { x: 49, y: 1 } } }
+service decision tick70080 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70120 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70127 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70158 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70160 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 45, y: 1 } } }
+service decision tick70160 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70206 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick70207 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70240 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 33, y: 5 } } }
+service decision tick70240 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70254 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70280 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 33, y: 5 } } }
+service decision tick70280 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70287 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70302 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 37, y: 1 } } }
+service decision tick70320 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70350 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70360 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 37, y: 1 } } }
+service decision tick70360 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70367 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70398 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70400 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 29, y: 9 } } }
+service decision tick70400 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70440 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70446 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick70447 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70480 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 29, y: 5 } } }
+service decision tick70480 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70494 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70520 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 29, y: 5 } } }
+service decision tick70520 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70527 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70542 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70560 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 34, y: 0 } } }
+service decision tick70560 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70590 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 34, y: 0 } } }
+service decision tick70600 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70607 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70638 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70640 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 29, y: 1 } } }
+service decision tick70640 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70680 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70686 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick70687 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70720 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 25, y: 9 } } }
+service decision tick70720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70734 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70760 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 25, y: 9 } } }
+service decision tick70760 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70767 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70782 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70800 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 25, y: 5 } } }
+service decision tick70800 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service birth tick70816 SimId(183) Owner(PlayerId(0)) desolator cellCellPos { x: 7, y: 21 }
+service tick70816 ProductionComplete { player: PlayerId(0), item: Unit(UnitKind(13)) }
+service tick70816 UnitSpawned { player: PlayerId(0), unit: SimId(183), building: SimId(31) }
+service shot tick70830 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70840 IssuedCommand { player: PlayerId(0), command: QueueProduction { item: Unit(UnitKind(10)) } }
+service decision tick70840 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 25, y: 5 } } }
+service decision tick70840 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70847 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick70878 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick70880 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 25, y: 1 } } }
+service decision tick70880 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick70920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70926 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick70927 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick70960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 21, y: 9 } } }
+service decision tick70960 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick70974 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71000 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 21, y: 9 } } }
+service decision tick71000 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick71007 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71022 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71040 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 21, y: 5 } } }
+service decision tick71040 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick71070 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71080 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 21, y: 5 } } }
+service decision tick71080 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick71087 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71118 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71120 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 21, y: 1 } } }
+service decision tick71120 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service decision tick71160 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick71166 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick71167 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick71200 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71200 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170)], target: SimId(38) } }
+service shot tick71214 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71240 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71240 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71247 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71262 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71280 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71280 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71310 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71320 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71320 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71327 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71358 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71360 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71360 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service decision tick71400 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71406 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick71407 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick71440 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71440 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71454 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71480 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71480 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71487 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71502 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71520 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71520 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71550 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71560 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71560 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71567 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71598 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71600 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71600 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service decision tick71640 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71646 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick71647 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick71680 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71680 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71694 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71720 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71720 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71727 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71742 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71760 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71760 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71790 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71800 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71800 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71807 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71838 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71840 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71840 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service decision tick71880 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71886 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service shot tick71887 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service decision tick71920 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168), SimId(170)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71920 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71934 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+service decision tick71960 IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(168)], target: CellPos { x: 17, y: 5 } } }
+service decision tick71960 IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)], target: SimId(38) } }
+service shot tick71967 SimId(170) Some("desolator") -> SimId(38) Some("soviet_war_factory")
+service shot tick71982 SimId(168) Some("attack_dog") -> SimId(38) Some("soviet_war_factory")
+snapshot tick SimTick(72000)
+queued CommandQueue { pending: [] }
+player PlayerId(0) credits 11 queues [(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(13)), progress: 503, charged: 503, fraction: 500 }, QueueItem { item: Unit(UnitKind(10)), progress: 0, charged: 0, fraction: 0 }])]
+player PlayerId(1) credits 27 queues [(QueueKey { producer: BuildingKind(4), lane: Main }, [QueueItem { item: Unit(UnitKind(18)), progress: 755, charged: 755, fraction: 0 }, QueueItem { item: Unit(UnitKind(20)), progress: 0, charged: 0, fraction: 0 }])]
+AiPlayers { definitions: Some(AiDefinitions { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, plans: [SidePlan { side: Some(Allied), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(15), BuildingKind(1), BuildingKind(2), BuildingKind(15), BuildingKind(4), BuildingKind(3), BuildingKind(1), BuildingKind(15)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(19)] }, SidePlan { side: Some(Soviet), country: None, defences: [], support: [], tier_reserves: [0, 0, 0], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(16), BuildingKind(6), BuildingKind(30), BuildingKind(16), BuildingKind(32), BuildingKind(31), BuildingKind(6), BuildingKind(16)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(10), UnitKind(18), UnitKind(0)] }, SidePlan { side: Some(Allied), country: Some(CountryId(0)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(34), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(1)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(31), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(2)), defences: [BuildingKind(21), BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(3)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(27), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Allied), country: Some(CountryId(4)), defences: [BuildingKind(15), BuildingKind(19), BuildingKind(17)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(1), BuildingKind(2), BuildingKind(3), BuildingKind(4), BuildingKind(10), BuildingKind(11), BuildingKind(5), BuildingKind(2), BuildingKind(4), BuildingKind(7), BuildingKind(23), BuildingKind(22), BuildingKind(26), BuildingKind(25), BuildingKind(9)], power: BuildingKind(1), harvester: UnitKind(15), army: [UnitKind(17), UnitKind(1), UnitKind(17), UnitKind(8), UnitKind(25), UnitKind(24), UnitKind(19), UnitKind(7), UnitKind(6), UnitKind(30), UnitKind(35), UnitKind(38), UnitKind(37)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(8)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(28), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(6)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(7)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, SidePlan { side: Some(Soviet), country: Some(CountryId(5)), defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(29), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }], difficulties: [Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 6000, wave_patience: 3600, defence_radius: 8 }, Difficulty { id: "medium", think_interval: 20, harvesters_per_refinery: 2, max_army: 24, wave_size: 12, first_wave: 3600, wave_patience: 2400, defence_radius: 10 }, Difficulty { id: "brutal", think_interval: 10, harvesters_per_refinery: 2, max_army: 36, wave_size: 16, first_wave: 2400, wave_patience: 1800, defence_radius: 12 }] }), controllers: {PlayerId(0): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(13), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 3600, defence_radius: 8 }, start: CellPos { x: 8, y: 21 }, gather: CellPos { x: 14, y: 21 }, waypoints: <omitted>
+known: {SimId(38): KnownBuilding { owner: PlayerId(1), footprint: Footprint { origin: CellPos { x: 55, y: 28 }, width: 3, height: 3 }, kind: BuildingKind(32) }}, repair_huts: {}, broken_bridges: {}, wave: {SimId(168), SimId(170), SimId(178), SimId(179), SimId(180), SimId(181), SimId(182), SimId(183)}, target: Some(Waypoint(21)), failures: {}, next_army: 7, patience_until: 74840, next_harvest: 0, fall_back_exempt: false, liquidating: false, issued: 657, flank: false, staging: None, waves_sent: 0, stalled: (0, 71960), last_stand: false, next_wave: 75907, seen_air: false, unseen_loss: true, observed_units: {SimId(168): CellPos { x: 58, y: 27 }, SimId(170): CellPos { x: 49, y: 32 }, SimId(178): CellPos { x: 42, y: 27 }, SimId(179): CellPos { x: 42, y: 27 }, SimId(180): CellPos { x: 42, y: 27 }, SimId(181): CellPos { x: 37, y: 25 }, SimId(182): CellPos { x: 40, y: 25 }, SimId(183): CellPos { x: 39, y: 27 }}, reserved: {}, naval_goal: Some(CellPos { x: 33, y: 17 }), naval_site: Some(CellPos { x: 30, y: 19 }), next_naval_scan: 72000, air_screens: {} }, PlayerId(1): AiController { plan: AiPlan { policy: AiPolicy { garrison_quota: 3, garrison_radius: 12, depot_radius: 16, naval_rescan: 600, naval_detector_quota: 1, artillery_min_range: 8, artillery_standoff: 3, paradrop_offset: 4, chrono_min_offset: 3, chrono_max_offset: 8 }, rules_difficulty: true, defences: [BuildingKind(16), BuildingKind(20), BuildingKind(18)], support: [UnitKind(2), UnitKind(3)], tier_reserves: [1, 2, 2], advanced_tech_level: 6, build_order: [BuildingKind(6), BuildingKind(30), BuildingKind(31), BuildingKind(32), BuildingKind(12), BuildingKind(35), BuildingKind(36), BuildingKind(8), BuildingKind(30), BuildingKind(32), BuildingKind(13), BuildingKind(24), BuildingKind(28), BuildingKind(27), BuildingKind(33)], power: BuildingKind(6), harvester: UnitKind(16), army: [UnitKind(18), UnitKind(0), UnitKind(18), UnitKind(14), UnitKind(22), UnitKind(26), UnitKind(10), UnitKind(20), UnitKind(12), UnitKind(33), UnitKind(39), UnitKind(42), UnitKind(41)] }, difficulty: Difficulty { id: "easy", think_interval: 40, harvesters_per_refinery: 1, max_army: 16, wave_size: 8, first_wave: 4667, wave_patience: 3600, defence_radius: 8 }, start: CellPos { x: 53, y: 24 }, gather: CellPos { x: 47, y: 24 }, waypoints: <omitted>
+known: {}, repair_huts: {}, broken_bridges: {}, wave: {}, target: None, failures: {}, next_army: 8, patience_until: 70081, next_harvest: 16481, fall_back_exempt: true, liquidating: false, issued: 229, flank: false, staging: None, waves_sent: 0, stalled: (6524589237647174507, 69921), last_stand: true, next_wave: 71148, seen_air: true, unseen_loss: true, observed_units: {}, reserved: {}, naval_goal: None, naval_site: None, next_naval_scan: 72001, air_screens: {} }} }
+unit SimId(170) Owner(PlayerId(0)) desolator Mobile { speed: 11, cell: CellPos { x: 49, y: 32 }, step: None } Health { hit_points: 150 } moveNone Some(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 48, burst_left: 0, volley: WeaponKind(18), target: None, order: None }) None
+unit SimId(182) Owner(PlayerId(0)) conscript Mobile { speed: 11, cell: CellPos { x: 42, y: 25 }, step: Some(Step { to: CellPos { x: 43, y: 25 }, progress: 130, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 52, y: 25 }, 9, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(178) Owner(PlayerId(0)) conscript Mobile { speed: 11, cell: CellPos { x: 44, y: 27 }, step: Some(Step { to: CellPos { x: 45, y: 27 }, progress: 18, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 51, y: 27 }, 6, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(179) Owner(PlayerId(0)) conscript Mobile { speed: 11, cell: CellPos { x: 44, y: 27 }, step: Some(Step { to: CellPos { x: 45, y: 27 }, progress: 18, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 51, y: 27 }, 6, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(180) Owner(PlayerId(0)) conscript Mobile { speed: 11, cell: CellPos { x: 44, y: 27 }, step: Some(Step { to: CellPos { x: 45, y: 27 }, progress: 18, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 51, y: 27 }, 6, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(181) Owner(PlayerId(0)) conscript Mobile { speed: 11, cell: CellPos { x: 39, y: 25 }, step: Some(Step { to: CellPos { x: 40, y: 25 }, progress: 162, length: 256 }) } Health { hit_points: 125 } moveSome((CellPos { x: 52, y: 25 }, 12, Following)) Some(Weapon { kind: WeaponKind(14), secondary: None, cooldown: 0, burst_left: 0, volley: WeaponKind(14), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(183) Owner(PlayerId(0)) desolator Mobile { speed: 11, cell: CellPos { x: 41, y: 27 }, step: Some(Step { to: CellPos { x: 42, y: 27 }, progress: 72, length: 256 }) } Health { hit_points: 150 } moveSome((CellPos { x: 49, y: 27 }, 7, Following)) Some(Weapon { kind: WeaponKind(18), secondary: Some(WeaponKind(98)), cooldown: 0, burst_left: 0, volley: WeaponKind(18), target: Some(SimId(38)), order: Some(Attack { target: SimId(38), chases: 1 }) }) None
+unit SimId(168) Owner(PlayerId(0)) attack_dog Mobile { speed: 23, cell: CellPos { x: 58, y: 27 }, step: None } Health { hit_points: 34 } moveNone Some(Weapon { kind: WeaponKind(6), secondary: None, cooldown: 31, burst_left: 0, volley: WeaponKind(6), target: None, order: None }) None
+building SimId(38) Owner(PlayerId(1)) soviet_war_factory CellPos { x: 55, y: 28 } Health { hit_points: 1000 }
+building SimId(31) Owner(PlayerId(0)) soviet_barracks CellPos { x: 5, y: 21 } Health { hit_points: 500 }
+building SimId(45) Owner(PlayerId(0)) radar_tower CellPos { x: 8, y: 15 } Health { hit_points: 1000 }
+special SpecialState { strategic: StrategicState { missiles: [], storm: None, flights: {}, announced: {} }, parasites: {}, deployed: {}, mirage_trees: {}, disguises: {}, erasures: {}, charges: {}, radiation_sites: [], coil_charge: {}, death_detonated: {}, eruption_next: {}, temporal_removed: {}, charge: {}, protected: {}, disabled: {}, cargo: {}, garrisons: {}, controlled: {}, bombs: {}, zones: [], rearming: {}, carrier_flights: {}, interactions: {}, hidden: {}, outages: {}, docked: {}, ammo: {}, reloading: {}, docks: {}, bays: {}, spawned: {}, missiles: {}, surfaced: {} }
+economy final partial window {"P0 cancelled Unit(UnitKind(12)) refund214": 1, "P0 cancelled Unit(UnitKind(20)) refund308": 1, "P0 cancelled Unit(UnitKind(33)) refund0": 1, "P0 lost conscript": 3, "P0 lost desolator": 1, "P0 lost v3_launcher": 1, "P0 produced Unit(UnitKind(0))": 1, "P0 produced Unit(UnitKind(13))": 3, "P0 produced Unit(UnitKind(3))": 1, "P0 queued_attack SimId(1) soviet_construction_yard": 2, "P0 queued_attack SimId(150) ?": 4, "P0 queued_attack SimId(30) soviet_barracks": 26, "P0 queued_attack SimId(38) soviet_war_factory": 71, "P0 queued_attack SimId(89) soviet_battle_lab": 23, "P0 queued_attack_actors SimId(1)": 8, "P0 queued_attack_actors SimId(150)": 4, "P0 queued_attack_actors SimId(30)": 26, "P0 queued_attack_actors SimId(38)": 275, "P0 queued_attack_actors SimId(89)": 23, "P0 repaired_hp soviet_battle_lab": 96, "P0 sales_refund": 2000, "P1 cancelled Building(BuildingKind(28)) refund406": 1, "P1 cancelled Building(BuildingKind(6)) refund159": 1, "P1 cancelled Unit(UnitKind(12)) refund165": 1, "P1 cancelled Unit(UnitKind(26)) refund0": 1, "P1 cancelled Unit(UnitKind(3)) refund0": 1, "P1 cancelled Unit(UnitKind(33)) refund1679": 1, "P1 lost attack_dog": 1, "P1 lost conscript": 13, "P1 lost rhino": 1, "P1 lost tesla_trooper": 1, "P1 lost yuri": 1, "P1 lost_building sentry_gun": 1, "P1 lost_building soviet_barracks": 1, "P1 lost_building soviet_battle_lab": 1, "P1 produced Unit(UnitKind(10))": 1, "P1 produced Unit(UnitKind(12))": 1, "P1 produced Unit(UnitKind(18))": 1, "P1 produced Unit(UnitKind(3))": 1, "P1 queued_attack SimId(124) soviet_battle_lab": 1, "P1 queued_attack SimId(158) ?": 5, "P1 queued_attack SimId(166) ?": 2, "P1 queued_attack SimId(168) ?": 1, "P1 queued_attack SimId(39) soviet_war_factory": 30, "P1 queued_attack_actors SimId(124)": 1, "P1 queued_attack_actors SimId(158)": 5, "P1 queued_attack_actors SimId(166)": 2, "P1 queued_attack_actors SimId(168)": 1, "P1 queued_attack_actors SimId(39)": 30, "P1 repaired_hp soviet_battle_lab": 120, "P1 repaired_hp soviet_war_factory": 415, "P1 sales_refund": 1750, "ended SimId(150)->SimId(39) TargetGone": 1, "ended SimId(156)->SimId(1) TargetGone": 1, "ended SimId(156)->SimId(150) TargetGone": 1, "ended SimId(157)->SimId(1) TargetGone": 1, "ended SimId(157)->SimId(150) TargetGone": 1, "ended SimId(158)->SimId(1) TargetGone": 1, "ended SimId(158)->SimId(150) TargetGone": 1, "ended SimId(158)->SimId(30) TargetGone": 1, "ended SimId(158)->SimId(89) TargetGone": 1, "ended SimId(159)->SimId(1) TargetGone": 1, "ended SimId(159)->SimId(150) TargetGone": 1, "ended SimId(166)->SimId(38) NoDamage": 6, "ended SimId(168)->SimId(38) NoDamage": 55, "ended SimId(170)->SimId(38) NoDamage": 32, "ended SimId(173)->SimId(158) TargetGone": 1, "ended SimId(174)->SimId(158) TargetGone": 1, "ended SimId(175)->SimId(158) TargetGone": 1, "ended SimId(176)->SimId(158) TargetGone": 1, "ended SimId(177)->SimId(166) OutOfReach": 1, "ended SimId(177)->SimId(166) TargetGone": 1, "ended SimId(177)->SimId(168) OutOfReach": 1, "shots attack_dog->soviet_war_factory": 55, "shots conscript->attack_dog": 5, "shots conscript->conscript": 140, "shots conscript->desolator": 1, "shots conscript->soviet_barracks": 46, "shots conscript->soviet_battle_lab": 45, "shots conscript->soviet_war_factory": 36, "shots conscript->tesla_trooper": 9, "shots conscript->v3_launcher": 12, "shots conscript->yuri": 7, "shots desolator->conscript": 4, "shots desolator->rhino": 34, "shots desolator->soviet_war_factory": 38, "shots rhino->attack_dog": 3, "shots rhino->desolator": 14, "shots v3_launcher->sentry_gun": 1, "shots yuri->conscript": 1}
+
+thread 'ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes' (7184951) panicked at crates/game/tests/ra8_gate_matches.rs:507:5:
+riverlands seed0 ["iraq", "cuba"] ["easy", "easy"]: None after72000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 24 filtered out; finished in 9.87s
+
+error: test failed, to rerun pass `-p game --test ra8_gate_matches`

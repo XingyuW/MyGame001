@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.69s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... 
+thread 'ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish' (8200220) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:35:87:
+the declared source-cost budget must suffice without another refund: BuildingSold { player: PlayerId(0), building: SimId(3), refund: 750 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p sim --lib`

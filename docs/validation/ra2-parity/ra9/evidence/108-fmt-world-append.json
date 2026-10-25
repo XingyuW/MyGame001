@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-21T02:10:21.193776+00:00",
+  "command": [
+    "cargo",
+    "fmt",
+    "--all"
+  ],
+  "exit_code": 0,
+  "seconds": 1.874,
+  "before_sha256": "fbc395db2e973105a64452f5aadb90e756e657153697e52c4d2f20751db00a0a",
+  "after_sha256": "fa60827a241b4dc877dd32e36089cfd89e1291dd0d3fa817276cddbb618ea4b5",
+  "scope": "Format completed new ra5_world append; other previously formatted Rust expected unchanged; no runtime behavior claim"
+}

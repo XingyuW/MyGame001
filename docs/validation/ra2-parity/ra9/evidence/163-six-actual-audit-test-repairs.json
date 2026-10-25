@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-21T05:04:59.496646+00:00",
+  "basis": "159 actual175PASS/6FAIL; all667frozeninputs unchanged. Root/RA8 authorized test-only sharedhelper/native-loader-path/exactphysicaldiagnostic repairs after drain.",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "before_sha256": "b160488120ca006a53e27b316934524c49ee2ebbd040eef7d9c547bfc0bed31e",
+      "after_sha256": "3a79202ccec618c04f50aef557135414e6b360727dc8abd9cf6da279c6d38e6a",
+      "preimage": "ra9-preliminary-logs/163-before-array-negatives.rs"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "before_sha256": "aaa74d5332b21ba5c4fec7a600321a8c420cbf9e8a3f07e7e3c4d764f5a4599b",
+      "after_sha256": "f16a4801c0f2fda09f2338bb786b588a8b50110bbcefde16d91010cc951e4c98",
+      "preimage": "ra9-preliminary-logs/163-before-country-rosters.rs"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "before_sha256": "c0bf712072667fc207d5e0db536bc6c6606302eff8542c9a78dfdecae8be1ab8",
+      "after_sha256": "b0c933fd4f0535ccb7ca236ddadb53344f5e8c79bfcdf689002b37d0da8397fc",
+      "preimage": "ra9-preliminary-logs/163-before-consumer62-admission.rs"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "before_sha256": "c8732fcf0e380a3ac01f4513781bd3af87deccef2d37888621c09ad70b51ba21",
+      "after_sha256": "00a0ce2f9de62d99205b068d5379cbacbc2dff65630f3f8c3561bbbfa569f8b7",
+      "preimage": "ra9-preliminary-logs/163-before-model162-admission.rs"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "before_sha256": "09123c1c0701400ff532613436ddceceeafc9ba973dbefad8f1e5a6250c03581",
+      "after_sha256": "0bf867b9ebb39ee203c99acab965bf52d37c54d508efe8ced61b9398182377a8",
+      "preimage": "ra9-preliminary-logs/163-before-source-disposition.rs"
+    }
+  ],
+  "patch_sha256": "fea0861309044a667efa646f514fb2bb2e6d4fc7f81c227f91400368df5d3145",
+  "scope": "No runtime/core97/data/contract/acceptance/authority changes; all original test names/purposes retained. Native raw-schema test now reaches actual loader, M60 controls use real parsed exact disposition after complete valid baseline."
+}

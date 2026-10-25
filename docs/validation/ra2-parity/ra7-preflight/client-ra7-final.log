@@ -1,0 +1,15 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 15.79s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/game-fe9efcf72dfbb190)
+
+running 7 tests
+test announcer::acceptance::ra7_announcements_filter_private_events_and_keep_public_warnings ... ok
+test ra7_controls::tests::ra7_every_new_binding_maps_input_to_its_order_or_ui_action ... ok
+test ra7_controls::deployment_mapping::ra7_deploy_key_maps_every_selected_unit_without_modifier_collisions ... ok
+test ra7_controls::tests::ra7_selection_cycle_type_all_and_bookmark_actions_execute_on_client_state ... ok
+test selection::tests::ra7_visible_disguise_is_not_an_enemy_cursor_target ... ok
+test selection::tests::ra7_modifier_cursor_names_the_command_with_the_same_precedence ... ok
+test announcer::acceptance::ra7_simulation_event_reaches_the_actual_notice_column ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 210 filtered out; finished in 1.68s
+

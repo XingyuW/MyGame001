@@ -1,0 +1,11 @@
+--- crates/game/tests/m6_production_matches.rs
++++ crates/game/tests/m6_production_matches.rs
+@@ -656,7 +656,7 @@
+             for event in &left_events {
+                 let witness = match event {
+                     SimEvent::WeaponFired { .. } => Some(0),
+-                    SimEvent::ProductionComplete { .. } => Some(1),
++                    SimEvent::ProductionComplete { .. } => None,
+                     SimEvent::OreDelivered { ore, credits, .. } if *ore > 0 && *credits > 0 => {
+                         Some(2)
+                     }

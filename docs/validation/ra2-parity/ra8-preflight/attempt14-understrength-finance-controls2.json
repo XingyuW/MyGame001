@@ -1,0 +1,36 @@
+{
+  "label": "attempt14-understrength-finance-controls2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "understrength",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-20T03:37:34.735254+00:00",
+  "elapsed_seconds": 0.019337667035870254,
+  "exit": 1,
+  "source_before": {
+    "crates/sim/src/ai.rs": "e836aa5ef8d86dc9f91c7bee81559c8612116a0c18b6d614095a60125fcb0771",
+    "crates/sim/src/ai/strategy.rs": "8f1b06ea98407d4f2d31d03229da6f2a556ff543aae02dc14ea5671cffa25331",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "1f9ce867e34015752619fbbde1a8670d081c2a6461c240f927a0ae8e2e2b2794"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "e836aa5ef8d86dc9f91c7bee81559c8612116a0c18b6d614095a60125fcb0771",
+    "crates/sim/src/ai/strategy.rs": "8f1b06ea98407d4f2d31d03229da6f2a556ff543aae02dc14ea5671cffa25331",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "92a0fc584a2fe719fd9d7b505c0de9197161e1e491077ce6e7a5c0be837f0595",
+    "crates/game/tests/ra8_gate_matches.rs": "112fccc43a99547c3d1a0d66c407756a8832de222868771b6cb2ee04a0b10b35",
+    "crates/sim/tests/ra8_ai.rs": "1f9ce867e34015752619fbbde1a8670d081c2a6461c240f927a0ae8e2e2b2794"
+  },
+  "log_sha256": "f51f6c06a11b33dc124a117641fb1b0413afad3b499b5cfa0de8d87556da8e0b"
+}

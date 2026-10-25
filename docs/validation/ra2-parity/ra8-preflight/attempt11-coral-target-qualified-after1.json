@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-coral-target-qualified-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate11_coral_iraq_cuba_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T17:48:23.167655+00:00",
+  "elapsed_seconds": 174.7756612499943,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9"
+  },
+  "log_sha256": "ac56a115144c02235d0386e29849a8cb9ce8d5c2dacf124ce5cb3c236b87c9db"
+}

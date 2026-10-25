@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.50s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+
+thread 'ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea' (4265635) panicked at crates/sim/tests/ra8_ai.rs:325:9:
+assertion `left == right` failed: water case 1
+  left: (true, false)
+ right: (true, true)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea ... FAILED
+
+failures:
+
+failures:
+    ra8_navy_requires_reachable_placement_water_and_an_enemy_hurtable_from_that_sea
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 7.56s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

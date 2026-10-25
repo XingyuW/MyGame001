@@ -1,0 +1,14 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Checking game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: unused imports: `Building` and `ProductionItem`
+ --> crates/sim/tests/ra6_infantry.rs:7:5
+  |
+7 |     Building, Cell, CellPos, Command, CommandQueue, Definitions, Grid, IssuedCommand, Owner,
+  |     ^^^^^^^^
+8 |     PlayerId, Players, ProductionItem, SimEvent, SimId, SimPlugin, SimSchedule, load_ruleset,
+  |                        ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra6_infantry") generated 1 warning (run `cargo fix --test "ra6_infantry" -p sim` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.96s

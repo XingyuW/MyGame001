@@ -1,0 +1,52 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1m 03s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_data_parity-4bf9e87c254d4d01)
+
+running 4 tests
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls has been running for over 60 seconds
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls has been running for over 60 seconds
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-consumer REJECTED source admission Static116 art:CABHUT:Height: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-consumer REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-consumer REJECTED source admission Masked19 rules:105mmE:Speed: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-consumer REJECTED source admission Metadata147 rules:AEGIS:Points: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-guard REJECTED source admission Static116 art:CABHUT:Height: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-guard REJECTED source admission Masked19 rules:105mmE:Speed: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-guard REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-guard REJECTED source admission Metadata147 rules:AEGIS:Points: source acceptance does not bind exact current consumer/model/reason
+RA9_SINGLE_SOURCE_CONTROL static116 missing-route REJECTED source admission Static116 art:CABHUT:Height: individual exact source policy/consumer/final scope/real receipts missing
+RA9_SINGLE_SOURCE_CONTROL masked19 missing-route REJECTED source admission Masked19 rules:105mmE:Speed: individual source model decision/final scope/native receipts missing
+RA9_SINGLE_SOURCE_CONTROL residual117 missing-route REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: individual exact source policy/consumer/final scope/real receipts missing
+RA9_SINGLE_SOURCE_CONTROL static116 foreign-route REJECTED source admission Static116 art:CABHUT:Height: missing/foreign exact source evidence routes
+RA9_SINGLE_SOURCE_CONTROL metadata147 missing-route REJECTED source admission Metadata147 rules:AEGIS:Points: individual exact source policy/consumer/final scope/real receipts missing
+RA9_SINGLE_SOURCE_CONTROL masked19 foreign-route REJECTED source admission Masked19 rules:105mmE:Speed: missing/foreign exact source evidence routes
+RA9_SINGLE_SOURCE_CONTROL residual117 foreign-route REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: missing/foreign exact source evidence routes
+RA9_SINGLE_SOURCE_CONTROL static116 malformed-receipt REJECTED source admission Static116 art:CABHUT:Height: scoped kind/route@actual-artifact-sha256 required
+RA9_SINGLE_SOURCE_CONTROL masked19 malformed-receipt REJECTED source admission Masked19 rules:105mmE:Speed: scoped kind/route@actual-artifact-sha256 required
+RA9_SINGLE_SOURCE_CONTROL metadata147 foreign-route REJECTED source admission Metadata147 rules:AEGIS:Points: missing/foreign exact source evidence routes
+RA9_SINGLE_SOURCE_CONTROL residual117 malformed-receipt REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: scoped kind/route@actual-artifact-sha256 required
+RA9_SINGLE_SOURCE_CONTROL static116 hashless-receipt REJECTED source admission Static116 art:CABHUT:Height: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL masked19 hashless-receipt REJECTED source admission Masked19 rules:105mmE:Speed: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL residual117 hashless-receipt REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL metadata147 malformed-receipt REJECTED source admission Metadata147 rules:AEGIS:Points: scoped kind/route@actual-artifact-sha256 required
+RA9_SINGLE_SOURCE_CONTROL static116 duplicate-route REJECTED source admission Static116 art:CABHUT:Height: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL masked19 duplicate-route REJECTED source admission Masked19 rules:105mmE:Speed: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL residual117 duplicate-route REJECTED source admission Residual117 rules:AAHeatSeeker2:ROT: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL metadata147 hashless-receipt REJECTED source admission Metadata147 rules:AEGIS:Points: malformed/duplicate real evidence route
+RA9_SINGLE_SOURCE_CONTROL metadata147 duplicate-route REJECTED source admission Metadata147 rules:AEGIS:Points: malformed/duplicate real evidence route
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_static116_nonfirst_acceptance_controls ... ok
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_masked19_nonfirst_acceptance_controls ... ok
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_residual117_nonfirst_acceptance_controls ... ok
+RA9_AUDIT_SUCCESS physical=16211 compared=13419 game_owned=2792 demanded_successful_pairs=7108 compared_source_atoms=3111 disposition_atoms=1911 reference_atoms=5022 used_differences=75
+test ra9_audit::single_source_acceptance_negatives::ra9_single_source_metadata147_nonfirst_acceptance_controls ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 181 filtered out; finished in 193.88s
+

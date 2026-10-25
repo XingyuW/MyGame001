@@ -1,0 +1,103 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T05:16:20.244130+00:00",
+  "pid": 51836,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/B-strict-04-plan.json",
+  "plan_sha256": "918b5006ad73c16d1233c56e1bf49e5f359aa598066d1249dbcd30b80cb5d0e6",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--no-fail-fast",
+        "--test",
+        "ra9_runtime_liveness",
+        "--test",
+        "ra9_temporal_sources",
+        "--test",
+        "ra9_specialist_firepower",
+        "--test",
+        "ra9_crate_cargo_census",
+        "--test",
+        "ra9_bay_current_state",
+        "--test",
+        "ra9_guard_effective_targets",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T05:16:20.397055+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-strict-04/01-runtime-forty-three-after.log",
+      "pid": 51842,
+      "pgid": 51842,
+      "exit": 0,
+      "end": "2026-10-22T05:16:30.455771+00:00",
+      "raw_bytes": 4730,
+      "raw_sha256": "3f3bbc49d16d59135a97e09000f6e064d7a8814126a2117487a6a05e24cbfe8d",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T05:16:30.724508+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-strict-04/02-fmt-check.log",
+      "pid": 51897,
+      "pgid": 51897,
+      "exit": 0,
+      "end": "2026-10-22T05:16:35.781535+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T05:16:36.046678+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-strict-04/03-diff-check.log",
+      "pid": 51913,
+      "pgid": 51913,
+      "exit": 0,
+      "end": "2026-10-22T05:16:41.077252+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--keep-going",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start": "2026-10-22T05:16:41.337733+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-strict-04/04-strict-clippy-keep-going.log",
+      "pid": 51921,
+      "pgid": 51921,
+      "exit": 0,
+      "end": "2026-10-22T05:16:46.389975+00:00",
+      "raw_bytes": 150,
+      "raw_sha256": "70c4258bd6d7f9da0ecf813198a1a088b2f3c79f2c3b6386df420ee825971f3e",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T05:16:41.388324+00:00",
+  "end": "2026-10-22T05:16:46.521746+00:00",
+  "source_unchanged": true
+}

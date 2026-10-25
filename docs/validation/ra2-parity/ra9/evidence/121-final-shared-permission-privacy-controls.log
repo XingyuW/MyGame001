@@ -1,0 +1,58 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.00s
+     Running tests/ra5_ore.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_ore-c39c9605dcd753e6)
+
+running 2 tests
+test ore_above_the_spread_density_puts_a_bail_on_one_free_cell_beside_it ... ok
+test ore_spreads_only_onto_free_building_ground_or_mined_ground ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.24s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-25553fff35365e86)
+
+running 3 tests
+test ra6_spy_disguise_default_copy_and_dog_detection ... ok
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... ok
+test ra9_stock_miners_take_real_shell_and_ivan_damage_but_refuse_land_c4_interact ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.81s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 5 tests
+test ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments ... 
+thread 'ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments' (13640357) panicked at crates/sim/tests/ra6_vehicles.rs:1357:9:
+[CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(0), target: CellPos { x: 3, y: 3 }, units: [SimId(99998)] }, reason: NotOwned(SimId(0)) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra9_mirage_public_attack_approaches_visible_out_of_range_target_and_breaks_tree ... ok
+test ra9_nuclear_public_sale_retains_launch_owner_and_exact_delayed_payload ... ok
+
+failures:
+
+failures:
+    ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 36 filtered out; finished in 0.48s
+
+error: test failed, to rerun pass `-p sim --test ra6_vehicles`
+     Running tests/ra7_vision.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra7_vision-8afa55524046f0bc)
+
+running 3 tests
+test ra7_explored_enemy_is_known_with_fog_off_but_hidden_with_fog_on ... ok
+test ra7_new_spy_is_concealed_before_first_combat_and_command ... ok
+test ra7_sensor_detects_spy_at_fifteen_but_not_sixteen_and_needs_power ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.43s
+
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-55129ee60c603374)
+
+running 1 test
+test ra8_yuri_cannot_acquire_a_hostile_occupied_building_as_a_control_target ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 131 filtered out; finished in 0.08s
+
+error: 1 target failed:
+    `-p sim --test ra6_vehicles`

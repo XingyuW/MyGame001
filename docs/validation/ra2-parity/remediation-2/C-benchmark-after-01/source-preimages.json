@@ -1,0 +1,198 @@
+{
+  "status": "EXACT_CHANGED_AND_UNTRACKED_GUARDED_INPUT_PREIMAGES",
+  "files": [
+    {
+      "source": "crates/game/src/battlefield.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/game/src/battlefield.rs",
+      "bytes": 53734,
+      "sha256": "1904d0341affebe319a3660bee385b2287984824296cff7ebe231780234453a2"
+    },
+    {
+      "source": "crates/game/src/privacy_order_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/game/src/privacy_order_tests.rs",
+      "bytes": 20173,
+      "sha256": "c65a169e0e82c03f0008ec7a6f13c24e349a4993d2f4789cb582ca3792c5f01a"
+    },
+    {
+      "source": "crates/game/src/selection.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/game/src/selection.rs",
+      "bytes": 146100,
+      "sha256": "d98b53a580e1ead231dce78380e23f6d73de6e812f9503d606448f82823b130c"
+    },
+    {
+      "source": "crates/sim/examples/m7_benchmark.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/examples/m7_benchmark.rs",
+      "bytes": 20677,
+      "sha256": "de2f52f76cf3e7fd2e1d1d61f9e4c103953a877337e3fb43550fd9657bfbd3a2"
+    },
+    {
+      "source": "crates/sim/src/ai.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/ai.rs",
+      "bytes": 207784,
+      "sha256": "e67953feca7feeb689c4d3c2db9eff250ae9befe015eda57e1f303dd89d27d34"
+    },
+    {
+      "source": "crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs",
+      "bytes": 12280,
+      "sha256": "dc40d64a28aa05469c4658976b36dd6768c4737dad6db9f2da0ff179b2069c28"
+    },
+    {
+      "source": "crates/sim/src/ai/ra8_recovery_tests.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/ai/ra8_recovery_tests.rs",
+      "bytes": 69272,
+      "sha256": "cd41d6331f40bad460f67c4947e1118bc5b1aa69187b9a948d933b77e5cbbab3"
+    },
+    {
+      "source": "crates/sim/src/ai/strategy.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/ai/strategy.rs",
+      "bytes": 109316,
+      "sha256": "cd73efbd113b1173f057b594fd9c1e622673dce3df1be9da8238a98fa1ae1d83"
+    },
+    {
+      "source": "crates/sim/src/garrison.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/garrison.rs",
+      "bytes": 17048,
+      "sha256": "2ba6b6b2e81efa3c82319b64988b3bc162e44e9fc3f20301c70c89631bda84a8"
+    },
+    {
+      "source": "crates/sim/src/special.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/special.rs",
+      "bytes": 20300,
+      "sha256": "f1690707dbd67e91b0433da1e62de4273636c029dd19d2b94a22e6f291c6100c"
+    },
+    {
+      "source": "crates/sim/src/special/advance.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/special/advance.rs",
+      "bytes": 16386,
+      "sha256": "c1bb9dc248df48bacbf5411f7521264a025741ce0bf69c350ebaf386d3c510e5"
+    },
+    {
+      "source": "crates/sim/src/special/resolve.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/src/special/resolve.rs",
+      "bytes": 11136,
+      "sha256": "22955d9f47e7e0819f8baf44985b5703ead0c1c9112c36b387c39419e9fbfff0"
+    },
+    {
+      "source": "crates/sim/tests/ra8_ai.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra8_ai.rs",
+      "bytes": 454402,
+      "sha256": "a90e6b9aade21c8f44322feee7ca650b22122e976ee6125688ade7cb3619fb93"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "bytes": 559928,
+      "sha256": "ddfd920ed524d1299bb66c3fc41b46c2e49ce8dfdad8eaec058e0b449341041e"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "bytes": 50994,
+      "sha256": "a703b4b5f07f37e10640a32e3b162af077a920b3403c0b00e37bc05b7088c8cc"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "bytes": 203484,
+      "sha256": "b097f665f914556527dbd8e1fe15ed7519ca2e3a739aac8411b13f19a3adea39"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "bytes": 87697,
+      "sha256": "c21ce32bafd32d94f224b1ff3814e90de2d24526ba16cab0a04f33897f17ac08"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "bytes": 73186,
+      "sha256": "ef465620f3d093704931225f8ec509c2edeb6af73940cb60dcf29beebf48a5b5"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/legacy904-branch-files.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/legacy904-branch-files.tsv",
+      "bytes": 3443,
+      "sha256": "741b23b84760552cbb36ded02190efe2d76769c34af3c5befabbd3dcb22ebf0e"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "bytes": 272993,
+      "sha256": "8be456daffc741d6f6d4b8b1f8c32ae7542c553dc65479dc8d30cf8021e4b5d6"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "bytes": 64814,
+      "sha256": "c3a6165165bbed84881a05877ced3313e1ab6be97cef6d35f35df6aaf371dacd"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/ra9-approved-model-census-sha256.txt",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/ra9-approved-model-census-sha256.txt",
+      "bytes": 65,
+      "sha256": "3f1ca051653fbe55584aedfd553e7f61c11483c99c40182431c82ecce0be9433"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "bytes": 65,
+      "sha256": "2a659fb7bd06447b01877d3c5b997531127989ae1f55a1725e1a9925e2089bf7"
+    },
+    {
+      "source": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "bytes": 1548466,
+      "sha256": "885fa07e8c2efe5a91d711c5f134194adb58aad1820eb0faad4977eaca048270"
+    },
+    {
+      "source": "crates/sim/tests/ra9_support_current.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_support_current.rs",
+      "bytes": 12141,
+      "sha256": "64ae817d36ae3f2b66cf92e8679438ecec839951b97aca816d2a17cd6529faab"
+    },
+    {
+      "source": "crates/sim/tests/ra9_temporal_pending.rs",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/ra9_temporal_pending.rs",
+      "bytes": 13502,
+      "sha256": "821f64ba99b88de64fa465f8423742e59206ae25a806d43a79423eb257a91e15"
+    },
+    {
+      "source": "crates/sim/tests/reference/README.md",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/README.md",
+      "bytes": 7889,
+      "sha256": "751b160cc059c7540f06b3845b989a8139865ee714e2d434a48b0be53309e146"
+    },
+    {
+      "source": "crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "bytes": 285,
+      "sha256": "65c8eef67726f3b4a2582c91df163b5d8db46a16a86476e109eed007b18e06d6"
+    },
+    {
+      "source": "crates/sim/tests/reference/ra9_model_census.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/ra9_model_census.tsv",
+      "bytes": 12446,
+      "sha256": "1650ee3d7436d08e48914e432e1a3e16226f6c4f81782b765928c558a61d054c"
+    },
+    {
+      "source": "crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "bytes": 543,
+      "sha256": "79eb3583c07fbe179ea61d2501fc5d84165ac1b5f8d4a60292e0ac8a2929eecb"
+    },
+    {
+      "source": "crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "bytes": 683,
+      "sha256": "73f99b0364579e90f4206c2711014c0105fd0b6bb3a6b72fd6017e183804a6a1"
+    },
+    {
+      "source": "crates/sim/tests/reference/ra9_scope_observation.tsv",
+      "preimage": "docs/validation/ra2-parity/remediation-2/C-benchmark-after-01/source-preimages/crates/sim/tests/reference/ra9_scope_observation.tsv",
+      "bytes": 430,
+      "sha256": "770e6416e3fba19eb111afc6dcb340708513ff09333fb8dadcaa40502cda5f73"
+    }
+  ],
+  "tracked_unchanged_source": "Available in recorded Git predecessor"
+}

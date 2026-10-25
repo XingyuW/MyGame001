@@ -1,0 +1,49 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.03s
+     Running tests/ra8_ai_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai_matches-f4b147b14025da0d)
+
+running 1 test
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8899: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8900: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"] before tick8901: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(34), SimId(38), SimId(44), SimId(46), SimId(53), SimId(58), SimId(64), SimId(67)], target: SimId(74) } }, ai_intent: Some(AiIntent { owned: {SimId(34), SimId(38), SimId(44), SimId(46), SimId(53), SimId(58), SimId(64), SimId(67)}, armed: {SimId(34), SimId(38), SimId(44), SimId(46), SimId(53), SimId(58), SimId(64), SimId(67)}, target: Some(SimId(74)) }) }] }
+demo seed0 ["germany", "great_britain"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 10589 })
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12860: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12861: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"] before tick12862: CommandQueue { pending: [] }
+demo seed0 ["germany", "great_britain"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(1), tick: 27554 })
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13480: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13481: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"] before tick13482: CommandQueue { pending: [] }
+demo seed0 ["france", "iraq"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 41164 })
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9619: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9620: CommandQueue { pending: [] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"] before tick9621: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: AttackMove { units: [SimId(77), SimId(102), SimId(111)], target: CellPos { x: 55, y: 38 } } }, ai_intent: Some(AiIntent { owned: {SimId(77), SimId(102), SimId(111)}, armed: {SimId(77), SimId(102), SimId(111)}, target: None }) }, PendingCommand { issued: IssuedCommand { player: PlayerId(0), command: Attack { units: [SimId(4), SimId(5), SimId(6), SimId(44), SimId(51), SimId(64), SimId(68), SimId(77), SimId(85), SimId(88), SimId(91), SimId(92), SimId(97), SimId(98), SimId(100), SimId(102), SimId(107), SimId(111), SimId(113), SimId(125), SimId(131), SimId(139)], target: SimId(129) } }, ai_intent: Some(AiIntent { owned: {SimId(4), SimId(5), SimId(6), SimId(44), SimId(51), SimId(64), SimId(68), SimId(77), SimId(85), SimId(88), SimId(91), SimId(92), SimId(97), SimId(98), SimId(100), SimId(102), SimId(107), SimId(111), SimId(113), SimId(125), SimId(131), SimId(139)}, armed: {SimId(4), SimId(5), SimId(6), SimId(44), SimId(51), SimId(64), SimId(68), SimId(77), SimId(85), SimId(88), SimId(91), SimId(92), SimId(97), SimId(98), SimId(100), SimId(102), SimId(107), SimId(111), SimId(113), SimId(125), SimId(131), SimId(139)}, target: Some(SimId(129)) }) }] }
+demo seed0 ["france", "cuba"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(0), tick: 11075 })
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10240: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10241: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["easy", "easy"] before tick10242: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: AttackMove { units: [SimId(16)], target: CellPos { x: 52, y: 53 } } }, ai_intent: Some(AiIntent { owned: {SimId(16)}, armed: {SimId(16)}, target: None }) }] }
+demo seed0 ["russia", "libya"] ["easy", "easy"]: Some(Won { winner: PlayerId(1), tick: 63607 })
+demo seed0 ["cuba", "germany"] ["medium", "medium"] before tick22880: CommandQueue { pending: [] }
+demo seed0 ["cuba", "germany"] ["medium", "medium"] before tick22881: CommandQueue { pending: [] }
+demo seed0 ["cuba", "germany"] ["medium", "medium"] before tick22882: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(72), SimId(88)], target: SimId(47) } }, ai_intent: Some(AiIntent { owned: {SimId(72), SimId(88)}, armed: {SimId(72), SimId(88)}, target: Some(SimId(47)) }) }] }
+demo seed0 ["cuba", "germany"] ["medium", "medium"]: Some(Won { winner: PlayerId(1), tick: 28470 })
+demo seed0 ["cuba", "russia"] ["medium", "easy"] before tick8240: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["medium", "easy"] before tick8241: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["medium", "easy"] before tick8242: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["medium", "easy"]: Some(Won { winner: PlayerId(0), tick: 32472 })
+demo seed0 ["russia", "libya"] ["medium", "medium"] before tick11420: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["medium", "medium"] before tick11421: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["medium", "medium"] before tick11422: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: Attack { units: [SimId(13), SimId(14), SimId(44), SimId(50), SimId(69), SimId(71), SimId(75), SimId(81), SimId(87)], target: SimId(0) } }, ai_intent: Some(AiIntent { owned: {SimId(13), SimId(14), SimId(44), SimId(50), SimId(69), SimId(71), SimId(75), SimId(81), SimId(87)}, armed: {SimId(13), SimId(14), SimId(44), SimId(50), SimId(69), SimId(71), SimId(75), SimId(81), SimId(87)}, target: Some(SimId(0)) }) }] }
+demo seed0 ["russia", "libya"] ["medium", "medium"]: Some(Won { winner: PlayerId(1), tick: 13592 })
+demo seed0 ["cuba", "russia"] ["brutal", "medium"] before tick7520: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["brutal", "medium"] before tick7521: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["brutal", "medium"] before tick7522: CommandQueue { pending: [] }
+demo seed0 ["cuba", "russia"] ["brutal", "medium"]: Some(Won { winner: PlayerId(0), tick: 12004 })
+demo seed0 ["russia", "libya"] ["brutal", "brutal"] before tick5450: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["brutal", "brutal"] before tick5451: CommandQueue { pending: [] }
+demo seed0 ["russia", "libya"] ["brutal", "brutal"] before tick5452: CommandQueue { pending: [PendingCommand { issued: IssuedCommand { player: PlayerId(1), command: QueueProduction { item: Unit(UnitKind(0)) } }, ai_intent: Some(AiIntent { owned: {}, armed: {}, target: None }) }] }
+demo seed0 ["russia", "libya"] ["brutal", "brutal"]: Some(Won { winner: PlayerId(1), tick: 14903 })
+test ra8_demo_admission_and_target_lifecycle_regressions_finish_with_original_rejection_rules ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 33.84s
+

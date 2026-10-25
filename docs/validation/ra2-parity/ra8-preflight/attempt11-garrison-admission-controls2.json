@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-garrison-admission-controls2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_garrison_admission_keeps_source_cost_cash_real_income_and_actual_defensive_fire",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:10:38.750148+00:00",
+  "elapsed_seconds": 6.3568066250300035,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "f25afdd910e51146e3e60e2848f56182e364e3d0cfecb62e1dc16b421ead4dc5"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "f25afdd910e51146e3e60e2848f56182e364e3d0cfecb62e1dc16b421ead4dc5"
+  },
+  "log_sha256": "a57bc24d9fbfed9d15902356def2ec79832c38e143fbd7b1407f2e8293025e50"
+}

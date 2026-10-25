@@ -1,0 +1,43 @@
+{
+  "failed_frozen_head": "2343be15afa50a22a88aad07f28009f105fb449e",
+  "failed_runtime": "bbb09feab392b31e6d627d0060586c73b100e6db",
+  "failed_gate": {
+    "workspace_exit": 101,
+    "workspace_seconds": 7346,
+    "passed": 253,
+    "failed": 1,
+    "ignored": 0,
+    "production_target_seconds": 6998.99,
+    "production_passed": 5,
+    "production_failed": 1,
+    "verified_seven_stalls": [
+      "liberty_bay: iraq (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "oasis_gulf: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "steel_harbor: france (medium) against germany (medium) stalled: players [(PlayerId(0), 29), (PlayerId(1), 0)]",
+      "frozen_sound: cuba (brutal) against germany (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 446)]",
+      "black_water: libya (brutal) against america (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "black_water: korea (brutal) against france (brutal) stalled: players [(PlayerId(0), 0), (PlayerId(1), 0)]",
+      "wheel_of_worlds: germany (brutal) against great_britain (brutal) stalled: players [(PlayerId(0), 136729), (PlayerId(1), 0)]"
+    ],
+    "successful_756_table": false,
+    "raw_archive_sha_verified": 10,
+    "subsequent_phases": "phase5 empty/partial,6\u201313notrun",
+    "stop_metadata": "docs/validation/ra2-parity/ra8-attempt5/gate-process.json"
+  },
+  "diagnosis": {
+    "exact_steel_baseline": "attempt5-steel-before2.log; None288000,438.370179959s; actual ground hits AA and real ore/travel persist, so not a liquidation/reload/limit problem",
+    "native_sample": "bounded nearest_cell firing-position search dominant;5.241876s command included in failed gate timing; no infinite-loop evidence",
+    "controlled_probe_corrections": [
+      "before1 allowed pre-wave idle fire; corrected real6000 tick initialization before actors",
+      "new-helper reactor34,2 tied economic34,12 on Chebyshev distance and won origin ordering outside the AA envelope; invalid before2/after1\u20134/new-helper fallback evidence explicitly superseded",
+      "provisional incidental-splash geometry inference was not established; actor dump revealed the missing actual-AA-job positive control",
+      "corrected reactor42,2 and requiring actual AA-focus command before introducing visible Rhino proves genuine late encounter",
+      "after5 exposes real ground-only failure blocked by moving aircraft, after6/7 pass"
+    ],
+    "valid_old_source_negative": "attempt5-screen-old-source-negative1-integrity.json:0pass2fail with real AA job/interceptor positive control; exact immediate restore",
+    "matching_attack_negative": "attempt5-screen-history-negative1-integrity.json:actual Attack chase history2reset1 on old source; exact immediate restore",
+    "interrupted_six_case_diagnostic": "attempt5-six-before1-stop.json:root-directed prioritization after21.34372s; no semantic test result"
+  },
+  "correction": "Source-range/eligibility observed threat response; preserve matching healthy orders; normal en-route combat, AA priority over incidental real unarmed/AA-only buildings; synthetic occupied Props never classified economically safe; use existing failed-target bound for idle ground team even while planes move. No new data tuning or mutable cache/state; read-only snapshot order/target already hashed as Weapon state.",
+  "remaining_validation": "exact default winners, full affected compatibility, final-source m13/budget, new freeze and all13; not closure"
+}

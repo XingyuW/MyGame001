@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.67s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+unit recovery refunds[] recruits{} actual_building_shots0
+
+thread 'ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher' (7274144) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:407:5:
+assertion `left == right` failed
+  left: 0
+ right: 350
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_unfundable_duplicate_unit_heads_refund_exactly_and_produce_a_real_cheaper_finisher
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 79 filtered out; finished in 0.20s
+
+error: test failed, to rerun pass `-p sim --lib`

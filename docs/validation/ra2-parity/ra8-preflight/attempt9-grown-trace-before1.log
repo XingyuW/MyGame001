@@ -1,0 +1,19 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+error[E0609]: no field `name` on type `&BuildingDef`
+   --> crates/game/tests/m13_grown_maps.rs:542:122
+    |
+542 | ...",owner.0,definitions.building(building.kind).unwrap().name,building.footprint,health.hit_points);
+    |                                                           ^^^^ unknown field
+    |
+    = note: available fields are: `id`, `sprite`, `width`, `height`, `production` ... and 7 others
+
+error[E0609]: no field `name` on type `&UnitDef`
+   --> crates/game/tests/m13_grown_maps.rs:545:116
+    |
+545 | ...   eprintln!("grown unit {id:?} {:?} {} HP{} {mobile:?}",owner.0,definitions.unit(unit.kind).unwrap().name,health.hit_points);
+    |                                                                                                          ^^^^ unknown field
+    |
+    = note: available fields are: `id`, `speed`, `sprite`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `game` (test "m13_grown_maps") due to 2 previous errors

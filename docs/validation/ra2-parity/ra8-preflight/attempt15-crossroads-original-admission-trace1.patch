@@ -1,0 +1,18 @@
+--- crates/sim/src/ai.rs
++++ crates/sim/src/ai.rs
+@@ -2480,15 +2480,6 @@
+             .own_units
+             .iter()
+             .any(|unit| view.fights(unit) && unit.harvest.is_none())
+-        // Finance an established stationary engagement, not another purchase
+-        // immediately after the first fully funded recruit leaves its producer.
+-        || !view.own_units.iter().any(|unit| {
+-            unit.attacking
+-                && unit.mobile.step.is_none()
+-                && unit.combat_target.is_some_and(|target| {
+-                    view.enemy_buildings.iter().any(|building| building.id == target)
+-                })
+-        })
+     {
+         return false;
+     }

@@ -1,0 +1,11 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -581,7 +581,7 @@
+         ) && view.enemy_units.iter().any(|enemy| {
+             Some(enemy.id) == unit.combat_target && !enemy.armed && enemy.harvest.is_some()
+         });
+-        if !distracted {
++        if true {
+             continue;
+         }
+         if let Some(enemy) = view

@@ -1,0 +1,35 @@
+{
+  "status": "FACTUAL_THROUGH189_PORTABLE_PLAN_ONLY_NO_ARCHIVE_OR_CANONICAL_WRITES",
+  "cutoff": 189,
+  "files": 552,
+  "bytes": 29287982,
+  "aliases": 15,
+  "historical_path_hash_resolutions": 30,
+  "new_exact_path_hash_resolutions": 812,
+  "new_actual_or_alias_paths": 188,
+  "authority64_drift": [],
+  "unresolved_cache_only_proof_paths": 0,
+  "outputs": [
+    {
+      "path": "ra9-preliminary-logs/190-through189-portable-evidence-file-list.json",
+      "bytes": 2617600,
+      "sha256": "558dfad3754a07b51b97345549a9fc1192dedde7c228de7d99365a6141988ba4"
+    },
+    {
+      "path": "ra9-preliminary-logs/190-through189-portable-evidence-file-list.tsv",
+      "bytes": 336297,
+      "sha256": "6f4341062c57b7a7c74541db57b24c1e6be4c0848888dbe57a92c8008d9cc923"
+    }
+  ],
+  "old168_and171_protected": {
+    "ra9-preliminary-logs/B-through168-portable-evidence-file-list.json": "7aed9c475a3d47b672ac5c0b049308fd08ca884942491a34a9f2297cea02d257",
+    "ra9-preliminary-logs/B-through168-portable-evidence-file-list.tsv": "0962d029e382bc0953901d3c357ac5f61b3237ebf8d6f0f6162808b8f907ed0c",
+    "ra9-preliminary-logs/B-through168-portable-evidence-file-list-completion.json": "dc2d3214692e417cddd22f0adde2fa6ca81c36b8660e005d9d6cadae38196b4a",
+    "ra9-preliminary-logs/171-compose-canonical-port.py": "bdf0a83cf00a3a919069313aff300d97e00b0c0ed4326819c0f52aefdab2e0e2",
+    "ra9-preliminary-logs/171-prospective-canonical-port-manifest.json": "9a4957e845b4076da9b5a0fc915aadf481a6cc0767469b73c2f08b2ad22eceb2",
+    "ra9-preliminary-logs/171-prospective-canonical-integration.patch": "dc6a9a8ba85687051b023bbe88a6547ed31d6107b0c5a47b780cca8681b98392"
+  },
+  "source_or_binding_writes": false,
+  "archive_writes": false,
+  "new_directories": 0
+}

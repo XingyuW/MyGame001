@@ -1,0 +1,12 @@
+{
+  "utc": "2026-10-19T19:22:40.318476+00:00",
+  "purpose": "bounded read-only owned-process CPU/elapsed snapshot; activity only, not match health or pass evidence",
+  "root_wrapper_pid": 47118,
+  "cargo_pid": 48196,
+  "rows": [
+    "47118  7720 47118       28:22   0:00.70   0.0 Ss   /opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python",
+    "48196 47118 47118       24:34   0:00.19   0.0 S    /Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo",
+    "48199 48196 47118       24:34  91:17.99 127.9 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831"
+  ],
+  "sampling": false
+}

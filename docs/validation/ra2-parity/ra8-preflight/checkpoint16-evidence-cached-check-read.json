@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-20T12:30:03.482808+00:00",
+  "receipt": "docs/validation/ra2-parity/ra8-preflight/checkpoint16-evidence-cached-check-final.json",
+  "receipt_sha256": "d1c68995b86973c66545faf144f9b69379dfb6512a22f8f3504e82611242ca65",
+  "completed_exit": 2,
+  "passed": false,
+  "identical_to_first": true,
+  "diagnostics_verified": 18,
+  "source_data_test_prose_errors": 0,
+  "raw_bytes_and_staged_blobs_unchanged": true
+}

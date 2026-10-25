@@ -1,0 +1,26 @@
+{
+  "utc": "2026-10-20T12:25:31.854940+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "elapsed_seconds": 0.011613416019827127,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "staged_paths": [
+    "crates/sim/src/ai.rs",
+    "crates/sim/tests/ra5_common/mod.rs",
+    "crates/sim/tests/ra5_crates.rs"
+  ],
+  "staged_blob_sha256": {
+    "crates/sim/src/ai.rs": "a219bfb73d6038cb56e5461120182350dce98585945bfbc50a525d36a1aaa17b",
+    "crates/sim/tests/ra5_common/mod.rs": "0a3d57fe1c6e01a5dc00f672bdbe8e3fa6753e80ea79ef72044af6cf342c1c95",
+    "crates/sim/tests/ra5_crates.rs": "133743cc92638fbf53e3a4a97c0f7c6ac98483365d6527fb3551be29f1e36074"
+  },
+  "diff_stat": " crates/sim/src/ai.rs               | 12 ++++++++++++\n crates/sim/tests/ra5_common/mod.rs |  5 ++++-\n crates/sim/tests/ra5_crates.rs     | 24 ++++++++++++++++++++++++\n 3 files changed, 40 insertions(+), 1 deletion(-)\n"
+}

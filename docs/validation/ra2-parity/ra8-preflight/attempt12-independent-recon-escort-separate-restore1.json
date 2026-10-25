@@ -1,0 +1,9 @@
+{
+  "utc": "2026-10-19T21:32:54.251075+00:00",
+  "source": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/tests/ra8_ai.rs": "4de8e563e2e399d0a18bfefce513f8107823f17d9b84b034de1b1786296e0ed2"
+  },
+  "matches_before_and_finally": true
+}

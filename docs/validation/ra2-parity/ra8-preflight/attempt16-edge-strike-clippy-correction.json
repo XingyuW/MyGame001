@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-20T22:19:59.971347+00:00",
+  "path": "crates/sim/src/ai/ra8_attrition_tests.rs",
+  "before_sha256": "c8bf152af3f2c26a670640b584209aa5274210b330da61c6aa4ba8000bf948dd",
+  "after_sha256": "e5667a1feb68cb1b9a267460d6c4b4d48c8fde38409bcfb8fe34e42386961ac0",
+  "old": "            } = event\n            {\n                if building == source {\n                    assert!(footprint.contains(cell));\n                    assert!(\n                        app.world()\n                            .resource::<Players>()\n                            .get(PlayerId(0))\n                            .unwrap()\n                            .vision()\n                            .is_visible(cell)\n                    );\n                    launched = true;\n                    launch_cell = Some(cell);\n                }\n            }\n",
+  "new": "            } = event\n                && building == source\n            {\n                assert!(footprint.contains(cell));\n                assert!(\n                    app.world()\n                        .resource::<Players>()\n                        .get(PlayerId(0))\n                        .unwrap()\n                        .vision()\n                        .is_visible(cell)\n                );\n                launched = true;\n                launch_cell = Some(cell);\n            }\n",
+  "reason": "Only Clippy collapsible_if syntax, identical match/filter and every native assertion/effect; no runtime production change. Final1 stops at strictClippy101 and all6 dependent game/sim commands unrun.",
+  "reversal_matches_before": true
+}

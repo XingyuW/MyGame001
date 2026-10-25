@@ -1,0 +1,5 @@
+error: unexpected argument 'ra8_a_real_reachable_ore_cycle_survives_an_incapable_naval_companion' found
+
+Usage: cargo test [OPTIONS] [TESTNAME] [-- [ARGS]...]
+
+For more information, try '--help'.

@@ -2,7 +2,7 @@ use bevy_ecs::world::World;
 
 use crate::ai::AiPlayers;
 use crate::building::{Building, Producer, hash_building};
-use crate::combat::{Armour, Health, Projectiles, Sight, Weapon, hash_combat};
+use crate::combat::{Armour, Condition, Health, Projectiles, Sight, Weapon, hash_combat};
 use crate::definitions::Definitions;
 use crate::economy::Players;
 use crate::harvest::Harvester;
@@ -63,10 +63,13 @@ impl Default for Fnv1a64 {
 /// allocated, the number of entities with a [`SimId`], every such entity in ascending [`SimId`]
 /// order (its id, then a flag byte and, for a unit, its components; then a flag byte and, for a
 /// harvester, its cycle; then a flag byte and, for a building, its owner and components; then a
-/// flag byte and its health, armour, and sight; then a flag byte and its weapon), the [`Grid`],
+/// flag byte and its health, armour, sight, and damage state; then a flag byte and its weapon), the [`Grid`],
 /// the [`Definitions`], the [`Players`] (with their visibility grids), the projectiles in flight,
 /// the [`MatchState`], and the computer players' [`AiPlayers`] (docs/DECISIONS.md D4, D11,
 /// extended in M2, M3, M4, and M6). Components added by later milestones are appended per entity.
+/// Since RA4 the [`Experience`](crate::Experience) of the trainable units follows at the end, if
+/// there is any; since RA5 the [`Crates`](crate::Crates), if the world ever had one. Which ore is
+/// gems and which cells were mined out is part of the [`Grid`].
 ///
 /// # Panics
 ///
@@ -83,7 +86,7 @@ pub fn state_hash(world: &mut World) -> u64 {
         Option<(&Owner, &Unit, &Mobile, &Position, &Facing, &Orders)>,
         Option<&Harvester>,
         Option<(&Owner, &Building, Option<&Producer>)>,
-        Option<(&Health, &Armour, &Sight)>,
+        Option<(&Health, &Armour, &Sight, Option<&Condition>)>,
         Option<&Weapon>,
     )>();
     let mut entities: Vec<_> = query.iter(world).collect();
@@ -114,9 +117,11 @@ pub fn state_hash(world: &mut World) -> u64 {
         }
         match combat {
             None => hasher.write(&[0]),
-            Some(components) => {
+            Some((health, armour, sight, condition)) => {
                 hasher.write(&[1]);
-                hash_combat(&mut hasher, components);
+                hash_combat(&mut hasher, (health, armour, sight));
+                // The damage state as of the last `Cleanup` stage (RA3).
+                hasher.write(&[condition.map_or(0, |condition| condition.0 as u8)]);
             }
         }
         match weapon {
@@ -127,6 +132,9 @@ pub fn state_hash(world: &mut World) -> u64 {
             }
         }
     }
+    world
+        .resource::<crate::TacticalState>()
+        .hash_into(&mut hasher);
     world.resource::<Grid>().hash_into(&mut hasher);
     world.resource::<Definitions>().hash_into(&mut hasher);
     world.resource::<Players>().hash_into(&mut hasher);
@@ -134,6 +142,39 @@ pub fn state_hash(world: &mut World) -> u64 {
     world.resource::<MatchState>().hash_into(&mut hasher);
     world.resource::<AiPlayers>().hash_into(&mut hasher);
 
+    world
+        .resource::<crate::SpecialState>()
+        .hash_into(&mut hasher);
+    world.resource::<crate::Props>().hash_into(&mut hasher);
+    world
+        .resource::<crate::WorldObjects>()
+        .hash_into(&mut hasher);
+    world.resource::<crate::Bridges>().hash_into(&mut hasher);
+    // RA4: the experience of every trainable unit in id order, and the kills and wrecks of a
+    // tick under way (both empty between ticks). Each part is written only if it holds
+    // something, under its own tag, so that a world without them hashes as before.
+    let mut query = world.query::<(&SimId, &crate::Experience)>();
+    let mut trained: Vec<_> = query.iter(world).collect();
+    if !trained.is_empty() {
+        trained.sort_unstable_by_key(|(id, _)| **id);
+        hasher.write(b"experience");
+        hasher.write_u64(trained.len() as u64);
+        for (id, experience) in trained {
+            hasher.write_u32(id.0);
+            experience.hash_into(&mut hasher);
+        }
+    }
+    world
+        .resource::<crate::veterancy::Kills>()
+        .hash_into(&mut hasher);
+    world
+        .resource::<crate::crew::Wrecks>()
+        .hash_into(&mut hasher);
+    // RA5: the crates, if the world ever had one.
+    world.resource::<crate::Crates>().hash_into(&mut hasher);
+    world
+        .resource::<crate::CommandQueue>()
+        .hash_into(&mut hasher);
     hasher.finish()
 }
 

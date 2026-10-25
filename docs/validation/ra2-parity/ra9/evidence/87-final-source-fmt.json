@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-21T01:21:44.360813+00:00",
+  "ended_utc": "2026-10-21T01:21:47.432386+00:00",
+  "command": [
+    "cargo",
+    "fmt",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "exit_code": 0,
+  "seconds": 3.071,
+  "lease": "RA8 serial functional phase jobs1, mandatory source stabilization",
+  "input_mismatches": []
+}

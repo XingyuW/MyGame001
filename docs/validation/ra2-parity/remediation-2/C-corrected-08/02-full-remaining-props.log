@@ -1,0 +1,14 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running tests/ra9_remaining_props.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_remaining_props-25315e9ac3c7dff3)
+
+running 7 tests
+test ra9_full_sustained_native_temporal_erases_each_real_occupied_prop_and_releases_terrain ... ok
+test ra9_real_beam_break_keeps_each_same_occupied_host_alive_for_the_full_uninterrupted_erase_window ... ok
+test ra9_real_bombsight_approaches_from_detection_range_and_never_falls_back_after_another_real_defuse ... ok
+test ra9_real_commands_source_or_prop_death_releases_a_genuine_temporal_channel_with_survival_twins ... ok
+test ra9_real_explicit_defusekit_traverses_long_native_path_and_prevents_the_later_ivan_explosion ... ok
+test ra9_real_ivan_charge_survives_native_commands_source_death_and_later_deals_the_same_damage ... ok
+test ra9_real_ivan_expiry_deals_four_hundred_base_damage_with_independent_armour_controls ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+

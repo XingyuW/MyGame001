@@ -1,0 +1,64 @@
+{
+  "decision": "GO WITH DOCUMENTED NON-BLOCKING DEBT",
+  "reviewed_tip": "f6fdac5a5add10e62285141a2a4ccb3328234e2f",
+  "gate_launch_tip": "525636dac32eb8bae4919a6dccdde1c0dbe815eb",
+  "frozen_manifest": {
+    "path": "docs/validation/ra2-parity/remediation-2/C-corrected-09/frozen-validation-inputs.json",
+    "sha256": "17d992857c80567e6d8377a8b98c4a1b254454ce13ff9e58104b811c52d5d64d"
+  },
+  "final_validation_summary": {
+    "path": "docs/validation/ra2-parity/review-2-corrected-08/final-validation-summary.json",
+    "sha256": "83030b60fa3530169c9868eb98adea664c61bf583c6aa05df0572ca7aaabbb41"
+  },
+  "findings": {
+    "p0": 0,
+    "p1": 0,
+    "p2": 3
+  },
+  "user_checks": {
+    "pending": 51,
+    "passed": 0
+  },
+  "artifacts": [
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/dispatch-round-2-c9-corrected-lead.md",
+      "bytes": 9537,
+      "sha256": "ae73a53640286e132a9b9fbfb591c71f39ae6f299b76868827680fb0dd3d9551"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-debt-dispositions.tsv",
+      "bytes": 166835,
+      "sha256": "7eaea475dc284a57862b7dd97c1d2bb41c71ae05986e41ecba1583ed50b423c0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-evidence-client.md",
+      "bytes": 11416,
+      "sha256": "5cfc92a95772fa6a857e2bee65de71e310f96fd8504b36b5df4cb51c12307dd5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-evidence-data.md",
+      "bytes": 11546,
+      "sha256": "1dc1dad478e7b6f3a7ac7198a3cc3512fcb829d7510ce8a5186038f6a9129a21"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-evidence-sim1.md",
+      "bytes": 13736,
+      "sha256": "f0936339ccc0882f8a88ce2d4dbfde45a8dcdc731ee7f9751ef32d1f7c93a331"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-evidence-sim2.md",
+      "bytes": 14789,
+      "sha256": "3e8c7df08d103b62b224dbf230bb3f301358a8e78e4f917678559a1630abca48"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-final-evidence-tests.md",
+      "bytes": 9687,
+      "sha256": "0bb2289c518f6869f37bf7bcbaa97b5676c0c4335fdb7e66f7d41f5e38dfe8a2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-final/evidence/round-2-lead.md",
+      "bytes": 20527,
+      "sha256": "6944885d1968719fb78d3510f54c6f46c56a46806e6d2443bd417168a70bc0c5"
+    }
+  ]
+}

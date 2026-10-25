@@ -1,0 +1,1399 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "passed": false,
+  "diagnostic_count": 153,
+  "types": {
+    "new blank line at EOF.": 134,
+    "trailing whitespace.": 19
+  },
+  "source_data_test_document_errors": 0,
+  "stdout_sha256": "0c90536b9aed2f68888a9d19e507db559ccfd51ebb0e5e82f7b0c06aa58b4b16",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "full_raw_record": "checkpoint8-staged-hygiene-raw.json",
+  "raw_bytes_altered": false,
+  "diagnostics": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6f03bf8b41af46a13a80798575728ad0e54a5b1f10d9891fee883d704ef4403c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "969682c98824efffd70ffc3aec69b7e36d93e262"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-after2.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "3fdab82741c31d1a3bf2279c6824807ee725afb5e60bb08a0a250288e9e7f206",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f23b2205260f9aea9e7a95e786203adbec0e3c98"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-ai-all1.log",
+      "line": 116,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "e69f4a521f6071a27313eac0baaeb89f987053d960789d602a8aaed08cc7d173",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "1f5e0fec043ebd3139d64892e1a1eaf6635d9923"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-attrition-all1.log",
+      "line": 18,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "737a58fe3166d7ae1ef6d8460c13d1014eaa236bfd5afc6ef028f9a48457ec6e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "3f6aca5d3dfea27cdc904d027a56a00e41710b6b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-demo-all1.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "8283b48c9c526ed9b9e77212364b231193b1dc49ee1e89171083ad16805bab02",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "43432e96036878a41a527057313b79a3044b3aef"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-aa-selection-liberty-after1.log",
+      "line": 368,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "91b0964292fe75e296906d3066dae489bdf17a09bd4d55eac59684125c0ee76b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5785464d184da0a25b39418da056c503bb465a8d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-ai-all1.log",
+      "line": 75,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "3c44a65d2d2dbd234b4f975f6921a6ab70646d9a301e0d4191aa9de502b356fa",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "79f1c3fc834c1bc8bc3543246b4b64e6146148dc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-ai-all2.log",
+      "line": 76,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "fb21d6b00b4fe7521c524d078e75e5a89489c08037d57bb67d88d18daf073957",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "d658b3175b3f8a9bd6e42135e905b98f6bfa25c8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-controlled-after3.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "4c81df8f38c95ed759e9ce905b095b4d1f8c752a3acbea4d69d26655b3ef687d",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2a31059b7417dc821902f3bc61adb8ac420be00d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lib1.log",
+      "line": 76,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "94934c68b1f3d111f472586be598c094864948edee7b839b947ee8ddb1ba2bb6",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "39bd79b4e84ba4c2ed2c061db047d82f42e64d68"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle1.log",
+      "line": 9,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "6418a3f6b7abecfafa260d674ae13131232b565d8ab200d9d5ccb5752cf58b2e",
+      "raw_line_including_eol_sha256": "0e455b5a3618cd2291082073fc354a834164a0dc7fcfb636f618b0eee28656be",
+      "index_blob_sha1": "44de5afc9ce3a8017a998d7029b5ebd607b8edad"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle3.log",
+      "line": 10,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "bdd38df47c3693da40bb367df59f6e6f07ca3838c5ed428867f5f847237d8225",
+      "raw_line_including_eol_sha256": "8cc06c37977ce403853e3649f503ba9cdb7da753c4acee0421f56cd131570e01",
+      "index_blob_sha1": "9417e2b40cf144390b606bf4178bea1defd7b81a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle3.log",
+      "line": 16,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "bdd38df47c3693da40bb367df59f6e6f07ca3838c5ed428867f5f847237d8225",
+      "raw_line_including_eol_sha256": "17d9daa783f1034c70d5952e55af02404d76227f41e996f30cfe8097f5212a55",
+      "index_blob_sha1": "9417e2b40cf144390b606bf4178bea1defd7b81a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle4.log",
+      "line": 15,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "52f2e2f4561babe29408e0b90110b7e31568fef4e6fd6625e926755708a6fa3e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "60e64191c38d9048941856b9f347dd2f7cd21cf1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-attrition-lifecycle5.log",
+      "line": 16,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "4ccd271d3fdfffbde967113fc8069839eb769a691d3dc4ebd566a4c4f5243d57",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "233747e32992076ca9ddfc06a591abf17737ae7e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-aa-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0be7589a2df937c3b37d83f8469d42feb0bd92109bf22c39fd54545f2c75258b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ba3ee2642431c20d7ddf9fdbf32a8da864ef2ea9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-aa-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "ff16a146fc63383efcb1cf134cf5aaf38388928259446d01c590165a7205eeb2",
+      "raw_line_including_eol_sha256": "81970acdbf6b11f400f61a9f6f5769e354116be93318e9c1f0ec22b8846dfedb",
+      "index_blob_sha1": "5319e77ac2381ca260da001ec65bce87ecb91954"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-ai-all1.log",
+      "line": 113,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "32719303f33bdf6cb99f8478806ed12535c81566911bd3ba83b7d9695fdaf6a5",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8c452c69ca7f3a50976ee7e8cdacc3ad0d6ad5bd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-focus-after1.log",
+      "line": 8,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "96580f7185b53f0e76f5c08a248f55dfbd5c5e6f73d3078c8a4c33dcb4adecc4",
+      "raw_line_including_eol_sha256": "051e576f6288889086f9b58c6f9e308b075078b7cc054648a7c3196d430c48f7",
+      "index_blob_sha1": "1289455baa35d1b1975833eaf1508ee172811c97"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-focus-after2.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "8f2bf83cc5a476e2e2e9318c49b9ca3b3363050b860f36960acbb1a2cc6169a4",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ed8addb4a92aeee892cf341b3c4688659505239c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-focus-ai-all1.log",
+      "line": 115,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "00e371e9634ae749d8d06c5448245dc7c22a34f87fbdc5584e75bb0118dbbf1b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "7f4dbdeb79b887e4398d2c6f0d027a0564f661f6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-bomber-focus-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "9fef68da5dd1b00c62f39911d87a6efb8137738cfc9e82f975c19d9cd92355d9",
+      "raw_line_including_eol_sha256": "826b3ed2fb87747a0f408950dab2d69a66b641d12cbe69dde7d516b00ab86ff7",
+      "index_blob_sha1": "c728fabc8091614e1c633d89485e07a3024f7db7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-after1.log",
+      "line": 21,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "4befb901483a5bfae1dd4f6c2d1bb691135cc029feb8e9c473f0c7185c36c49f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2eac498e1da603360d4db6e5ba5be532307bcab0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "d1e85f17bd3a476c1f1c8b6436071e90a87fe69999e8526a06dcf28d62800512",
+      "raw_line_including_eol_sha256": "995c32b9c3de4e289e4f1cd2c84215114719ad7fce420807f7ed7b836e9b8003",
+      "index_blob_sha1": "c7064fa48ca61a137f7b975c0051b041f79eb1d6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-building-budget-demo1.log",
+      "line": 50,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "31124c0e93d98f2fcc412b8a24b3c0183fcad8ff302577438345168e5b7bb6cd",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "72c23d2c5115509e712f024186c6920142ce594a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-after4.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6cb1be5a1d89da6c45c2ea1ef4149dd75b63c618463f9177f5d618b1273daa73",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2fbd5f1d69dd3af6621c5e18a48a864217ec9912"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-after6.log",
+      "line": 14,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "eba293e81efeceec4aa67cdc5b6edb2a15bf5f29a15fc02afc97df5e8d8286bb",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "9f39cca0d4815dffb055f459f3bec354dd81eb1b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-aggregate-after3.log",
+      "line": 20,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "8d33c851787f9349ee37eaf8972b822530ecb43caf2257cba1f53de5808b0c79",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "7c0e2c979a4328fdebcc9a6be27566b1b9f70060"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-aggregate-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "f95aadf744c2219286c5420570aa1e979a3cc8de4ca4f16cd8f1469cec36846f",
+      "raw_line_including_eol_sha256": "5652ad85b20dc95b95c015040c15dfc5f6ddd5076865367d84a25b856f503cbb",
+      "index_blob_sha1": "af4e3846c42a26c7dcbc8a624e250fdee0378a06"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-aggregate-before2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "e4350f7682871da7c1f97fd02da7795d05af1fccfdabf02cf3485dd7c14e1b6e",
+      "raw_line_including_eol_sha256": "5652ad85b20dc95b95c015040c15dfc5f6ddd5076865367d84a25b856f503cbb",
+      "index_blob_sha1": "32f02a46aa6dfd2c34a84a56eb931b5672bd64ec"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-bonus-after2.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "275f5a43af83a673cd71fd5742e77b99b4486c0ed7b93895dfdf155d7f096e4f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "31321358e4a5ff55b16dfdd0f52a68d667e354d5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-completed-after3.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "725ffad295954c9490d71b59c993a41fd1218e44768c05821703f06bc27499ef",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "7d99a33e9ffc79b505ac4c349b6f5240acea8fa5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-defence-after2.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0b420934c3956854d5149e9ef866b56d73cc9fc4f7aac2f19fad088d1246e165",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ca57a95ff426c7782011be9fb249247a7e0298ed"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-demo-after7.log",
+      "line": 50,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "f98641d0c241809e236f93a43f92f3440ac78d445378feedac88386f450a4c8b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "3d0dfbece16976dc784b1e46895554c7a769f84b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-protected-after1.log",
+      "line": 17,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "6fd16b642ddcefce79ca1f46c165adc02f858423599d60b5653ccf1bf0f82e2d",
+      "raw_line_including_eol_sha256": "7f6ae1e3aa7c8b7b6fbbe4778603209e56da2947e2855bbe47fc92013c78fac2",
+      "index_blob_sha1": "34549cd0e94e4237b2038bffa533aa8324d4669a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-protected-after2.log",
+      "line": 20,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "5f99da561476cdaca2064dd5198140185dcae72ca0f4777908a0b69f92017147",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "746fab0ac44b43de48bf1931e48a1281fdc93d17"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-security-after2.log",
+      "line": 30,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "fd3313f70bcf29b2c62ca6572911ba1addca3c989b979c583a9d94516d9d1dc0",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "11eb9edf7295615e8ec963129654d24c2572e52e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-units-after1.log",
+      "line": 16,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "2435c8d5e6c0c66421b4aeae27dd083d36ea9d42459c09dfbfa8fb22f3306312",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "0af947d15a41fc3e03e5986acd80a681894c3752"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-units-after2.log",
+      "line": 8,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "26fc70c7f7cabc1ce6cba1338ebb4bfdeb61c839f460d35f44246f064200fc88",
+      "raw_line_including_eol_sha256": "b203dc19e463119f1c5dcaeace8288ebc11ed624bd7e33516df2f70347ba04f5",
+      "index_blob_sha1": "1dc15dbbfbf2b6085064f736e606078dbfbcc336"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9ec47f0c73201bcf91f55c28bfb77eb656d864d59900f844e3212c14fc0c09c0",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "15b38e29237c5779f72513d0c6430ebd5e0124b7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ef12393cefd7525664a408368c956199ead4d6e5e8f8ad495028194378c719f3",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4f4a1712ff11271d3f3e402b90665d44f9df40eb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 104,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "af168058f81f56eda93caf05a375cf14f670907ea40350f057029f64dbae39e4",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "658360505b7daffeecbe7b744ddbe24d22a2b1ff"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "83be7faa2300f07fd7fdb1fa084c3940095b0dc7767b4540da4339bdb30b35e8",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "b5008a8e5ca0f23e12a3995acecdac48bfa2a5fe"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 301,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6b70170014b1862b67f25f4cde30806d6697986c06e8a6124f1376f8ace96393",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5d40b484ff8451a094ab620c53fafbe07ac90fb5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "978c124608f7ec4f43d1224ddfe046c54b134ce7e1d2ad16a890ff09f3c11d34",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "84cf3f4af34a9d385febfc8c84839700c5a4e3f4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "40cb91d7ff990502f5fb0e074898e9cc17a6d7f309ce9846be08a27d3e38e87c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "fc45f04be47c2c62d5c762192070391cc230afca"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 428,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "2cc5a5b09ddba39d1e89a8a2bbe400ec0cad4926d3c57cd16686f0e5dc24f490",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "59dfbfbb1fa917eed6893c8ff0ad1ff69ccc077d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 118,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "5aef7c9c75d1676746383012f0247cae4709aeb26b2596946dc002e68a467754",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "98ee664e793cd0b689f915b5af3f964c0d6aab52"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final2-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 97,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "70c184f8a737c815fda8c94cda8cb72a0302341017417ac76d9c3c5f959ba388",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "30e6728ccffd8403a59048ab50708d3627c93817"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ff46254f70e61ba1469cf7ed176da97fb4011e354ff30d6e593dec721818523b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4821b895f7a4ac16d5a31293fb0bcd57f1749004"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "c16b790cc479a25602ff7a5e13cd59afd8c46882044edac5ce9fb788b5b523b1",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "30c3ae90a671715f745176bae730d2c3c81032d5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 104,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "fa59a3078b57121548ecb81602829b3004c4e33d981d6f609e58ebac49f748a0",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "0bb5a4a1ec7d42157656e5177925c54962a0bf37"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9decb4877eac281ed4a0a8c8ba41deb939af65c07682b5f38ee7bec13b0d24ea",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c82a5d514cfee4e7a90e75611dcdaa74ead086fb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 301,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1a52d527028fe13b1838e7e0b9db068d7411c9bfe0c22bbeed099eb9c456e1f8",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "d88c3c3ec5e8a64374d36c2049c9165389c0cb63"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b0347c2fff1e9ea5a491f4305ca12badaec13c1afb9c2999996826b5ebd2c314",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "038109ad9409693e9d1abe18b6d677c344dbae96"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6f11e043ca89d65aa36e8b61158311fefde3c00a244c3cd8ee66ec4ecd78e5b6",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5e1d9b0d36433f6c84e02180456c036a8aed3b5c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 428,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1afffc6ff2dedc8d5980d37b0b4aae72265fcc280831ad7475d13ba6faaf493e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "d16078c83a6c603f38fe047246ac7a494c402a5f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 118,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "f66790d76fe1ccb36ca18e9ad1606b2720e14dbe9527d88ad72209119309049a",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "174a43c11b18e6191c9a64c6b130d2aad5c44a35"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 97,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "7289f147b05892aa9475b3127be139ae69e1ef2e486c9c5eb4011076058cd0b7",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "32435362f94eb76d4cc59a4553c666f571b420a8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b50d6b1c9837cd0463b905a8882f4b8b585e4a393efe891d22c9b5d9d8368b5f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "18f1b2bb7cacd9b3b8867e3dbb862cd90d7fb919"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes.log",
+      "line": 192,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "7c312af6e6f66312c5c7bab78242ee21e9f6c27a99594dfc0ba73c57c951ffd8",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c28a70cf6f34310fd82b6ab0e039a13d3057a728"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes.log",
+      "line": 156,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "e8d824ba2af19fb8dd4cc6aac6fb9ea6c795d4f8f3210e178fe4c4f174a2c18e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f6e6cbbc20e7387450d38f85d185caf7d414b65c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final3-exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "736c5620a0a47129758282288049ec1d5f70427cb8dcf31d3cd74be709c1f147",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "bddd5152608046a5e8451f547e0bfc71c682d706"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0d041c5447cc3391bb0b323cfffbe3afed9a7f455a7998a0967c900730508e22",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c1941bc52589856690344f78e4bc8b5f76758683"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "cd76c0153292f5200873529821285f9cdd97835734b5a4e604bcb9d94c29d803",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "a1bc817892dbeaf45ecb499d47d409ac48779018"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 121,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "01a3e2805f4d65467b07866ca22e9c4557f0648b4341f66f431acc2d7f8b674f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "459fc583673b0e5f76d62cb4a972790c3a71c053"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b9155fc8550a369506ac47972540ba9a8ba5be5ffe57a0a02197ac359f118fe2",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8392b82884adba3af72e6f76fd4230daaa1dea07"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 170,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "09c42fc3789defe42436b70822d784884f1ef716a1deda6c59aa7a02825b454e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "01a524bccb33da9cc0974e8ba6866c46de1e1c43"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "3361b60bf927b2b958bff07e90401185032d774920bc1b5fd621d17b87eccc68",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2d00c0a38fdcc8e240d1d749423b6d3e4ca86bc0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "803b82b58a7c27c00ac61d2d2c53d74aebe9f60381475426ec3bfa0ebcaa6a16",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f7c6950f3b4a0d08475cc15d3f5357211088d5c6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 152,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "41e85aacfcae70ce236e5ed5a224175e42551b228c5825f0404b986993f4b91f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "3676e3fd7fe72f11be6e70a3b00e4b4a29c90147"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 151,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "43159976e29c6a2d3f4f4b07e2898d4f3dbd326f331cc828fc32bb1a191207ad",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4b9454f9a12f19413957fc355e2ecbf70e24e16e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 123,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "861136b9a6a8e4a72c54dc677ec87e00d8b3f1b56865897c35b51ec8544422a8",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ac4ea154b2fa30ea4f16eb7373b532fac9fd7725"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "5e47b77da5a6d031a7573ae800c7420b920ecff95c0d43a0a91a83da2fce2e6e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "51445fc11867b11aaeb10eacbcfa099aaac48643"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes.log",
+      "line": 213,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "13d9de62856f792c87e9ac09103334501bed48ccda7481e755911afdd7286876",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f8b31dbc493d18e3e591c053712f8cc4443ef17a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes.log",
+      "line": 156,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "474416823e99bac9ae1593e253ac7f741afd0cd2acb2771f977bed81587ae25c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "3cb68842dc9079953db9c82ba5a43482a46f43b1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes.log",
+      "line": 112,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "70be1c11d2355ec3d4be691c682256a2641f373c7f61b0fedab1921b3fc6c31b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "dfec75277b1ea976e182b6e89ab4e6c869d6d89a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-15-ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes.log",
+      "line": 366,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0fcacf953064ebe81c474640303a3d1b3552c75a0a64e6b5add1f02bd1fe1885",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5d1eb129995fc8a438a67568dcf37bdbc6e29d25"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-16-ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 132,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9a9946dfe525a6ecdac9b7a5e4788226138b3e89ba3e0440ab162e415fc99f16",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8dd5709fa9f5efdab6544ecaa8507b42016e5b05"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-17-ra8_gate_steel_france_germany_medium_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "43087f442537d0c106a6cdb6475bf7ef9597d3a693a0d7ef3ad6069113ec34d0",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "01927f36c5953997fc116a74bb51135fd802237b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-18-ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "787014fd9d1762113514ec881986c1b4929a1da1c28702f0b3b7d2928b00671c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "d04260289ffe698ae79fa7a640e3c90a38778fd8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-19-ra8_gate_black_water_libya_america_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "401f1839289f88e53866e52a646f269e51ef3ee88b62c61020d844c0d2ec25c7",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "17a1c0ea8201423defd01cbfae05f31e3f0e1175"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-20-ra8_gate_black_water_korea_france_brutal_seed_zero_finishes.log",
+      "line": 126,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "000bf0eb1a120d3f6da6751fb6efaea04d0fe1b8f4e5495d91e812901f972f1e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "abe953e4eff79956be8286b5af5fc019f4fa5dfc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final4-exact-21-ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 275,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "eddcdde84b7fb430f9b1f01fa4f6b0a34b7b872ccb6512d85e6219c4ea037a3e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4542c72ca00469d844d72da0cbec320ffc1b5126"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "240b79ca1504269f1f0a8a3f5246ec9a14a6726084eb93f4382ae549f1c71d46",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "987464129faa50b770bf720d9990ac20cdd3baea"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-companion-crossroads_armies_finish_after_new_terrain_changes.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "3684a4ec52b2ccbb37d8e986f55db282c3963f5a9c94bf0b7d4cc1d4d443f308",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "89a05cae5217550a08071421cf3f255871cd0e79"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b95bde66e278637055c095226007923a3a7169385e9353f3f70e720b32c0f61e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "605e525b7a0962766ae100b78ed3a8752969a441"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "e99d4abab5637bd49d8e56b175d682886ea66e9721a1b8ff483fd820255ce93f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ec82393d495d77363e3712f46301984585352d3a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "4492c765f9fc1c024fd0369b064bcd45c55633bf13d055bbf18f3e9c71a5662c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "776d776ef935ca68d76f5e07f6c21775aac30e9f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "16aa487a2320eebe09dbd104e4a31431c2ed0e6d088b947481f4f1b50282313c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5a0b37c5649d7870f9179f68ec65b5387bdb57f8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "cfd9acf025633133f151ec424c28d2046d716e6690f7eeeb14acc54cbf21b6c7",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "671c92cc203578a4abf070c2270dba0a4607cc18"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 121,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "2937f7e571698ce4b71b259cc948c4cddddedf45f336e48cbd3b63ea41d739cd",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "6d0378f7c8b665d882647cea724024bf30509436"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "e50aca9ce5dc25898ca10cf9fdef1d89320de6ac5852847d4a531bac888936f3",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "709b251148229399d16110aff4ccbad40e0a4d8f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 170,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "c5ba4bc925aee9a22055ab12ca0c1d04821ac3cb235971eb9ff589263b1b47e1",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "0e541820c68ce1e03a2fd9b8a81f5e8be7b66780"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ae8a6a501738d2d41538f8f663d240dafb4dd96bf697009e259c9236fa2cd85b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f712cee55f90b7e499e8e9ddfd65f4dbb5602533"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "959f8aa88ff3efe04dedba7874b650e0d1e14564877278ee2e290323b3e93875",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "6a07f53620d61b4a7a3c01477f5b7fec16cd8af9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 152,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "f0c4f687deb9fda65fbd0f9328ae6dbd23974b1f3db96fce9aaaa975f2b5af54",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f94b8527fa2f55c9f4bc07afd761d633bb4f2f0e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 151,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1141915467eef629406396d829f530e2319ab802105c0dc216865e82fef2a0b9",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4c2d6dbd978a480c77121b8930ed60b7d2a00afe"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 123,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6107aae9ca801c088ba2b2ee163bb2f34d666577fe25564b7f8db91bdef421ea",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "e39160ad8e7e6a2f75c56013c195dd50cbaf6164"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "14858ac2ab8894d714a616f097ceca35ec2bb127771a8fb92f89fada089a59f9",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "223d39953e298eab0e4ffc74ec281389e6cfc49f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes.log",
+      "line": 213,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9e86d92db680b0347f7c6b1c98f5eb5556e8ede7f455e96db6a0466708e59827",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c77c82ca3177a057b69b8a280c61b83cf792d84e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes.log",
+      "line": 156,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1b7179dfaca67193160cd12180c4c803a87b4dd5f1543e329213a13f936cdd3c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "24b086c7e0ce57edef06946e6c79825d3046d92c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes.log",
+      "line": 112,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "cb739b1d2e2d599f32d6c5611164f93376463d7313a40d449f9b2090e959a78e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "e6cffd9a987bf2c530aa62db0ac4d1ac3159fd35"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-15-ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes.log",
+      "line": 366,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1be11c456e9b3ab4a70e0b6729a9d98adfbd91e58fce5b87a048ae6000832235",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8a180ecf858db8b6a48ed90974aea07824bb3c00"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-16-ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 132,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "2d58c86d46cf0a7e4c4e9047eee1df1f488643a0cb67ea53e37c5cd04ba7d91a",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "6ab41047de142fb91c7762121be724d9b853414a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-17-ra8_gate_steel_france_germany_medium_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "bb486547ee4e4e44d86c0d196abeb8c94dc58b01cf6fefc73799df87ad5928c4",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "9658b71be60e81016e0599dfeb1aa0f1c5ba1e90"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-18-ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "113de87040b97a5021e2e292189b7af4b82a041f58f5575db05eda393a682d47",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "e5687e6cb804b630ac6272c2c35aae347394b1d2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-19-ra8_gate_black_water_libya_america_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0fe19367227dd494992b475200ca7df8cc977124635f1c53a75b9a9ea685e8dc",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "59a77827efea2748d5b317a2c36475c8041123e4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-20-ra8_gate_black_water_korea_france_brutal_seed_zero_finishes.log",
+      "line": 126,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ac68d1582b048c9e7de3431cfa1518e4abcfd08d4350e8bd7670414de2b37355",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "46c3e6bf057f57123b04d7c05df6bfa536237e4d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-21-ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 275,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9b9ece9a95a6d47b3b7f5a8a0a6f03c407f855b07370e302511431e7327c9095",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "a6a9357bcabf8fab5a003eef1508dfd9f4a4bf7e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-22-ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "bbde1868fa608993f4b0287f428dceb4510410d5d7908e1920194093c17685f2",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "dc0740f1988dddb8e4c3c533cc8efd2c8c5f8be8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-23-ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes.log",
+      "line": 89,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "485a7d807533b4de41e613416f7091b1f4708135d2a45823f43f73a90a6415c0",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5bbe6b03893bec0b51c0f0f88d6167c08519eacd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-24-ra8_gate7_pacific_cuba_great_britain_brutal_seed_zero_finishes.log",
+      "line": 94,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "af30388e75a482a14156a7329c4cf14f6c51a40308920e4d2f2903a5ff98e7a4",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "260ac3e8b3c650ead9471f558a73b328dc37b23f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-25-ra8_gate7_lakes_russia_medium_libya_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "fa11ff5e758adfca94c42b181018c2bb7c33d534d4f21336ad9f91f5c9fac308",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "42056246a79f1905e33bcb7dfd4e5c1e0162c08d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-exact-26-ra8_gate7_demo_russia_libya_easy_seed_zero_finishes.log",
+      "line": 34,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b634696d1e0a255a094aac1b3ba342c00ba28ec7b8e6cf58f7e4e884d276bc7e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c4d944bdb2fd67622d53f05cdcac9676432f12c3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-fullsim.log",
+      "line": 1418,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "d71004e3292e6a8697833767b73049fb2d8f054a3da30d21f3f49ef92ad8c9c1",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8b0ea7921db13363039039beb26b9fe0a35c4d4a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-game-bin.log",
+      "line": 225,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "d1364d5dc1e186961d89acf8c0093adff83b52bb132e72e8a830ffbd5ebf5a6d",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "90c16f25d120d4fe09ca6b348c44b052aa9f77f8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-final5-m10.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "20da81a24c753c4203a7f260ab982fe5d5a2cdb3451f4c0af4f7929859f9e400",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "033d1d7404cde34e0a1a5b636e0ba507a61ef6f3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-jungle-attrition-after1.log",
+      "line": 91,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "c8bbb736d135c4aa6a240824c82ad91bf8cf1d69e0ed24455b06723153d94b74",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "da33c14dc8db131cd72ff1a92a642d54c7f347b7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-pacific-attrition-after1.log",
+      "line": 76,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "66341829a723f0c4b8a8dab151eb0378d5b56ea4941c950d61a97f8aff63a46e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2a74b1985c00edb8611afccad39c0f70babde37e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-prospective-finisher-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "472e871c1539e0ef5f14db6a8e906e33beddeb9482dba0674fc2241a033a82fa",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "7c2322df17300a317ebd4858ec57929d75790208"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-prospective-recovery-all1.log",
+      "line": 22,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "f043df308dc0a7ed6867261ad0a47687cfcfab42ea6459ce8933bb4a07ef3d38",
+      "raw_line_including_eol_sha256": "92d9b97c716551d14179b6c25f132955ae5f968d95611b81d68862e91e6b683e",
+      "index_blob_sha1": "225e73cc850c7d1bf703cf61e485e5f9086f8817"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-prospective-recovery-all2.log",
+      "line": 31,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "8844562dd61df653ef25a4c94ae4e61ae5ff13aa8a946f4a1359f372ab07ad0e",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "b9697b47f6c0c67730701686fdf78d55f2735e69"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-prospective-riverlands-after1.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "65d2ffd4ae8d6120b419050d070d6fa7bff5e440af0f0974c1c36721a413100b",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "a8049cedeca5a2aca45eb6b947cf143a84528aec"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-recovery-integration-ai742.log",
+      "line": 82,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "d7064a6d730d7d8f4de595d2eb81ce38281c84920ff1fab4ad377d7e997ea293",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "fac289d4853d4609cea90c064f8ade4ad7d1daf8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-recovery-integration-default101.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "62e55eeb71ced9e435430112d70b968f991e1adb5c30599f8f34c0a2244e01fe",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "c2350eb8eecae7149f00188de89a0b2dd75a476d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-riverlands-attrition-after1.log",
+      "line": 27,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "9452aa290950b300a5d4c4b53d5b3d0ccbd2b1e0396950b9944b5de071849859",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "298382a1a10556816c8c09eac84853143c43dbd2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-controlled-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "63c7405f34b0cdb415e8b8d9c18dd30ac81395b3cf53214f3a3939a17015ea61",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "6b831aed633262a2fda17c7892cda222a63f94df"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-demo1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "4c3de809be20e45de10b3458c073b186ba4cf4096ac33fc17a11721618242851",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "352aefbc26e3b2e7202b7563c09e2c7c08c0b19a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-exact-after2.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ca93f444f7e1f489b3c6635eb84861fbdecae8f886b07a377e6e65c5043b9bd8",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4916d880a90c642e7a9ef5b515a0936e44fbff54"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-intents-all2.log",
+      "line": 31,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "2be5be0df99f7433cc2d5cb670f56b0a6ed48cad544de75e8b1219f5046f5730",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2eb49266d6e195dfd3a7a1bfdf3a04d36e82260b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-public1.log",
+      "line": 30,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "03e9a336b03eee8a3ac30d0ef284b6f949a05cccad3e5ae692bc4058bedbf367",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "8118fc3618d99ca007e8195c8d9c7e0825a2e4bc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after1.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "64ef8012518102082d12ba5ab6cd4ada9ad4eb836c937f6b81f1bd1cd903bba4",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "21994f327bdb22a72b9999d6e43a020260865c69"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after3.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "bbda116cd2b9b5127ea3bbf7a6c05e65c00e67124eba37bbaf14b6f6683d1987",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5134141a5d5dfba31beda937b18baafd6df9878c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after4.log",
+      "line": 32,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "70817e730e9e3c1f0072d0b9f17810325b11b5de9a128664d656315f62e919a6",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ff29e7f42e637b0931ba7b28fe96d901083028ca"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-source-after2.log",
+      "line": 8,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "55ca559ea6b7d8cee57564c6f872cc61bafbc47e28010ee5a153b14d72c82a5f",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "2968badf59ef77c502555076a88d0d825ed25b85"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-world1.log",
+      "line": 31,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "6985da9d782f49dd69d9f8ba859e7b8c04dcf2f5992248274a774e5876ded350",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "5f52ef69dba94d63f6a83369ddaa649fc834ae64"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-controlled-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "0406c619305a80a676e8cb4253b7dc0c526155a1dfa91acd61da0dc4527dc52a",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "ce5275b5e1bd7f5e0e2259cbc32efc5c38cd7f09"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-controlled-before2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "3a045a429159feec67de3e0aa6857355cac6054204896966a230a01254a83a73",
+      "raw_line_including_eol_sha256": "892bebf2903cbcbec9a6b62519e970fd066cfa6ad6b1eadc3d8ebe5f8a1f2944",
+      "index_blob_sha1": "bb6d904353e3a1e593e0353a85af4c9cee6429b6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-controlled-before3.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "ec3f187a19e0c7eaba17fe5afdcf1ab72f47a7b75cf50b18959f28550153f2c8",
+      "raw_line_including_eol_sha256": "892bebf2903cbcbec9a6b62519e970fd066cfa6ad6b1eadc3d8ebe5f8a1f2944",
+      "index_blob_sha1": "802e3a7ea91b3fae6db92afb655be513a0f56e7e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-controlled-before4.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "31afaaec5897b22afa77958f4b832440246ecc3335b7932744b76332921238e3",
+      "raw_line_including_eol_sha256": "892bebf2903cbcbec9a6b62519e970fd066cfa6ad6b1eadc3d8ebe5f8a1f2944",
+      "index_blob_sha1": "f428997b03dfae21837200cc0a1228bd394a001e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-exact-after3.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "b2213f95a794ab2acebc10b4cd7ed96708e40e9dabae4649fea87d7419142cb3",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "800a67c1f82e641fb752bfb971a50c1483681607"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after1.log",
+      "line": 12,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "8b42a5bc1c93cefe651cba0bc7bb343692d61140d1363248f0d668eac60fbd22",
+      "raw_line_including_eol_sha256": "dd5b0746f21bbef182fd405fe8200f59d62e2cf5c97aece4ad162af4614be04f",
+      "index_blob_sha1": "48c32a182c6658c5750d9d1e3db24032ee9f9d62"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after2.log",
+      "line": 12,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "22a707d219a5d191be5ef97d8377c2f8f6e6de973dd984a350625b7871d7aa44",
+      "raw_line_including_eol_sha256": "dd5b0746f21bbef182fd405fe8200f59d62e2cf5c97aece4ad162af4614be04f",
+      "index_blob_sha1": "ec6f61003a933163b6b96c5ee9da760d80d7b6a3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after3.log",
+      "line": 34,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "1b6be6252f107269b8fcab012a2d0bb9da88509ef4358c7c94b1e52a15c08c2c",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f018f6dd78987f945e031c717149e4281433ddbf"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-matrix-after4.log",
+      "line": 34,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "06daa5899ac83929b67c8343b24635b8607c6bd8b7b6b7d0abcd0e3fa8142dba",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "f48052ff550f3806384cc589d9ebf9b37adba4af"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-strategic-power-public-after3.log",
+      "line": 30,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "990287283603ccd62d2127f6b58047b89451d797c03d37d4f3f59c61577ff801",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "219e25dcb8a36b2561365d4da4bf53c6c4034f7d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-dock-fixture-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "92aa5a3b3330c52632e45a8e5951c5bf1923bf14a9944e731853ac0484f24ef9",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "901bb6508373f20546630875aeb7805decef2ba9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-dock-fixture-negative1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "5cace7f3d79207fd227502d508d7594f839e3a6249dc8183469cb126dcbe9f75",
+      "raw_line_including_eol_sha256": "5844532043bebce285584db311138bec19b912c91f1bfd7cb2607c7ce378e6bb",
+      "index_blob_sha1": "69cde6ddfe7426d2d41c5e09fabeefcf990fbdfe"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-honesty-after1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace.",
+      "classification": "intentional captured unfinished Rust test progress trailing space",
+      "raw_file_sha256": "e7c8e4e47a312afa63fec08f449bfd099c8063d2f570255556de6c1854c5d939",
+      "raw_line_including_eol_sha256": "8539b62baac63cb7638754728d645f7e3b920feb5f45fcf1d1b8613a1d0eb864",
+      "index_blob_sha1": "322c05d86bfb36ac5abcf9972049644b86a93921"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-honesty-after2.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "c567e9fcd074051807a59817b0a427bd39fbddc9bd284d3a9d3b5b97f3183ff2",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "e58ff9faeddafdc4b845123460fa13793ed35019"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-job-after1.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "20503f0c0eb31b263fe7bc059d3a64d180ad8cd4103378a6cefa421a862a2956",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "6b5580955eaf6251dbfeb0adfa2992280f480d69"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt7-worker-job-after2.log",
+      "line": 14,
+      "diagnostic": "new blank line at EOF.",
+      "classification": "intentional byte-preserved Cargo raw stdout EOF",
+      "raw_file_sha256": "ab2c0ade0f093608a2c5a3fc0608ca8cfecdf38ecd6037f42d6e4aae58e85eca",
+      "raw_line_including_eol_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "index_blob_sha1": "4f4ec7f2fdc754eb1ffa2f6579d3717c8ba947f5"
+    }
+  ]
+}

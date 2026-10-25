@@ -1,0 +1,17 @@
+{
+  "utc": "2026-10-21T02:56:31.062592+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "scope": "source-stabilization strict actual Rust inputs; separate audit acceptance metadata may finish concurrently",
+  "ended_utc": "2026-10-21T02:56:36.709655+00:00",
+  "exit_code": 0,
+  "seconds": 5.646,
+  "input_mismatches": []
+}

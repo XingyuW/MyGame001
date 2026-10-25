@@ -6,11 +6,12 @@
 //! | Input | Effect |
 //! |-------|--------|
 //! | Sidebar: a ready building, or `B` | placement mode: a preview of the building follows the cursor, green where `PlaceBuilding` would be accepted and red where it would be rejected; a left click on a green footprint places it (`PlaceBuilding`) |
-//! | Sidebar: Sell, or `X` | sell mode: a left click on one of the player's buildings sells it (`SellBuilding`); the mode stays until it is left |
+//! | Sidebar: Sell, or `L` | sell mode: a left click on one of the player's buildings sells it (`SellBuilding`); the mode stays until it is left |
+//! | Sidebar: Repair, or `K` | repair mode: a left click on one of the player's buildings starts repairing it, or stops (`RepairBuilding`); the mode stays until it is left |
 //! | Sidebar: Rally | rally mode: a left click on a cell makes it the rally point of every unit-producing building of the player (`SetRallyPoint`) |
 //! | Right click or `Escape` in a mode | leaves the mode |
 //! | `Delete` or `Backspace` | `SellBuilding` of the player's building under the cursor |
-//! | `R` | `SetRallyPoint` of every unit-producing building of the player, to the cell under the cursor |
+//! | `Y` | `SetRallyPoint` of every unit-producing building of the player, to the cell under the cursor |
 //!
 //! The production queue itself is driven from the sidebar (`crate::sidebar`), which uses
 //! [`production_menu`] and [`menu_command`]. As in `crate::selection`, the decisions are pure
@@ -29,7 +30,7 @@ use sim::{
     PlayerId, PlayerState, ProductionItem, RejectReason, SimId,
 };
 
-use crate::buildings::{BuildingSprites, BuildingView, own_building_at, sprite_position};
+use crate::buildings::{BuildingSprites, BuildingView, own_building_at};
 use crate::hotkeys::{Hotkey, pressed_hotkeys};
 use crate::map::{HoveredCell, MapView};
 use crate::projection::{cell_corners, to_world};
@@ -70,10 +71,15 @@ pub enum InterfaceMode {
     /// Select units (`crate::selection`).
     #[default]
     Normal,
+    Interact,
+    Strategic(SimId),
+    ChronoDestination(SimId, sim::CellPos),
     /// Place the ready building of this type.
     Place(BuildingKind),
     /// Sell the player's building under the cursor.
     Sell,
+    /// Start or stop repairing the player's building under the cursor.
+    Repair,
     /// Set the rally point of the player's unit-producing buildings.
     Rally,
 }
@@ -94,7 +100,39 @@ pub fn production_menu(definitions: &Definitions) -> Vec<ProductionItem> {
         .filter_map(|index| u16::try_from(index).ok())
         .map(|index| ProductionItem::Unit(sim::UnitKind(index)))
         .filter(|&item| definitions.production(item).is_some());
-    buildings.chain(units).collect()
+    let mut menu: Vec<ProductionItem> = buildings.chain(units).collect();
+    // Within each tab, the cards follow the tech tree: what is buildable from the start first,
+    // then what each completed structure unlocks (file order within a tier). Before this, the
+    // Radar Tower that five Soviet-style units need sat on the last page of the Buildings tab.
+    menu.sort_by_key(|&item| {
+        (
+            matches!(item, ProductionItem::Unit(_)),
+            tech_tier(definitions, item),
+        )
+    });
+    menu
+}
+
+/// How many structures deep `item` lies in the tech tree: 0 for what the construction yard
+/// builds without prerequisites, otherwise one more than its deepest producer or prerequisite
+/// (a building that produces itself does not count as its own requirement).
+pub fn tech_tier(definitions: &Definitions, item: ProductionItem) -> u32 {
+    fn tier(definitions: &Definitions, item: ProductionItem, depth: u32) -> u32 {
+        let Some(terms) = definitions.production(item) else {
+            return 0;
+        };
+        if depth > 32 {
+            return depth;
+        }
+        std::iter::once(terms.producer)
+            .chain(terms.prerequisites.iter().copied())
+            .filter(|&kind| item != ProductionItem::Building(kind))
+            .map(|kind| tier(definitions, ProductionItem::Building(kind), depth + 1) + 1)
+            .max()
+            .unwrap_or(0)
+    }
+    // The construction yard itself is the root every other tier counts from.
+    tier(definitions, item, 0).saturating_sub(1)
 }
 
 /// The command for menu entry `index` (0 for the first): queue the entry, or cancel it with
@@ -119,6 +157,37 @@ pub fn ready_building(state: &PlayerState, definitions: &Definitions) -> Option<
         let terms = definitions.production(head.item)?;
         (head.progress >= terms.build_time).then_some(kind)
     })
+}
+
+/// Every building type of `state` that is complete and waits for placement, in the order of the
+/// queues (RA2: the two lanes of the Construction Yard may each hold one).
+pub fn ready_buildings(state: &PlayerState, definitions: &Definitions) -> Vec<BuildingKind> {
+    state
+        .queues()
+        .filter_map(|(_, items)| {
+            let head = items.first()?;
+            let ProductionItem::Building(kind) = head.item else {
+                return None;
+            };
+            let terms = definitions.production(head.item)?;
+            (head.progress >= terms.build_time).then_some(kind)
+        })
+        .collect()
+}
+
+/// The ready building of `state` the interface deals with in `mode`: the one that placement
+/// mode is placing, if it is ready; otherwise the first ready one ([`ready_building`]).
+pub fn ready_in_mode(
+    mode: InterfaceMode,
+    state: &PlayerState,
+    definitions: &Definitions,
+) -> Option<BuildingKind> {
+    match mode {
+        InterfaceMode::Place(kind) if ready_buildings(state, definitions).contains(&kind) => {
+            Some(kind)
+        }
+        _ => ready_building(state, definitions),
+    }
 }
 
 /// The footprint of a building of `width` × `height` cells centred on `cell` (for an even side,
@@ -163,6 +232,18 @@ pub fn sell_command(
     Some(Command::SellBuilding { building })
 }
 
+/// The command for starting or stopping the repair of the player's building under the cursor,
+/// if any.
+pub fn repair_command(
+    grid: &Grid,
+    owners: &BTreeMap<SimId, PlayerId>,
+    player: PlayerId,
+    hovered: Option<CellPos>,
+) -> Option<Command> {
+    let building = own_building_at(grid, owners, player, hovered?)?;
+    Some(Command::RepairBuilding { building })
+}
+
 /// The commands for setting a rally point: every building of `producers` (the player's buildings
 /// whose type produces units) gets the hovered cell as its rally point.
 pub fn rally_commands(producers: &[SimId], hovered: Option<CellPos>) -> Vec<Command> {
@@ -187,6 +268,8 @@ pub fn mode_after_key(
         Hotkey::PlaceReady => ready.map_or(mode, InterfaceMode::Place),
         Hotkey::SellMode if mode == InterfaceMode::Sell => InterfaceMode::Normal,
         Hotkey::SellMode => InterfaceMode::Sell,
+        Hotkey::RepairMode if mode == InterfaceMode::Repair => InterfaceMode::Normal,
+        Hotkey::RepairMode => InterfaceMode::Repair,
         Hotkey::Cancel => InterfaceMode::Normal,
         _ => mode,
     }
@@ -218,6 +301,7 @@ pub struct ClickContext<'a> {
 /// * placement: `PlaceBuilding` where the preview is valid, and the mode ends; a click on a red
 ///   footprint issues nothing and stays in the mode;
 /// * sell: `SellBuilding` of the player's building under the cursor; the mode stays;
+/// * repair: `RepairBuilding` of the player's building under the cursor; the mode stays;
 /// * rally: `SetRallyPoint` of every unit-producing building; the mode ends;
 /// * normal: nothing (clicks select units, `crate::selection`).
 pub fn mode_click(
@@ -226,7 +310,10 @@ pub fn mode_click(
     context: &ClickContext,
 ) -> (Vec<Command>, InterfaceMode) {
     match mode {
-        InterfaceMode::Normal => (Vec::new(), mode),
+        InterfaceMode::Normal
+        | InterfaceMode::Interact
+        | InterfaceMode::Strategic(_)
+        | InterfaceMode::ChronoDestination(..) => (Vec::new(), mode),
         InterfaceMode::Place(kind) => match context.placement {
             Some(Ok(_)) => match place_command(Some(kind), hovered, context.definitions) {
                 Some(command) => (vec![command], InterfaceMode::Normal),
@@ -236,6 +323,12 @@ pub fn mode_click(
         },
         InterfaceMode::Sell => (
             sell_command(context.grid, context.owners, HUMAN, hovered)
+                .into_iter()
+                .collect(),
+            mode,
+        ),
+        InterfaceMode::Repair => (
+            repair_command(context.grid, context.owners, HUMAN, hovered)
                 .into_iter()
                 .collect(),
             mode,
@@ -282,8 +375,14 @@ fn building_owners(
 ) -> (BTreeMap<SimId, PlayerId>, Vec<SimId>) {
     let mut owners = BTreeMap::new();
     let mut producers = Vec::new();
-    if let Some(mut buildings) = host.world().try_query::<(&SimId, &Owner, &Building)>() {
-        for (id, owner, building) in buildings.iter(host.world()) {
+    if let Some(mut buildings) = host
+        .world()
+        .try_query::<(&SimId, &Owner, &Building, Option<&sim::Health>)>()
+    {
+        for (id, owner, building, health) in buildings.iter(host.world()) {
+            if health.is_some_and(|health| health.hit_points <= 0) {
+                continue;
+            }
             owners.insert(*id, owner.0);
             if owner.0 == HUMAN && definitions.produces_units(building.kind) {
                 producers.push(*id);
@@ -306,12 +405,17 @@ pub fn placement_preview(
     let def = definitions.building(kind)?;
     let footprint = footprint_at(cell, def.width, def.height);
     let mut owned = Vec::new();
-    if let Some(mut buildings) = host.world().try_query::<(&Owner, &Building)>() {
+    if let Some(mut buildings) = host
+        .world()
+        .try_query::<(&Owner, &Building, Option<&sim::Health>)>()
+    {
         owned.extend(
             buildings
                 .iter(host.world())
-                .filter(|(owner, _)| owner.0 == HUMAN)
-                .map(|(_, building)| building.footprint),
+                .filter(|(owner, _, health)| {
+                    owner.0 == HUMAN && !health.is_some_and(|health| health.hit_points <= 0)
+                })
+                .map(|(_, building, _)| (building.kind, building.footprint)),
         );
     }
     let check = sim::check_placement(
@@ -325,10 +429,10 @@ pub fn placement_preview(
     Some((footprint, check))
 }
 
-/// The human player's ready building.
-fn human_ready_building(host: &SimHost) -> Option<BuildingKind> {
+/// The human player's ready building that `mode` deals with ([`ready_in_mode`]).
+fn human_ready_building(host: &SimHost, mode: InterfaceMode) -> Option<BuildingKind> {
     let definitions = host.definitions()?;
-    ready_building(host.players()?.get(HUMAN)?, definitions)
+    ready_in_mode(mode, host.players()?.get(HUMAN)?, definitions)
 }
 
 // --- Systems --------------------------------------------------------------------------------
@@ -344,7 +448,7 @@ fn issue_economy_commands(
     let Some(definitions) = host.definitions() else {
         return;
     };
-    let ready = human_ready_building(&host);
+    let ready = human_ready_building(&host, *mode);
     let mut next = mode_while_ready(*mode, ready);
     let mut commands = Vec::new();
     let (owners, producers) = building_owners(&host, definitions);
@@ -360,6 +464,7 @@ fn issue_economy_commands(
             key => next = mode_after_key(next, key, ready),
         }
     }
+    sink.issue(commands);
     if next != InterfaceMode::Normal && buttons.just_pressed(MouseButton::Right) {
         next = InterfaceMode::Normal;
     } else if buttons.just_pressed(MouseButton::Left)
@@ -383,13 +488,14 @@ fn issue_economy_commands(
         if let Some(Err(reason)) = &placement {
             info!("the building cannot be placed there: {reason}");
         }
-        commands.extend(click);
-        next = after;
+        let expected = click.len();
+        if sink.issue(click) == expected {
+            next = after;
+        }
     }
     if *mode != next {
         *mode = next;
     }
-    sink.issue(commands);
 }
 
 /// Outlines the footprint the ready building would cover at the cursor, green if
@@ -444,7 +550,7 @@ fn spawn_placement_ghost(mut commands: Commands) {
 
 /// Shows the ready building's sprite at the cursor in placement mode, tinted by validity.
 #[allow(clippy::type_complexity)]
-fn update_placement_ghost(
+pub(crate) fn update_placement_ghost(
     hovered: Res<HoveredCell>,
     view: Option<Res<MapView>>,
     mode: Res<InterfaceMode>,
@@ -480,7 +586,11 @@ fn update_placement_ghost(
         }
         sprite.color = preview_colour(valid);
         // Above every unit and building (their depths lie below 2, `crate::units::unit_depth`).
-        transform.translation = sprite_position(footprint, tile).extend(3.0);
+        sprite.custom_size = Some(crate::hd_art::building_size(
+            footprint.width,
+            footprint.height,
+        ));
+        transform.translation = crate::hd_art::building_position(footprint, tile).extend(3.0);
         if *visibility != Visibility::Inherited {
             *visibility = Visibility::Inherited;
         }
@@ -620,6 +730,15 @@ mod tests {
             sell_command(&grid, &owners, HUMAN, Some(CellPos::new(9, 9))),
             None
         );
+        // Repair, like sell, names only the player's own building under the cursor.
+        assert_eq!(
+            repair_command(&grid, &owners, HUMAN, Some(CellPos::new(6, 6))),
+            Some(Command::RepairBuilding { building: own })
+        );
+        assert_eq!(
+            repair_command(&grid, &owners, HUMAN, Some(CellPos::new(9, 9))),
+            None
+        );
         assert_eq!(
             sell_command(&grid, &owners, HUMAN, Some(CellPos::new(1, 1))),
             None
@@ -738,13 +857,33 @@ mod tests {
         );
         assert_eq!(after, InterfaceMode::Sell);
         commands.extend(sold);
+        let (repaired, after) = mode_click(
+            InterfaceMode::Repair,
+            Some(CellPos::new(6, 6)),
+            &context(None),
+        );
+        assert_eq!(after, InterfaceMode::Repair);
+        commands.extend(repaired);
         let (rallied, after) = mode_click(InterfaceMode::Rally, Some(cell), &context(None));
         assert_eq!(after, InterfaceMode::Normal);
         commands.extend(rallied);
 
+        let selected = crate::selection::Selection(selection.clone());
+        commands.extend(crate::special_controls::deploy_commands(&selected));
+        commands.extend(crate::special_controls::interact_commands(
+            &selected, barracks,
+        ));
+        commands.push(crate::special_controls::undeploy_command(barracks));
+        commands.push(crate::special_controls::strategic_command(
+            barracks, cell, &selected,
+        ));
         let mut variants = BTreeSet::new();
         for command in &commands {
             variants.insert(match command {
+                Command::Deploy { .. } => "Deploy",
+                Command::Undeploy { .. } => "Undeploy",
+                Command::Interact { .. } => "Interact",
+                Command::Superweapon { .. } | Command::Chronoshift { .. } => "Superweapon",
                 Command::Move { .. } => "Move",
                 Command::Stop { .. } => "Stop",
                 Command::Harvest { .. } => "Harvest",
@@ -752,21 +891,84 @@ mod tests {
                 Command::CancelProduction { .. } => "CancelProduction",
                 Command::PlaceBuilding { .. } => "PlaceBuilding",
                 Command::SellBuilding { .. } => "SellBuilding",
+                Command::RepairBuilding { .. } => "RepairBuilding",
                 Command::SetRallyPoint { .. } => "SetRallyPoint",
                 Command::Attack { .. } => "Attack",
                 Command::AttackMove { .. } => "AttackMove",
+                Command::Guard { .. } => "Guard",
+                Command::Scatter { .. } => "Scatter",
+                Command::Follow { .. } => "Follow",
+                Command::ForceFire { .. } => "ForceFire",
+                Command::ForceMove { .. } => "ForceMove",
+                Command::QueueMove { .. } => "QueueMove",
             });
         }
-        assert_eq!(variants.len(), 10, "{variants:?}");
+        assert_eq!(variants.len(), 15, "{variants:?}");
         assert!(commands.contains(&Command::PlaceBuilding {
             building: power,
             origin: footprint.origin,
         }));
         assert!(commands.contains(&Command::SellBuilding { building: barracks }));
+        assert!(commands.contains(&Command::RepairBuilding { building: barracks }));
         assert!(commands.contains(&Command::SetRallyPoint {
             building: barracks,
             cell,
         }));
+    }
+
+    #[test]
+    fn two_ready_buildings_of_the_two_lanes_are_each_placed_in_their_own_mode() {
+        // RA2: a Power Plant in the lane of the buildings and a Pillbox in the lane of the
+        // defences (it needs a Barracks) are built side by side and are ready together.
+        // (The second Power Plant feeds the Barracks, so that nothing is slowed down.)
+        let mut host = crate::sim_host::tests::demo_host_with(|world| {
+            for id in ["power_plant", "barracks"] {
+                let spot = (30..60)
+                    .flat_map(|y| (20..60).map(move |x| sim::CellPos::new(x, y)))
+                    .find(|&cell| sim::spawn_building(world, HUMAN, id, cell).is_ok());
+                assert!(spot.is_some(), "ground for {id}");
+            }
+        });
+        let definitions = host.definitions().expect("definitions").clone();
+        let kind = |id: &str| definitions.building_kind(id).expect("building");
+        let (power, pillbox) = (kind("power_plant"), kind("pillbox"));
+        let time = |kind| {
+            definitions
+                .production(ProductionItem::Building(kind))
+                .expect("terms")
+                .build_time
+        };
+        crate::sim_host::tests::run(
+            &mut host,
+            [power, pillbox]
+                .map(|kind| Command::QueueProduction {
+                    item: ProductionItem::Building(kind),
+                })
+                .to_vec(),
+        );
+        for _ in 1..time(power).max(time(pillbox)) {
+            crate::sim_host::tests::run(&mut host, Vec::new());
+        }
+        let state = host.players().and_then(|p| p.get(HUMAN)).expect("human");
+        assert_eq!(ready_buildings(state, &definitions), [power, pillbox]);
+        assert_eq!(ready_building(state, &definitions), Some(power));
+        // The mode keeps the building it is placing; any other mode deals with the first.
+        let place = InterfaceMode::Place(pillbox);
+        assert_eq!(ready_in_mode(place, state, &definitions), Some(pillbox));
+        assert_eq!(
+            mode_while_ready(place, ready_in_mode(place, state, &definitions)),
+            place
+        );
+        assert_eq!(
+            ready_in_mode(InterfaceMode::Normal, state, &definitions),
+            Some(power)
+        );
+        // A building that is not ready cannot be the one in placement.
+        let barracks = InterfaceMode::Place(kind("barracks"));
+        assert_eq!(
+            mode_while_ready(barracks, ready_in_mode(barracks, state, &definitions)),
+            InterfaceMode::Normal
+        );
     }
 
     #[test]
@@ -790,6 +992,15 @@ mod tests {
         );
         assert_eq!(
             mode_after_key(InterfaceMode::Sell, Hotkey::SellMode, None),
+            InterfaceMode::Normal
+        );
+        // `K` toggles repair mode, from any mode.
+        assert_eq!(
+            mode_after_key(InterfaceMode::Sell, Hotkey::RepairMode, None),
+            InterfaceMode::Repair
+        );
+        assert_eq!(
+            mode_after_key(InterfaceMode::Repair, Hotkey::RepairMode, None),
             InterfaceMode::Normal
         );
         for mode in [
@@ -883,5 +1094,289 @@ mod tests {
             placement_preview(&host, power, CellPos::new(19, 38)).expect("preview");
         assert_eq!(footprint.origin, CellPos::new(19, 38));
         assert_eq!(check, Err(RejectReason::NotReady(power)));
+    }
+
+    // Append inside construction::tests. Requires Tree corrected test-only take_commands helper.
+    fn ra9_ready_boundary_host() -> (SimHost, BuildingKind, CellPos) {
+        let mut host = crate::sim_host::tests::fixture_host(|world| {
+            world
+                .resource_mut::<sim::Players>()
+                .add(HUMAN, 10_000)
+                .expect("player");
+            for (kind, cell) in [
+                ("yard", CellPos::new(5, 5)),
+                ("power", CellPos::new(9, 5)),
+                ("barracks", CellPos::new(5, 10)),
+                ("factory", CellPos::new(10, 10)),
+            ] {
+                sim::spawn_building(world, HUMAN, kind, cell).expect("scenario setup");
+            }
+        });
+        let kind = host
+            .definitions()
+            .expect("definitions")
+            .building_kind("power")
+            .expect("power");
+        let item = ProductionItem::Building(kind);
+        let budget = host
+            .definitions()
+            .expect("definitions")
+            .production(item)
+            .expect("terms")
+            .build_time
+            * 4;
+        let events =
+            crate::sim_host::tests::run(&mut host, vec![Command::QueueProduction { item }]);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. }))
+        );
+        for _ in 0..budget {
+            if human_ready_building(&host, InterfaceMode::Place(kind)) == Some(kind) {
+                break;
+            }
+            crate::sim_host::tests::run(&mut host, vec![]);
+        }
+        assert_eq!(
+            human_ready_building(&host, InterfaceMode::Place(kind)),
+            Some(kind)
+        );
+        let cell = (0..32)
+            .flat_map(|y| (0..32).map(move |x| CellPos::new(x, y)))
+            .find(|&cell| placement_preview(&host, kind, cell).is_some_and(|(_, r)| r.is_ok()))
+            .expect("actual valid preview");
+        (host, kind, cell)
+    }
+
+    fn ra9_construction_app(host: SimHost, mode: InterfaceMode, cell: Option<CellPos>) -> App {
+        let mut app = App::new();
+        app.insert_resource(host)
+            .init_resource::<CommandSink>()
+            .insert_resource(mode)
+            .insert_resource(HoveredCell(cell))
+            .init_resource::<ButtonInput<MouseButton>>()
+            .init_resource::<ButtonInput<KeyCode>>()
+            .add_systems(Update, issue_economy_commands);
+        app
+    }
+
+    #[test]
+    fn ra9_scheduled_economy_click_transitions_require_actual_sink_acceptance_and_execute() {
+        for placing in [false, true] {
+            for refusal in ["none", "paused", "full", "closed"] {
+                let (host, kind, cell) = ra9_ready_boundary_host();
+                let producers = building_owners(&host, host.definitions().expect("definitions")).1;
+                assert!(producers.len() >= 2, "real multi-producer rally setup");
+                let mode = if placing {
+                    InterfaceMode::Place(kind)
+                } else {
+                    InterfaceMode::Rally
+                };
+                let mut app = ra9_construction_app(host, mode, Some(cell));
+                if refusal == "paused" {
+                    app.world_mut().resource_mut::<CommandSink>().toggle_pause();
+                }
+                if refusal == "full" {
+                    for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS {
+                        app.world_mut()
+                            .resource_mut::<CommandSink>()
+                            .push(Command::SetRallyPoint {
+                                building: producers[0],
+                                cell,
+                            })
+                            .expect("fill actual sink");
+                    }
+                }
+                if refusal == "closed" {
+                    let host = app
+                        .world_mut()
+                        .remove_resource::<SimHost>()
+                        .expect("scenario host");
+                    crate::sim_host::uninstall_match(app.world_mut()); // Real close path.
+                    app.world_mut().insert_resource(host); // Definitions retained only for this closed-sink scenario.
+                }
+                let before = app.world().resource::<CommandSink>().accepted();
+                app.world_mut()
+                    .resource_mut::<ButtonInput<MouseButton>>()
+                    .press(MouseButton::Left);
+                app.world_mut().run_schedule(Update);
+                let sink = app.world().resource::<CommandSink>();
+                let expected = if placing { 1 } else { producers.len() as u64 };
+                assert_eq!(
+                    sink.accepted() - before,
+                    if refusal == "none" { expected } else { 0 }
+                );
+                assert_eq!(
+                    *app.world().resource::<InterfaceMode>(),
+                    if refusal == "none" {
+                        InterfaceMode::Normal
+                    } else {
+                        mode
+                    }
+                );
+                if refusal != "none" {
+                    assert!(sink.refused() > 0);
+                    continue;
+                }
+                let commands = crate::sim_host::tests::take_commands(&mut app);
+                assert_eq!(
+                    commands.len(),
+                    expected as usize,
+                    "actual emitted batch, not just counters"
+                );
+                let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+                let events = crate::sim_host::tests::run(&mut host, commands);
+                assert!(
+                    !events
+                        .iter()
+                        .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+                    "{events:?}"
+                );
+                if placing {
+                    assert!(
+                        events.iter().any(
+                            |e| matches!(e,sim::SimEvent::BuildingPlaced{kind:k,..}if *k==kind)
+                        )
+                    );
+                } else {
+                    let mut query = host
+                        .world()
+                        .try_query::<(&sim::SimId, &sim::Producer)>()
+                        .expect("producers");
+                    assert!(
+                        query
+                            .iter(host.world())
+                            .filter(|(id, _)| producers.contains(id))
+                            .all(|(_, producer)| producer.rally == Some(cell))
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn ra9_partial_rally_accepts_only_available_slots_and_keeps_rally_mode() {
+        let (host, _, cell) = ra9_ready_boundary_host();
+        let producers = building_owners(&host, host.definitions().expect("definitions")).1;
+        assert_eq!(producers.len(), 2, "two genuine producers");
+        let old = CellPos::new(7, 8);
+        let mut app = ra9_construction_app(host, InterfaceMode::Rally, Some(cell));
+        for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS - 1 {
+            app.world_mut()
+                .resource_mut::<CommandSink>()
+                .push(Command::SetRallyPoint {
+                    building: producers[0],
+                    cell: old,
+                })
+                .expect("fill");
+        }
+        let before = app.world().resource::<CommandSink>().accepted();
+        app.world_mut()
+            .resource_mut::<ButtonInput<MouseButton>>()
+            .press(MouseButton::Left);
+        app.world_mut().run_schedule(Update);
+        assert_eq!(
+            *app.world().resource::<InterfaceMode>(),
+            InterfaceMode::Rally
+        );
+        let sink = app.world().resource::<CommandSink>();
+        assert_eq!(sink.accepted() - before, 1);
+        assert_eq!(sink.refused(), 1);
+        let commands = crate::sim_host::tests::take_commands(&mut app);
+        let mut host = app.world_mut().remove_resource::<SimHost>().expect("host");
+        let events = crate::sim_host::tests::run(&mut host, commands);
+        assert!(
+            !events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::CommandRejected { .. })),
+            "{events:?}"
+        );
+        let mut query = host
+            .world()
+            .try_query::<(&sim::SimId, &sim::Producer)>()
+            .expect("producers");
+        for (id, producer) in query.iter(host.world()) {
+            if *id == producers[0] {
+                assert_eq!(producer.rally, Some(cell));
+            }
+            if *id == producers[1] {
+                assert_eq!(producer.rally, None);
+            }
+        }
+    }
+
+    #[test]
+    fn ra9_cancel_invalid_preview_and_no_longer_ready_transitions_need_no_sink_slot() {
+        for paused in [false, true] {
+            for escape in [false, true] {
+                let (host, kind, cell) = ra9_ready_boundary_host();
+                let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), Some(cell));
+                if paused {
+                    app.world_mut().resource_mut::<CommandSink>().toggle_pause();
+                } else {
+                    for _ in 0..crate::sim_host::MAX_PENDING_COMMANDS {
+                        app.world_mut()
+                            .resource_mut::<CommandSink>()
+                            .push(Command::Stop { units: vec![] })
+                            .expect("fill only; never executed");
+                    }
+                }
+                let before = app.world().resource::<CommandSink>().accepted();
+                if escape {
+                    app.world_mut()
+                        .resource_mut::<ButtonInput<KeyCode>>()
+                        .press(KeyCode::Escape);
+                } else {
+                    app.world_mut()
+                        .resource_mut::<ButtonInput<MouseButton>>()
+                        .press(MouseButton::Right);
+                }
+                app.world_mut().run_schedule(Update);
+                assert_eq!(
+                    *app.world().resource::<InterfaceMode>(),
+                    InterfaceMode::Normal
+                );
+                let sink = app.world().resource::<CommandSink>();
+                assert_eq!(sink.accepted(), before);
+                assert_eq!(sink.refused(), 0);
+            }
+        }
+        for hovered in [None, Some(CellPos::new(-1, -1)), Some(CellPos::new(5, 5))] {
+            let (host, kind, _) = ra9_ready_boundary_host();
+            if let Some(cell) = hovered {
+                assert!(placement_preview(&host, kind, cell).is_none_or(|(_, r)| r.is_err()));
+            }
+            let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), hovered);
+            app.world_mut()
+                .resource_mut::<ButtonInput<MouseButton>>()
+                .press(MouseButton::Left);
+            app.world_mut().run_schedule(Update);
+            assert_eq!(
+                *app.world().resource::<InterfaceMode>(),
+                InterfaceMode::Place(kind)
+            );
+            let sink = app.world().resource::<CommandSink>();
+            assert_eq!((sink.accepted(), sink.refused()), (0, 0));
+        }
+        let (mut host, kind, cell) = ra9_ready_boundary_host();
+        let events = crate::sim_host::tests::run(
+            &mut host,
+            vec![Command::CancelProduction {
+                item: ProductionItem::Building(kind),
+            }],
+        );
+        assert!(
+            events
+                .iter()
+                .any(|e| matches!(e, sim::SimEvent::ProductionCancelled { .. }))
+        );
+        let mut app = ra9_construction_app(host, InterfaceMode::Place(kind), Some(cell));
+        app.world_mut().run_schedule(Update);
+        assert_eq!(
+            *app.world().resource::<InterfaceMode>(),
+            InterfaceMode::Normal
+        );
+        assert_eq!(app.world().resource::<CommandSink>().accepted(), 0);
     }
 }

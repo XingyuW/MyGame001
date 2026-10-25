@@ -1,0 +1,38 @@
+{
+  "label": "attempt12-demo-gb-cuba-easy-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate12_demo_great_britain_cuba_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T21:06:18.598340+00:00",
+  "elapsed_seconds": 42.83161283301888,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "84722a07b453b41da82861bc4e73bded652f2aa0db604f6060141afad9d693c9",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "289056c9ff5cdd2a83ab9a2c4d71564b2b064c3275b114dcb61624e8da1bca9f"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "84722a07b453b41da82861bc4e73bded652f2aa0db604f6060141afad9d693c9",
+    "crates/sim/src/ai/strategy.rs": "323f97d83614232db3d1d619d54847b885c1f0635d55382bc8804d95bb998ef9",
+    "crates/sim/src/special/infantry.rs": "31dce2c06293a73c22d907114f508096860cb3a3cdb342d75c5f541003b4d002",
+    "crates/sim/tests/ra8_temporal.rs": "1f2745ba36166ba48a203be39f5e5660c7f203fbdd7a4c6997f5a5cf9b5b9553",
+    "crates/sim/src/ai/ra8_attrition_tests.rs": "bc5e2c071410f3f9f64a2bdc44f64db7d2bc8a59b25c726b0d297f04779ac1e8",
+    "crates/game/tests/ra8_gate_matches.rs": "743c78d3ba344d0690cbb595c720c0910be78e69b276197799bbfc99e41af6c0",
+    "crates/sim/tests/ra8_ai.rs": "289056c9ff5cdd2a83ab9a2c4d71564b2b064c3275b114dcb61624e8da1bca9f"
+  },
+  "log_sha256": "991f6b25cd120b666613920cb57704ccf4ea8cf479ca1a422fc95648ec8669e3"
+}

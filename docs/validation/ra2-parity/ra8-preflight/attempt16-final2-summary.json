@@ -1,0 +1,574 @@
+{
+  "label": "attempt16-final2",
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "start_utc": "2026-10-20T22:20:15.143380+00:00",
+  "pid": 58488,
+  "pgid": 58488,
+  "runtime_paths": 344,
+  "additional_paths": 169,
+  "overlap": 18,
+  "unique": 495,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T22:20:15.143488+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-01-fmt.log",
+      "end_utc": "2026-10-20T22:20:16.254809+00:00",
+      "elapsed_seconds": 1.1112758329836652,
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T22:20:16.301998+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-02-regenerate.log",
+      "end_utc": "2026-10-20T22:20:16.384075+00:00",
+      "elapsed_seconds": 0.08202420803718269,
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T22:20:16.431916+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-03-clippy.log",
+      "end_utc": "2026-10-20T22:20:22.538299+00:00",
+      "elapsed_seconds": 6.106285832996946,
+      "exit": 0,
+      "log_sha256": "d64b0a5da267429f2b3de6d32f9326006f3cec1ab3f21d43d3456da56aed36ef",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "crossroads",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T22:20:22.588999+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-04-crossroads.log",
+      "end_utc": "2026-10-20T22:21:18.758731+00:00",
+      "elapsed_seconds": 56.16940299997805,
+      "exit": 0,
+      "log_sha256": "7cdfb702c5e6203c20b0f03de5dd796b9726f94f123d5d8b51adfe720264f80f",
+      "rust_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "crossroads-reverse",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T22:21:18.848643+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-05-crossroads-reverse.log",
+      "end_utc": "2026-10-20T22:21:27.647845+00:00",
+      "elapsed_seconds": 8.799095333029982,
+      "exit": 0,
+      "log_sha256": "f467089a03f0f0098d4dfbd904b797d979995b1ea4048fd0bb05b0329b4b5492",
+      "rust_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "riverlands",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T22:21:27.707145+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-06-riverlands.log",
+      "end_utc": "2026-10-20T22:21:34.245178+00:00",
+      "elapsed_seconds": 6.5379079160047695,
+      "exit": 0,
+      "log_sha256": "eef8300319bb7d1d7a2f9b0e7d144ebbc55f269ad86aead8d7ac428def2c9514",
+      "rust_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T22:21:34.301326+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-07-demo10.log",
+      "end_utc": "2026-10-20T22:22:48.255854+00:00",
+      "elapsed_seconds": 73.9540551250102,
+      "exit": 0,
+      "log_sha256": "ea2ffa5c4c10eaab5acc7a2266dee9f7646fac907676a10980de5bbf01d07236",
+      "rust_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T22:22:48.385037+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-08-grown3.log",
+      "end_utc": "2026-10-20T22:23:26.576459+00:00",
+      "elapsed_seconds": 38.19114691700088,
+      "exit": 0,
+      "log_sha256": "d7d9347c12f40cb02f89798161448ac72656a1e0aa6d9c2c573d613c16bb9e58",
+      "rust_results": [
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "full-sim",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim"
+      ],
+      "start_utc": "2026-10-20T22:23:26.652541+00:00",
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt16-final2-09-full-sim.log",
+      "end_utc": "2026-10-20T22:47:42.429833+00:00",
+      "elapsed_seconds": 981.3773653339595,
+      "exit": 0,
+      "log_sha256": "e502acac306c46d2f9a83d24c5b671b26a5a28c8cdefc2cb088cd5596945ed21",
+      "rust_results": [
+        {
+          "passed": 124,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 33,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 24,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 37,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 32,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 24,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 36,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 18,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 23,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 30,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 32,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 131,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "source_mismatches": []
+    }
+  ],
+  "status": "PASSED",
+  "reordered_acceptance": "Required full13 before isolated all21/fixed3/3exampleguards, no drops. Fullsim replaces redundant individual AI/attrition/recovery commands.",
+  "prior_exact_receipt": "attempt16-coral-edge-after1.json;11-bound receipt before this fresh discovered495 manifest; no retrospective495 claim.",
+  "end_utc": "2026-10-20T22:47:42.541205+00:00",
+  "elapsed_seconds": 1172.9970242920099
+}

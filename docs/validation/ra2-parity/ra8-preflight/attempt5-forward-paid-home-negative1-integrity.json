@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_strike_aircraft_exploit_a_short_observed_ground_clearance_opening",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 25.38714199999231,
+  "before_sha256": "278aa7a3aef38719be47443a5a80a023df758f81288d2039d624df0a52a3e3ea",
+  "mutated_sha256": "84062a3f045cfab39142212ce1f2baa4e32547b5b4654c818f553d6944c65020",
+  "restored_sha256": "278aa7a3aef38719be47443a5a80a023df758f81288d2039d624df0a52a3e3ea",
+  "mutation": "Only replace forward endpoint selection with old home gather; actual paid ready replacement fixture; immediate exact restoration"
+}

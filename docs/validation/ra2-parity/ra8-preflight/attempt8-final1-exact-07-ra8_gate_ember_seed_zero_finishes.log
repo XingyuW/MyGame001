@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.15s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+test ra8_gate_ember_seed_zero_finishes ... ember_caldera seed0 ["libya", "korea"] ["brutal", "medium"]: Some(Won { winner: PlayerId(0), tick: 31866 })
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 32.37s
+

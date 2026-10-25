@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 0.77s
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 6 tests
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... FAILED
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+
+failures:
+
+---- ra6_reactor_chain_radiation_and_temporal_suppression stdout ----
+
+thread 'ra6_reactor_chain_radiation_and_temporal_suppression' (2302855) panicked at crates/sim/tests/ra6_vehicles.rs:176:185:
+assertion failed: app.world().resource::<sim::SpecialState>().radiation_sites.is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ra6_reactor_chain_radiation_and_temporal_suppression
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `-p sim --test ra6_vehicles`

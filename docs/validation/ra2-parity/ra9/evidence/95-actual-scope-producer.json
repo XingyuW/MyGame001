@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-21T01:26:02.093673+00:00",
+  "ended_utc": "2026-10-21T01:26:07.066201+00:00",
+  "command": [
+    "python3",
+    "scripts/ra2_reference.py",
+    "--ra9-scope"
+  ],
+  "exit_code": 0,
+  "seconds": 4.973,
+  "scope": "actual originalINI+wholeRust source metadata observations, not expected contract or native proof",
+  "outputs": {
+    "crates/sim/tests/reference/ra9_legacy_original.tsv": {
+      "sha256": "d20a52b768ad12557e58537b27f166d0b0a8b0c2904814cdc3c01ca4601255e7",
+      "bytes": 9827
+    },
+    "crates/sim/tests/reference/ra9_scope75_original.tsv": {
+      "sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7",
+      "bytes": 10248
+    },
+    "crates/sim/tests/reference/ra9_special_original.tsv": {
+      "sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb",
+      "bytes": 1280
+    },
+    "crates/sim/tests/reference/ra9_model_census.tsv": {
+      "sha256": "ee701d23a5829a50f263aa51e19b845a02dac4ea7f866941d91535c7a898c727",
+      "bytes": 11417
+    },
+    "crates/sim/tests/reference/ra9_model_surface.txt": {
+      "sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+      "bytes": 921
+    },
+    "crates/sim/tests/reference/ra9_scope_observation.tsv": {
+      "sha256": "7c01a40308b159b10b0ead926fe0ec7e76f6ed4bf0f858bcbcba2ff91e0cc5a6",
+      "bytes": 430
+    }
+  }
+}

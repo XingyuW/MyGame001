@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-20T12:09:11.861600+00:00",
+  "original_manifest": "docs/validation/ra2-parity/ra8-attempt15/PRESERVED.json",
+  "original_manifest_sha256": "372fb053e748023ba1374ed7f4f156d68f9a59813cd79d3cadacaa71547a151e",
+  "file_count": 70,
+  "bytes_per_set": 1576140,
+  "copies_verified": 140,
+  "label_files_exactly_listed": true,
+  "mismatches": [],
+  "note": "Fresh read before any label reuse; original manifest and every raw/archive byte preserved. This does not promote failed attempt15 to acceptance."
+}

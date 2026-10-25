@@ -1,0 +1,6 @@
+{
+  "test_only_observational_mutation": true,
+  "test_sha_before": "1b7e230db1939baba4de82bb155fc2ab2975a9c9d24b8558bdd81db0abbd8c63",
+  "test_sha_after": "1b7e230db1939baba4de82bb155fc2ab2975a9c9d24b8558bdd81db0abbd8c63",
+  "meaning": "Original20,20 ability fixture restored only for observational remaining/beam/order trace; original assertions unchanged. Prepared near-range fixture restored in finally; requires separate laterSHA inspection before dependent work."
+}

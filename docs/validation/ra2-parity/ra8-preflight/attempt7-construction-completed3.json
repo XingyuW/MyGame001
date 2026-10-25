@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9054475000011735,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format11.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests::ra8_completed_paid_unit_heads_and_duplicate_tails_keep_normal_exit_and_fifo",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "seconds": 16.171938999992562,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-completed-after3.log"
+  }
+]

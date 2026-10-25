@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0609]: no field `air_range_bonus` on type `&WeaponDef`
+   --> crates/sim/src/ai/strategy.rs:460:72
+    |
+460 |                     let reach = anti_air.range.saturating_add(anti_air.air_range_bonus);
+    |                                                                        ^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `damage`, `range`, `min_range`, `reload` ... and 12 others
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `sim` (lib) due to 1 previous error

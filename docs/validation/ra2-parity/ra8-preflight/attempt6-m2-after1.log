@@ -1,0 +1,45 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 3.75s
+     Running tests/m2_movement.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m2_movement-7bca37147e5a4da1)
+
+running 37 tests
+test a_completion_says_whether_the_unit_stopped_short_of_its_destination ... ok
+test a_destination_held_by_an_idle_unit_is_replaced_by_the_nearest_reachable_cell ... ok
+test a_group_order_gives_every_unit_its_own_destination_cell ... ok
+test a_move_outside_the_map_is_rejected ... ok
+test a_new_move_replaces_the_current_order ... ok
+test a_newly_placed_obstacle_triggers_a_repath ... ok
+test a_unit_of_either_boundary_speed_crosses_an_open_map_and_arrives_on_time ... ok
+test a_unit_ordered_to_its_own_cell_stays ... ok
+test a_unit_standing_in_the_way_is_bypassed ... ok
+test an_order_ends_when_two_units_keep_giving_way_to_each_other_in_a_sealed_room ... ok
+test an_order_ends_when_units_keep_giving_way_in_a_dead_end_closed_by_idle_units ... ok
+test commands_for_missing_foreign_or_repeated_units_are_rejected ... ok
+test every_order_ends_even_when_units_are_walled_in_by_waiting_units ... ok
+test every_order_ends_on_random_maps_under_random_group_orders ... ok
+test executed_route_is_optimal_through_the_production_path ... ok
+test facing_follows_each_step_direction ... ok
+test fifty_units_of_the_boundary_speeds_reach_a_clicked_destination ... ok
+test fifty_units_reach_a_clicked_destination_without_overlap_or_deadlock ... ok
+test invariant_i6_holds_and_every_order_ends_under_seeded_random_orders ... ok
+test invariant_i6_holds_while_fifty_units_cross_each_other_for_2000_ticks ... ok
+test no_diagonal_step_between_two_blocked_orthogonal_neighbours ... ok
+test orders_end_at_both_boundary_speeds_when_units_keep_giving_way ... ok
+test path_cost_is_optimal_on_open_and_obstructed_fixture_maps ... ok
+test path_requests_are_served_within_the_per_tick_budget_oldest_first ... ok
+test rejections_have_descriptive_messages ... ok
+test spawning_is_checked ... ok
+test stop_ends_the_order_at_the_next_cell_centre ... ok
+test the_boundary_speed_fixture_holds_the_slowest_and_fastest_speeds ... ok
+test the_hash_covers_unit_state ... ok
+test the_same_scenario_gives_the_same_hash_at_every_tick ... ok
+test ticks_spent_waiting_for_the_pathfinder_do_not_count_as_stalled ... ok
+test two_units_that_want_each_others_cell_resolve_by_one_stepping_aside ... ok
+test units_cover_exactly_their_speed_per_tick ... ok
+test units_meeting_head_on_in_a_one_cell_corridor_both_pass ... ok
+test units_queued_behind_a_unit_of_the_slowest_speed_follow_it_to_their_destinations ... ok
+test unreachable_target_ends_the_order_with_an_event_and_no_panic ... ok
+test validation_checks_each_named_unit_in_turn ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.87s
+

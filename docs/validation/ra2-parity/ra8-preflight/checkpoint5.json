@@ -1,0 +1,152 @@
+{
+  "frozen_runtime": "bbb09feab392b31e6d627d0060586c73b100e6db",
+  "feature_commit": "bb1f87e9496236ecf3bcdcd797fd1446f732d203",
+  "main_unchanged": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "gate_state": "ready for required parent milestone check; full13 not started; no validator active",
+  "next_command": "env -u RA2_DUEL_SEED -u RA2_DUEL_PAIR sh scripts/validate_ra2_parity.sh ra8",
+  "full_gate_required_commands": 13,
+  "acceptance": "docs/validation/ra2-parity/RA8_ACCEPTANCE.md",
+  "decisions": "docs/DECISIONS.md R88\u2013R115",
+  "fixture_migration_ledger": "DECISIONS.md R94/R96/R102 and R110 (history-based credit observation through same3000, existing final assertions unchanged); R108 restores existing neutral strategy opt-out with diagnostics only",
+  "static_tests": 1197,
+  "added_tests": 73,
+  "removed_or_renamed_tests": 0,
+  "ignores": 0,
+  "test_inventory": "attempt4-test-inventory.json",
+  "serial_preflight": {
+    "targets": 22,
+    "passed": 483,
+    "failed": 0,
+    "ignored": 0,
+    "sim_targets": 13,
+    "sim_passed": 243,
+    "game_unit_passed": 217,
+    "demo_test_functions": 1,
+    "demo_matches": 10,
+    "exact_default_test_functions": 12,
+    "multiplayer_tests": 5,
+    "old_production_companions": 5,
+    "summary": "attempt4-final-preflight-summary.json",
+    "strict_checks": "attempt4-strict-results2.json"
+  },
+  "m13_metrics": "attempt4-m13-metrics.json",
+  "m13_winners": 21,
+  "m13_count": 21,
+  "m13_ending_median": 56614,
+  "m13_ending_p90": 108259,
+  "m13_ending_maximum": 288884,
+  "m13_limit_unchanged": 400000,
+  "ten_player256_means_ms": [
+    0.842308,
+    0.623839,
+    0.780129
+  ],
+  "mean_budget_ms_unchanged": 5,
+  "profile_state_digest": "94f4c6583a68ff22",
+  "profile_event_count": 660,
+  "profile_event_digest": "acbe6072fabd5e3a",
+  "ra9_handoff": [
+    "R83 Size/SizeLimit/loaded boarding and actual attached-Squid host WeaponFired debt",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal resolution boundaries: source-inspected, not ability-support claims",
+    "R99 source-only unproven hypothetical bombable=false capability lead; broader audit explicitly deferred"
+  ],
+  "assumptions": "R91/R92 game-owned full-tech composition, tier reserves, tactical radii/standoff/offsets and source-weight category mapping; prior RA5/RA6 assumptions remain; R114 observed-AA algorithm derives from source eligibility/ranges and existing gather/failure policy, with no new quota/weight/radius",
+  "storage": {
+    "configured_cargo_target": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "new_external_directory": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+    "allocated_KiB": 708,
+    "retention": "retained, recreatable, needed only for reruns; no clone/worktree/environment or substantial tmp artifact",
+    "other_caches": "configured UV_CACHE_DIR/PIP_CACHE_DIR preserved; existing RA5 render and RA7 evidence retained"
+  },
+  "verification_pending": [
+    "all thirteen frozen gates, both756-winner sweeps and unchanged-R29 before/after metrics",
+    "independent final review",
+    "user visual/audio/play-feel verification"
+  ],
+  "staged_whitespace_checks": {
+    "feature": "feature-staged-whitespace-check1.json: exit2,32 classified preserved raw diagnostics; not passed",
+    "performance": "performance-staged-whitespace-check1.json: exit2,one preserved raw EOF; not passed",
+    "process": "separate exact-set rechecks inspected before each commit; no source/data/test diagnostics or suppression",
+    "correction": "refreeze-staged-whitespace-check2.json: exit2 solely12 exact preserved raw EOF diagnostics, separately classified and exact-rechecked before later commit; not passed",
+    "refreeze_checkpoint": "checkpoint2-staged-whitespace-check.json: standaloneexit2 solelycrossroads-final2.log:8 preservedrawEOF; separatelyclassified/rechecked, notpassed",
+    "second_gate_correction": "attempt2-staged-whitespace-check1.json: standaloneexit2,426 exact preserved raw-only diagnostics (406 trace/progress spaces/20EOF); exact-output SHA recheck inspected before commit; not passed",
+    "third_refreeze_checkpoint": "checkpoint3-staged-whitespace-check.json: standaloneexit2 solelyattempt2-game-exact-final2.log:551 preservedrawEOF; exact-output recheck inspected before later commit; notpassed",
+    "fourth_freeze": "checkpoint4-staged-whitespace-check.json: standaloneexit2 solely2 exact preserved rawEOF lines; separate exact-output recheck inspected before later commit; notpassed",
+    "attempt4_lifecycle": "attempt4-lifecycle-staged-hygiene.json: standaloneexit2 only5 raw EOF lines, classified and separately exact-rechecked before3b81f76; not passed",
+    "attempt4_tactical": "attempt4-aa-staged-hygiene.json: standaloneexit2 only12 raw EOF lines, classified and separately exact-rechecked beforebbb09fe; not passed",
+    "fifth_freeze": "checkpoint5-staged-hygiene.json: standalone unfiltered exit0, separately rechecked before checkpoint commit"
+  },
+  "previous_checkpoint": "4dfeeedc910ea9589889806d396aaa51c13c03c4",
+  "correction_decisions": "R111\u2013R114 concrete attempt4 corrections; R115 final-source checkpoint",
+  "focused_game": {
+    "game_unit_tests": 217,
+    "default_matches": 22,
+    "default_test_functions": 13,
+    "demo_log": "attempt4-game-ai1.log",
+    "exact_log": "attempt4-game-exact1.log",
+    "all_explicit_winners": true,
+    "old_production_companions": 5,
+    "multiplayer_tests": 5,
+    "assertions_limits_rejection_exemptions": "unchanged",
+    "logs": "attempt4-final-preflight-summary.json"
+  },
+  "m13_measured_seconds": 914.394,
+  "m13_elapsed_seconds": 914.567,
+  "before_R29": {
+    "production": {
+      "source": "docs/validation/ra2-parity/ra7/production-lengths.tsv",
+      "count": 756,
+      "tick_median": 31540.0,
+      "tick_p90_nearest_rank": 64532,
+      "tick_maximum": 209163,
+      "R29_ratio_median": 0.13147048611111112,
+      "R29_ratio_p90_nearest_rank": 0.2807579365079365,
+      "R29_ratio_maximum": 0.7824722222222222
+    },
+    "duel": {
+      "source": "docs/validation/ra2-parity/ra7/duel-lengths.tsv",
+      "count": 756,
+      "tick_median": 32782.5,
+      "tick_p90_nearest_rank": 69184,
+      "tick_maximum": 157564,
+      "R29_ratio_median": 0.1386996527777778,
+      "R29_ratio_p90_nearest_rank": 0.3236736111111111,
+      "R29_ratio_maximum": 0.7664722222222222
+    }
+  },
+  "R29_comparison_pending": "both756-winner final frozen sweeps; ratios use unchanged72000*max(128,width+height)/128; p90 nearest-rank",
+  "witness_actor_guard": "ai.rs View::new own_units filters through army_commandable before capture; excludes spawned/flights/erasures/deployed/interactions/docked/rearming/disabled; recoverable Prop Deploy uses a distinct branch. Parent confirmed no source change necessary.",
+  "R97_status": "mechanism closed in R103 because actual default gate reproductions required it; not deferred as known broken play",
+  "profile_note": "R89/R98 seeded equalities remain historical evidence for isolated performance commits; new queue hash intentionally extends state format",
+  "failed_attempts": [
+    "ra8-attempt1/STOPPED.md",
+    "ra8-attempt2/STOPPED.md and captured-sha256.json (all8 raw files verified unchanged)",
+    "ra8-attempt3/STOPPED.md and captured-sha256.json (all8 raw files verified unchanged)",
+    "ra8-attempt4/STOPPED.md and captured-sha256.json: all8 raw files reverified unchanged"
+  ],
+  "new_correction_tests": {
+    "game": 3,
+    "sim": 7
+  },
+  "compatibility_probe_integrity": [
+    "attempt2-ra4-recovery-boundary-probe1-integrity.json",
+    "attempt2-ra4-scout-boundary-probe1-integrity.json"
+  ],
+  "final_default_runtime_diff": "git diff bbb09fe -- crates assets scripts Cargo.toml Cargo.lock empty; only docs/evidence follow runtime",
+  "affected_test_preflight": {
+    "summary": "attempt4-final-preflight-summary.json",
+    "passed": 483,
+    "failed": 0,
+    "ignored": 0,
+    "targets": 22,
+    "strict_checks": "attempt4-strict-results2.json"
+  },
+  "test_probe_integrity": "attempt3-crossroads-credit-history-integrity.json",
+  "lifecycle_commit": "3b81f76abe1a09372b65fd9dd4fe132d75e77cfd",
+  "private_extension_review_scope": "R112 private tagged/value-hashed conditional bridge goal: authorize actor/type/ownership/visible hut first, readiness after FIFO, public Interact strict, actual R67 restoration guard. R113 complete strategic validity certificate with narrow revalidated cell-visibility cancellation.",
+  "negative_probe_integrity": [
+    "attempt4-bridge-readiness-negative-integrity1.json",
+    "attempt4-strategic-cell-negative-integrity1.json"
+  ],
+  "checkpoint_metadata_diagnostics": "checkpoint5-parser-diagnostics.json: two historical-field merge errors corrected; no source/test mutation or simulation failure"
+}

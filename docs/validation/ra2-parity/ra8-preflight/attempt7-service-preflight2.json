@@ -1,0 +1,29 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9993127500056289,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-format2.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ra8_service_healing_certificate_keeps_public_intrinsic_capacity_and_fifo_errors_strict",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 16.593960083002457,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-security-after1.log"
+  }
+]

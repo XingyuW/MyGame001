@@ -1,0 +1,8 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 14.10s
+     Running `target/release/examples/m7_benchmark`
+m7 benchmark (release build): 100 armed units per player, 2000 measured ticks per scenario; budget: mean <= 5ms, longest tick <= 50ms
+fixture: 200 units spawned; mean tick 0.094 ms, longest tick 0.787 ms; mean over the 494 ticks with at least 150 units alive 0.299 ms; units alive every 500 ticks [200, 147, 34, 28, 28]; 28 units moved, 2617 shots, 172 units destroyed
+shipped: 200 units spawned; mean tick 0.218 ms, longest tick 5.237 ms; mean over the 463 ticks with at least 150 units alive 0.491 ms; units alive every 500 ticks [200, 138, 77, 46, 31]; 31 units moved, 1065 shots, 176 units destroyed
+peak heap in use: 1.3 MiB (budget 1024 MiB)
+m7 benchmark: passed

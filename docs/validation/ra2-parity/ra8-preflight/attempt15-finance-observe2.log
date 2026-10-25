@@ -1,0 +1,25 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 43.85s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+finite repair before tick0 cash200 repairing{} queues[]
+finite repair before tick20 cash177 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 23, charged: 23, fraction: 750 }])]
+finite repair before tick40 cash152 repairing{} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 48, charged: 48, fraction: 750 }])]
+finite repair before tick60 cash127 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 73, charged: 73, fraction: 750 }])]
+finite repair before tick80 cash102 repairing{SimId(4)} queues[(QueueKey { producer: BuildingKind(3), lane: Main }, [QueueItem { item: Unit(UnitKind(1)), progress: 98, charged: 98, fraction: 750 }])]
+R186 sale tick850 cash0 understrengthtrue wave{} queued[] actors[(SimId(7), UnitKind(1), CellPos { x: 8, y: 14 }, None, None, false)] commandSellBuilding { building: SimId(3) }
+
+thread 'ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish' (11595606) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:545:55:
+the declared source-cost budget must suffice without another refund: BuildingSold { player: PlayerId(0), building: SimId(3), refund: 750 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p sim --lib`

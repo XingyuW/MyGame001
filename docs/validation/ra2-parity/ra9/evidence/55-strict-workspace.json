@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-20T23:50:23.670976+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 101,
+  "seconds": 27.79,
+  "lease": "RA8 revocable functional phase jobs1 compiler-only"
+}

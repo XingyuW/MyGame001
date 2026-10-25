@@ -1,0 +1,18 @@
+{
+  "metadata_errors": [
+    {
+      "exit": 1,
+      "exception": "KeyError: 'staged_hygiene'",
+      "correction": "historical field is staged_whitespace_checks"
+    },
+    {
+      "exit": 1,
+      "exception": "AttributeError: 'str' object has no attribute 'append'",
+      "correction": "historical assumptions field is a string; preserve its original type"
+    }
+  ],
+  "metrics_valid_before_errors": true,
+  "checkpoint_written_before_errors": false,
+  "simulation_source_changed": false,
+  "final_generation_exit": 0
+}

@@ -1,0 +1,42 @@
+{
+  "utc": "2026-10-21T03:42:37.666202+00:00",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "scripts/ra2_reference.py",
+        "--ra9-dispositions"
+      ],
+      "exit_code": 0,
+      "seconds": 0.138
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ra2_reference.py",
+        "--ra9-dispositions",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.132
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 101,
+      "seconds": 3.951
+    }
+  ],
+  "seconds": 4.221,
+  "exit_code": 101,
+  "scope": "Actualnew174contracts/router/table/staticcompileonly; acceptance174 empty/failclosed, no source/native coverage pass"
+}

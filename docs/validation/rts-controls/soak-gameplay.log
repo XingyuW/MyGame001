@@ -1,0 +1,49 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 2.08s
+     Running `/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m7_soak`
+shipped demo: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 7.30 s for both runs
+shipped demo: vanguard against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 8.35 s for both runs
+shipped demo: vanguard against vanguard, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 8.18 s for both runs
+shipped demo: vanguard against meridian, both easy: 36000 ticks, 4 matches (3 ended, the last still running), 7.96 s for both runs
+shipped demo: vanguard against meridian, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 7.57 s for both runs
+shipped demo: vanguard against meridian, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 7.53 s for both runs
+shipped demo: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.81 s for both runs
+shipped demo: meridian against vanguard, both normal: 36000 ticks, 6 matches (5 ended, the last still running), 7.40 s for both runs
+shipped demo: meridian against vanguard, both hard: 36000 ticks, 8 matches (7 ended, the last still running), 7.51 s for both runs
+shipped demo: meridian against meridian, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 7.38 s for both runs
+shipped demo: meridian against meridian, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 7.62 s for both runs
+shipped demo: meridian against meridian, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 7.66 s for both runs
+shipped crossroads: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.31 s for both runs
+shipped crossroads: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 7.08 s for both runs
+shipped crossroads: vanguard against vanguard, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 7.11 s for both runs
+shipped crossroads: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.69 s for both runs
+shipped crossroads: vanguard against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 7.13 s for both runs
+shipped crossroads: vanguard against meridian, both hard: 36000 ticks, 4 matches (3 ended, the last still running), 7.17 s for both runs
+shipped crossroads: meridian against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.70 s for both runs
+shipped crossroads: meridian against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 7.13 s for both runs
+shipped crossroads: meridian against vanguard, both hard: 36000 ticks, 3 matches (2 ended, the last still running), 7.09 s for both runs
+shipped crossroads: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.55 s for both runs
+shipped crossroads: meridian against meridian, both normal: 36000 ticks, 3 matches (2 ended, the last still running), 7.49 s for both runs
+shipped crossroads: meridian against meridian, both hard: 36000 ticks, 2 matches (1 ended, the last still running), 6.97 s for both runs
+shipped riverlands: vanguard against vanguard, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.43 s for both runs
+shipped riverlands: vanguard against vanguard, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 6.97 s for both runs
+shipped riverlands: vanguard against vanguard, both hard: 36000 ticks, 7 matches (6 ended, the last still running), 6.95 s for both runs
+shipped riverlands: vanguard against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.44 s for both runs
+shipped riverlands: vanguard against meridian, both normal: 36000 ticks, 6 matches (5 ended, the last still running), 8.00 s for both runs
+shipped riverlands: vanguard against meridian, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 7.14 s for both runs
+shipped riverlands: meridian against vanguard, both easy: 36000 ticks, 3 matches (2 ended, the last still running), 7.06 s for both runs
+shipped riverlands: meridian against vanguard, both normal: 36000 ticks, 5 matches (4 ended, the last still running), 6.93 s for both runs
+shipped riverlands: meridian against vanguard, both hard: 36000 ticks, 6 matches (5 ended, the last still running), 6.63 s for both runs
+shipped riverlands: meridian against meridian, both easy: 36000 ticks, 2 matches (1 ended, the last still running), 6.33 s for both runs
+shipped riverlands: meridian against meridian, both normal: 36000 ticks, 4 matches (3 ended, the last still running), 6.89 s for both runs
+shipped riverlands: meridian against meridian, both hard: 36000 ticks, 5 matches (4 ended, the last still running), 6.79 s for both runs
+fixture skirmish_40x40: red against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 1.98 s for both runs
+fixture skirmish_40x40: red against red, both normal: 36000 ticks, 14 matches (13 ended, the last still running), 2.48 s for both runs
+fixture skirmish_40x40: red against blue, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 1.96 s for both runs
+fixture skirmish_40x40: red against blue, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 2.32 s for both runs
+fixture skirmish_40x40: blue against red, both easy: 36000 ticks, 7 matches (6 ended, the last still running), 2.02 s for both runs
+fixture skirmish_40x40: blue against red, both normal: 36000 ticks, 10 matches (9 ended, the last still running), 2.22 s for both runs
+fixture skirmish_40x40: blue against blue, both easy: 36000 ticks, 8 matches (7 ended, the last still running), 1.96 s for both runs
+fixture skirmish_40x40: blue against blue, both normal: 36000 ticks, 13 matches (12 ended, the last still running), 2.44 s for both runs
+m7 soak: 3168000 ticks in 274.6 s; peak heap in use 1.8 MiB (budget 1024 MiB)
+m7 soak: passed

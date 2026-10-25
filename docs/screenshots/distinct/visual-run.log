@@ -1,0 +1,48 @@
+[2m2026-10-06T04:56:18.245545Z[0m [32m INFO[0m [2mbevy_diagnostic::system_information_diagnostics_plugin::internal[0m[2m:[0m SystemInfo { os: "macOS 27.0.1", kernel: "27.0.0", cpu: "Apple M5", core_count: "10", memory: "32.0 GiB" }
+[2m2026-10-06T04:56:18.287592Z[0m [32m INFO[0m [2mbevy_render::renderer[0m[2m:[0m AdapterInfo { name: "Apple M5", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "", driver_info: "", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: true }
+[2m2026-10-06T04:56:18.408990Z[0m [32m INFO[0m [2mbevy_winit::system[0m[2m:[0m Creating new window MyGame001 (66v0)
+[2m2026-10-06T04:56:18.447580Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/demo/demo.tmx: 64x64 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.447939Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/crossroads/crossroads.tmx: 56x56 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.448235Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/riverlands/riverlands.tmx: 64x48 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.448774Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/liberty_bay/liberty_bay.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.449292Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/frostline/frostline.tmx: 112x112 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.449799Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/oasis_gulf/oasis_gulf.tmx: 128x96 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.450313Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/coral_archipelago/coral_archipelago.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.450861Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/continental_divide/continental_divide.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.451441Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/steel_harbor/steel_harbor.tmx: 128x128 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.451959Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/glacier_pass/glacier_pass.tmx: 120x120 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.452396Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/red_canyon/red_canyon.tmx: 96x96 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.452980Z[0m [32m INFO[0m [2mgame::map[0m[2m:[0m map maps/jungle_delta/jungle_delta.tmx: 128x112 cells, tile 64x32 px
+[2m2026-10-06T04:56:18.953296Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m catalogue: 12 maps, 2 factions, 3 difficulties
+[2m2026-10-06T04:56:18.953384Z[0m [32m INFO[0m [2mgame::options[0m[2m:[0m settings read from /Users/xingyuwang/Library/Application Support/MyGame001/settings.txt
+[2m2026-10-06T04:56:19.206924Z[0m [32m INFO[0m [2mbevy_render::batching::gpu_preprocessing[0m[2m:[0m GPU preprocessing is fully supported on this device.
+[2m2026-10-06T04:56:20.086666Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m8-menu.png
+[2m2026-10-06T04:56:20.863170Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T04:56:22.745122Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m8-match.png
+[2m2026-10-06T04:56:23.497399Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 1 x meridian (normal): 8 buildings and 18 units spawned
+[2m2026-10-06T04:56:25.238440Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m8-base-review.png
+[2m2026-10-06T04:56:25.920968Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map crossroads (seed 8): meridian against 1 x vanguard (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T04:56:26.083421Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 0}
+[2m2026-10-06T04:56:27.677015Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m8-crossroads-meridian.png
+[2m2026-10-06T04:56:28.412908Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map riverlands (seed 8): vanguard against 1 x meridian (normal): 2 buildings and 18 units spawned
+[2m2026-10-06T04:56:28.565172Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 1, generation: 0}
+[2m2026-10-06T04:56:30.162487Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m8-riverlands-vanguard.png
+[2m2026-10-06T04:56:31.779370Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m9-armory.png
+[2m2026-10-06T04:56:33.345488Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m9-infantry.png
+[2m2026-10-06T04:56:34.910997Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/m9-vehicles.png
+[2m2026-10-06T04:56:35.713762Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 1 x meridian (normal): 8 buildings and 16 units spawned
+[2m2026-10-06T04:56:35.863009Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 0, generation: 1}
+[2m2026-10-06T04:56:38.213364Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/hd-technology.png
+[2m2026-10-06T04:56:38.940974Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 1 x meridian (normal): 8 buildings and 14 units spawned
+[2m2026-10-06T04:56:39.223132Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 20 destroyed
+[2m2026-10-06T04:56:41.024226Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 0: unit 13 destroyed
+[2m2026-10-06T04:56:41.024325Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 21 destroyed
+[2m2026-10-06T04:56:41.474161Z[0m [32m INFO[0m [2mgame::units[0m[2m:[0m player 1: unit 18 destroyed
+[2m2026-10-06T04:56:42.198215Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/hd-combat.png
+[2m2026-10-06T04:56:42.940212Z[0m [32m INFO[0m [2mbevy_ecs_tiled::tiled::map[0m[2m:[0m Map removed: AssetId<bevy_ecs_tiled::tiled::map::asset::TiledMapAsset>{ index: 1, generation: 1}
+[2m2026-10-06T04:56:43.733323Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/followup-menu-players.png
+[2m2026-10-06T04:56:44.511311Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 4 x vanguard (normal), all unlocked: 5 buildings and 45 units spawned
+[2m2026-10-06T04:56:46.265192Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/followup-four-enemies-speed.png
+[2m2026-10-06T04:56:46.998518Z[0m [32m INFO[0m [2mgame::skirmish[0m[2m:[0m match on map demo (seed 8): vanguard against 1 x meridian (normal): 8 buildings and 47 units spawned
+[2m2026-10-06T04:56:48.776979Z[0m [32m INFO[0m [2mbevy_render::view::window::screenshot[0m[2m:[0m Screenshot saved to /Users/xingyuwang/GameProjects/MyGame001/docs/screenshots/distinct/distinct-roster.png
+[2m2026-10-06T04:56:49.450235Z[0m [33m WARN[0m [2mbevy_winit::state[0m[2m:[0m Skipped event Destroyed for unknown winit Window Id WindowId(525785105664)

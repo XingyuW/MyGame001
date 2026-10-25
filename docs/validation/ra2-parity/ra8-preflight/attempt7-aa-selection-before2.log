@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 16.04s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier ... two AA jobs: selectedfalse firedfalse firstSome(AirScreenProgress { remaining: 0, distance: 4, hp: 886, last_progress: 9560 }) expiredAirScreenProgress { remaining: 0, distance: 4, hp: 893, last_progress: 6010 } all{SimId(4): AirScreenProgress { remaining: 0, distance: 4, hp: 886, last_progress: 9560 }}
+
+thread 'ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier' (7428850) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:793:5:
+the expired minimum candidate starved a fresh observed AA clearance job
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.32s
+
+error: test failed, to rerun pass `-p sim --lib`

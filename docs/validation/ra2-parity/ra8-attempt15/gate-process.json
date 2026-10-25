@@ -1,0 +1,144 @@
+{
+  "attempt": 15,
+  "checkpoint": 15,
+  "start_utc": "2026-10-20T05:56:11.299628+00:00",
+  "head": "57595d274261a9d4859ab2d1d15b86b9d9bb071f",
+  "runtime_commit": "0d8f16daba2cc31edba5757d3b99fc2e3c094145",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "clean_before_launch": true,
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "RUST_TEST_NOCAPTURE=1",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "wrapper_pid": 46861,
+  "wrapper_ppid": 7720,
+  "wrapper_pgid": 46861,
+  "source_files": 495,
+  "source_manifests": {
+    "runtime": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint15-runtime-manifest.json",
+      "exists": true,
+      "bytes": 38160,
+      "sha256": "082fba0ef2ca763da9ad86a3919b41449ae66f3881ed8f95ce8e784e5231c74f",
+      "mtime_ns": 1792475262909180387
+    },
+    "test-example": {
+      "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint15-test-example-manifest.json",
+      "exists": true,
+      "bytes": 19513,
+      "sha256": "91247e51fa867c580387d1690e2a0f06ce3bbd4b51dce61a35b6df5b50c3030a",
+      "mtime_ns": 1792475262913548806
+    }
+  },
+  "preservation": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-attempt14/PRESERVED.json",
+    "exists": true,
+    "bytes": 8984,
+    "sha256": "2527a350f00d8db04d9b5dc0a758ad4a9b6048b8079da66c9fb850d02e4f6bb4",
+    "mtime_ns": 1792463590767704745
+  },
+  "preservation_recheck": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8-preflight/checkpoint15-attempt14-preservation.json",
+    "exists": true,
+    "bytes": 456,
+    "sha256": "3e21a5e27d2105f28e37d0500c5f8229de5a936d9501d85850bc8589bf2b6223",
+    "mtime_ns": 1792475116758417538
+  },
+  "configured_caches": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp"
+  },
+  "preexisting_native_production_table": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/m6_production_matches_lengths.tsv",
+    "exists": true,
+    "bytes": 49763,
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792155643228129596
+  },
+  "preexisting_label_production_table": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/production-lengths.tsv",
+    "exists": true,
+    "bytes": 49763,
+    "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+    "mtime_ns": 1792408455665559025
+  },
+  "production_table_status": "Preexisting tables are historical/stale until a fresh successful current phase4 native publication is bound.",
+  "completed_rows": [
+    {
+      "line": "01 exit 0  1 s  cargo fmt --all -- --check",
+      "number": 1,
+      "exit": 0,
+      "script_date_seconds": 1,
+      "completion_observed_utc": "2026-10-20T05:56:13.311277+00:00",
+      "wrapper_elapsed_seconds": 2.0041858330368996,
+      "observed_interval_seconds": 2.0041858330368996
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "number": 2,
+      "exit": 0,
+      "script_date_seconds": 0,
+      "completion_observed_utc": "2026-10-20T05:56:13.378267+00:00",
+      "wrapper_elapsed_seconds": 2.0712092910544015,
+      "observed_interval_seconds": 0.06702345801750198
+    },
+    {
+      "line": "03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "number": 3,
+      "exit": 0,
+      "script_date_seconds": 0,
+      "completion_observed_utc": "2026-10-20T05:56:13.442076+00:00",
+      "wrapper_elapsed_seconds": 2.1350180830340832,
+      "observed_interval_seconds": 0.0638087919796817
+    },
+    {
+      "line": "04 exit 101  17010 s  cargo test --workspace --release  [428 passed, 7 failed, 0 ignored]",
+      "number": 4,
+      "exit": 101,
+      "script_date_seconds": 17010,
+      "completion_observed_utc": "2026-10-20T10:39:42.724829+00:00",
+      "wrapper_elapsed_seconds": 17011.31604933302,
+      "observed_interval_seconds": 17009.181031249987
+    }
+  ],
+  "source_mismatches": [],
+  "m6_reporting": "ONE required756 sweep collects all bounded returned non-Won cases; no abort on its diagnostic None alone. Invariant/rejection panics remain strict. No extra sweep or acceptance weakening.",
+  "script_pid": 46889,
+  "script_pgid": 46889,
+  "script_session": 46889,
+  "status": "STOPPED after completed failure/source mismatch",
+  "stop_reason": "Completed phase failure or frozen-source mismatch",
+  "stop_signal_utc": "2026-10-20T10:39:42.855868+00:00",
+  "end_utc": "2026-10-20T10:39:42.857594+00:00",
+  "elapsed_seconds": 17011.448855708004,
+  "exit": -15,
+  "output_log": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/ra8/gate-process-output.log",
+    "exists": true,
+    "bytes": 236,
+    "sha256": "ee7f8c2340e6733723395403ca0960ab640041187dba51cd33fe17ac47942ebd",
+    "mtime_ns": 1792492782350121534
+  },
+  "uncompleted_phases": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "phase_timing_note": "Script dates are integer wall seconds; row observation intervals include up to1s polling/next-command handoff. Wrapper monotonic total is recorded separately."
+}

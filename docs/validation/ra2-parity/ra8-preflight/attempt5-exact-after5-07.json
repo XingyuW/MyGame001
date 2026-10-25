@@ -1,0 +1,21 @@
+{
+  "name": "attempt5-exact-after5-07",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_thousand_lakes_france_germany_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "started_utc": "2026-10-16T11:13:11.087791+00:00",
+  "elapsed_seconds": 64.20979533300851,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-exact-after5-07.log"
+}

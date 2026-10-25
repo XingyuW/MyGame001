@@ -1,0 +1,66 @@
+{
+  "utc": "2026-10-22T00:37:32.585953+00:00",
+  "tip": "23647de4220408d42eeef6522deb4d4541528452",
+  "round": 1,
+  "base": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "common_instructions": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/common-review-instructions.md",
+    "sha256": "b237cf33cc754741a0d7789628bc92b1ec55075f57dc79a695045e63ec4b952d"
+  },
+  "rendered": [
+    {
+      "role": "data",
+      "canonical_brief": "docs/prompts/ra2-parity-review/slice-data.md",
+      "canonical_bytes": 23306,
+      "canonical_sha256": "4fa4ab8d7d9e584e74e1ad06e0980778fda5c5a414dda46ea32cb61467391a6a",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-data.md",
+      "rendered_bytes": 24249,
+      "rendered_sha256": "e2e9069e22c05d97f1e04584b43022c76ad1a34efc70d79d6e29c8c464b1de82"
+    },
+    {
+      "role": "tests",
+      "canonical_brief": "docs/prompts/ra2-parity-review/slice-tests.md",
+      "canonical_bytes": 22724,
+      "canonical_sha256": "67eec8b78d4448e7bfeee8ec5f945f806c8530b7effd2dfc4b87169f804f266d",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-tests.md",
+      "rendered_bytes": 23742,
+      "rendered_sha256": "ddd7053c02a6fac808822abe5a93085d00a7fa196ee853c546e5acbf3ab0d46e"
+    },
+    {
+      "role": "sim2",
+      "canonical_brief": "docs/prompts/ra2-parity-review/slice-sim2.md",
+      "canonical_bytes": 21526,
+      "canonical_sha256": "4ea875a48f090a01bc819872bef0f04bc73477b61c171f1df9454d067f248c20",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-sim2.md",
+      "rendered_bytes": 22469,
+      "rendered_sha256": "5dabff9c4fd7a04078b131922ea9d4c0a14eac89a5058f2e60819f3abafbf96c"
+    },
+    {
+      "role": "sim1",
+      "canonical_brief": "docs/prompts/ra2-parity-review/slice-sim1.md",
+      "canonical_bytes": 19848,
+      "canonical_sha256": "c26ab370e9c88cb75e8a3bc61fc0ed0b7b6924ccebfd4a65b318c71df8c331a2",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-sim1.md",
+      "rendered_bytes": 20791,
+      "rendered_sha256": "e8f32c157be10849c4bf222a01c897972c6dcba4f88dcbc85ad1eddab5696e29"
+    },
+    {
+      "role": "client",
+      "canonical_brief": "docs/prompts/ra2-parity-review/slice-client.md",
+      "canonical_bytes": 20060,
+      "canonical_sha256": "ba1bc1452db138a0a07e8138ba694958764fcecda714aab090e17d8af3753ca1",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-client.md",
+      "rendered_bytes": 21038,
+      "rendered_sha256": "90d57472360fc7f9ac6be485609c9293a2b590f56a478ca3ed09a1144ca58127"
+    },
+    {
+      "role": "lead",
+      "canonical_brief": "docs/prompts/ra2-parity-review/lead.md",
+      "canonical_bytes": 19629,
+      "canonical_sha256": "7d19481a05ae789ea6fcd7a8051590a663d6c316316497c58484f96a936ee4b6",
+      "rendered_path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/dispatch-round-1-lead.md",
+      "rendered_bytes": 20491,
+      "rendered_sha256": "d0b9055dcb8e4e1bb3ab7de3d035e47519bb6e16daccba9b41bcdc89730dfc9d"
+    }
+  ]
+}

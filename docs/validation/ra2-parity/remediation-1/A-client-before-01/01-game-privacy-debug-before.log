@@ -1,0 +1,53 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.13s
+     Running unittests src/main.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/game-5f08020bbb778566)
+
+running 7 tests
+
+thread 'battlefield::tests::ra9_privacy_fogged_scenery_keeps_observed_hp_and_destruction_until_reobserved' (16296934) panicked at crates/game/src/privacy_scenery_tests.rs:55:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test battlefield::tests::ra9_privacy_fogged_scenery_keeps_observed_hp_and_destruction_until_reobserved ... FAILED
+test battlefield::tests::ra9_privacy_scenery_observation_resets_on_uninstall_and_match_replacement ... ok
+
+thread 'special_controls::tests::ra9_privacy_interact_hidden_and_missing_have_equal_sink_mode_audio_and_text' (16296938) panicked at crates/game/src/privacy_interact_tests.rs:155:9:
+assertion `left == right` failed: I-mode leaked hidden spy occupancy before/through native validation
+  left: ([Interact { unit: SimId(3), target: SimId(4) }], Normal, 1, "no unit or building 4 is visible to the player", 1)
+ right: ([], Interact, 0, "D: deploy / unload    I: interact", 0)
+test special_controls::tests::ra9_privacy_interact_hidden_and_missing_have_equal_sink_mode_audio_and_text ... FAILED
+
+thread 'hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection' (16296936) panicked at crates/game/src/privacy_hover_tests.rs:73:5:
+assertion `left == right` failed
+  left: None
+ right: Flex
+test hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection ... FAILED
+
+thread 'selection::tests::ra9_privacy_native_mind_control_prunes_groups_and_independently_guards_markers' (16296937) panicked at crates/game/src/privacy_selection_tests.rs:154:5:
+ownership loss must prune current selection
+test selection::tests::ra9_privacy_native_mind_control_prunes_groups_and_independently_guards_markers ... FAILED
+
+thread 'battlefield::tests::ra9_privacy_fogged_hover_does_not_consult_unseen_garrison_presence' (16296933) panicked at crates/game/src/privacy_scenery_tests.rs:306:5:
+assertion `left == right` failed: unseen garrison presence must not change whether the fogged scenery label exists
+  left: ("House\nDestructible  100%", None)
+ right: ("House\nDestructible  100%", Flex)
+test battlefield::tests::ra9_privacy_fogged_hover_does_not_consult_unseen_garrison_presence ... FAILED
+
+thread 'weapon_fx::tests::ra9_privacy_damage_smoke_stops_new_emission_after_native_reconcealment' (16296939) panicked at crates/game/src/privacy_smoke_tests.rs:181:5:
+new actor-position smoke leaked through real concealment: [("typhoon", 1), ("mirage_tank", 1)]
+test weapon_fx::tests::ra9_privacy_damage_smoke_stops_new_emission_after_native_reconcealment ... FAILED
+
+failures:
+
+failures:
+    battlefield::tests::ra9_privacy_fogged_hover_does_not_consult_unseen_garrison_presence
+    battlefield::tests::ra9_privacy_fogged_scenery_keeps_observed_hp_and_destruction_until_reobserved
+    hover_info::tests::ra9_privacy_spy_hover_uses_native_disguise_then_real_detection
+    selection::tests::ra9_privacy_native_mind_control_prunes_groups_and_independently_guards_markers
+    special_controls::tests::ra9_privacy_interact_hidden_and_missing_have_equal_sink_mode_audio_and_text
+    weapon_fx::tests::ra9_privacy_damage_smoke_stops_new_emission_after_native_reconcealment
+
+test result: FAILED. 1 passed; 6 failed; 0 ignored; 0 measured; 268 filtered out; finished in 4.34s
+
+error: test failed, to rerun pass `-p game --bin game`

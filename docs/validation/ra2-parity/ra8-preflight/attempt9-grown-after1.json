@@ -1,0 +1,26 @@
+{
+  "label": "attempt9-grown-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "m13_grown_maps",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:06:08.211136+00:00",
+  "elapsed_seconds": 81.8101543749799,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "log_sha256": "04f8fb7899835c81455c088730c58596d9769c705a3e6f3d2549d9b16b76386a"
+}

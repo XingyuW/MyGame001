@@ -1,0 +1,11 @@
+01 exit 0  1 s  cargo fmt --all -- --check
+02 exit 0  0 s  git diff --check
+03 exit 0  0 s  cargo clippy --workspace --all-targets -- -D warnings
+04 exit 0  2803 s  cargo test --workspace --release  [735 passed, 0 failed, 0 ignored]
+05 exit 0  1 s  cargo build --release -p game
+06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600
+07 exit 0  122 s  cargo run -p game -- --smoke-test 600
+08 exit 0  1 s  cargo run --release -p sim --example m7_benchmark
+09 exit 0  2208 s  cargo run --release -p sim --example m7_soak
+10 exit 0  1623 s  cargo run --release -p sim --example m14_duels -- full
+validation ra3a: PASSED

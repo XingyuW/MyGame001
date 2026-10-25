@@ -1,0 +1,52 @@
+   Compiling hashbrown v0.17.1
+   Compiling hashbrown v0.16.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling syn v3.0.6
+   Compiling objc2 v0.6.4
+   Compiling futures-core v0.3.34
+   Compiling derive_more v2.1.1
+   Compiling async-task v4.7.1
+   Compiling simd-adler32 v0.3.10
+   Compiling crc32fast v1.5.2
+   Compiling slotmap v1.1.1
+   Compiling futures-lite v2.6.1
+   Compiling miniz_oxide v0.9.1
+   Compiling zerocopy v0.8.59
+   Compiling fixedbitset v0.5.7
+   Compiling crossbeam-queue v0.3.14
+   Compiling concurrent-queue v2.5.0
+   Compiling nonmax v0.5.5
+   Compiling smallvec v1.16.2
+   Compiling indexmap v2.14.2
+   Compiling bevy_platform v0.19.1
+   Compiling flate2 v1.1.10
+   Compiling once_cell v1.21.4
+   Compiling bevy_tasks v0.19.1
+   Compiling tiled v0.16.0
+   Compiling block2 v0.6.2
+   Compiling toml_edit v0.25.15+spec-1.1.0
+   Compiling bevy_utils v0.19.1
+   Compiling dispatch2 v0.3.1
+   Compiling bevy_macro_utils v0.19.1
+   Compiling thiserror-impl v2.0.21
+   Compiling serde_derive v1.0.229
+   Compiling ctrlc v3.5.2
+   Compiling bevy_ecs_macro_logic v0.19.1
+   Compiling bevy_derive v0.19.1
+   Compiling bevy_ecs_macros v0.19.1
+   Compiling thiserror v2.0.21
+   Compiling ppv-lite86 v0.2.21
+   Compiling bevy_ecs v0.19.1
+   Compiling rand_chacha v0.10.0
+   Compiling serde v1.0.229
+   Compiling ron v0.12.2
+   Compiling bevy_app v0.19.1
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.57s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/sim-84fd1faff8cf3358)
+
+running 1 test
+test ai::tests::ra5_bridge_memory_hash_covers_hut_identity_location_and_observed_collapse ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 45 filtered out; finished in 0.00s
+

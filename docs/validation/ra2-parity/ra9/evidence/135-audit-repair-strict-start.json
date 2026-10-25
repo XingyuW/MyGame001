@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-21T03:18:37.559984+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "scope": "strict onlychangedaudit target; actualwholeworkspace strict124 passed before these2 audit-only repairs",
+  "inputs": {
+    "crates/sim/tests/ra9_audit/mod.rs": "d2ac40f65fb63c2e354f03b06721d4a849ab47db293753196d10f91391aa3451",
+    "crates/sim/tests/ra9_audit/policy-admission.rs": "e4dfaba8bf2c99b8ff2fd0225fd7f1999f127a50c265d941375b06f9e3de1a8f"
+  }
+}

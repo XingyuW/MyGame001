@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 15.72s
+     Running tests/ra8_temporal.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_temporal-a4af102cc497485b)
+
+running 1 test
+
+thread 'ra8_temporal_fixture_minimum_is_strict_at_the_native_point_boundary' (10033045) panicked at crates/sim/tests/ra8_temporal.rs:164:5:
+native shot must retain its beam after Combat resolve: fired=true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_temporal_fixture_minimum_is_strict_at_the_native_point_boundary ... FAILED
+
+failures:
+
+failures:
+    ra8_temporal_fixture_minimum_is_strict_at_the_native_point_boundary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p sim --test ra8_temporal`

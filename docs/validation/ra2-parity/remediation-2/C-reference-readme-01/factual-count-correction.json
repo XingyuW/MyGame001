@@ -1,0 +1,20 @@
+{
+  "status": "FACTUAL_REFERENCE_README_COUNT_CORRECTION_NOT_POLICY_OR_NATIVE_ACCEPTANCE",
+  "utc": "2026-10-22T20:44:57.522488+00:00",
+  "path": "crates/sim/tests/reference/README.md",
+  "before_sha256": "89e6fa0a4ac15ef4c05215dafd3d6d339f40352c84efb209347f8a42e4adf00d",
+  "after_sha256": "751b160cc059c7540f06b3845b989a8139865ee714e2d434a48b0be53309e146",
+  "actual_atoms": 1911,
+  "source_keys": 1888,
+  "portions": {
+    "whole": 1869,
+    "1": 19,
+    "2": 19,
+    "3": 4
+  },
+  "classifications": {
+    "CURRENT_MODEL_NONREAD": 759,
+    "INTENTIONAL_DIFFERENCE": 1152
+  },
+  "limits": "Only compositor description corrected; source dispositions/classes/reasons/routes/values unchanged; independent DATA reinspection remains required."
+}

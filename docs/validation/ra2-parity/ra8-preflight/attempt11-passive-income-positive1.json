@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-passive-income-positive1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_passive_income_with_real_unit_production_keeps_paid_recovery_repairs",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T11:48:46.853493+00:00",
+  "elapsed_seconds": 6.071095582970884,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e344244c93d906c31ea816e57597b8b1cd84ce220c507698dcc252f4cbdfa720"
+  },
+  "log_sha256": "987793a900c2a8759cf112859b70d346e0b96b1ce2ea1b20b1c02132caf9c606"
+}

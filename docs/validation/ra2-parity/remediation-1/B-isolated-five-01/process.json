@@ -1,0 +1,138 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T06:01:33.347399+00:00",
+  "pid": 57736,
+  "head": "1cedaee83b9cb299869a581d13a25e2736c8c41f",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/B-isolated-five-01-plan.json",
+  "plan_sha256": "acb8901cf17e967cfa3e8b29d4727267bb1774477fef6d8b7006175545b50d41",
+  "runner_sha256": "dfecd0b723700a7726d6ac7acef982a8be0e28cdb0175354b95b405eb0a80d3a",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "to-the-end",
+        "all"
+      ],
+      "start": "2026-10-22T06:01:33.526316+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-isolated-five-01/01-all21.log",
+      "pid": 57749,
+      "pgid": 57749,
+      "exit": 0,
+      "end": "2026-10-22T07:02:54.624989+00:00",
+      "raw_bytes": 8361,
+      "raw_sha256": "96b6563df04e2025bea99fb4d5457adb58a4a6a208781c5f5cacd4710cf50469",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "run",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "liberty_bay",
+        "continental_divide",
+        "pacific_atoll"
+      ],
+      "start": "2026-10-22T07:02:55.189728+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-isolated-five-01/02-fixed3.log",
+      "pid": 68883,
+      "pgid": 68883,
+      "exit": 0,
+      "end": "2026-10-22T07:05:55.535858+00:00",
+      "raw_bytes": 1277,
+      "raw_sha256": "6a8f31ae50ba7e37e6538528066bd012ac31606db4f251891e577a0af0e17c43",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m13_ten_players",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-22T07:05:56.033652+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-isolated-five-01/03-guard-m13.log",
+      "pid": 69350,
+      "pgid": 69350,
+      "exit": 0,
+      "end": "2026-10-22T07:06:01.084311+00:00",
+      "raw_bytes": 470,
+      "raw_sha256": "c682057ab8dab94820d0e443af99eab9c2ee7e700e7db08e2286cad099839cd4",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m14_duels",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-22T07:06:01.574548+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-isolated-five-01/04-guard-m14.log",
+      "pid": 69409,
+      "pgid": 69409,
+      "exit": 0,
+      "end": "2026-10-22T07:06:06.632594+00:00",
+      "raw_bytes": 445,
+      "raw_sha256": "ce9b469da49f1d79ce106c65f395e2b2a76ad4b018482ea1a90798993d59fedc",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--example",
+        "m7_soak",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-22T07:06:07.138505+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-isolated-five-01/05-guard-soak.log",
+      "pid": 69452,
+      "pgid": 69452,
+      "exit": 0,
+      "end": "2026-10-22T07:06:12.188246+00:00",
+      "raw_bytes": 473,
+      "raw_sha256": "270d1e791b268d47bd3942bf1f8a53718d5e5d98d3ff60258bc96c9cde9f69fd",
+      "source_unchanged": true
+    }
+  ],
+  "frozen_manifest": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-1/B-corrected-02/frozen-validation-inputs.json",
+    "sha256": "b3959fd36a8367dbd6fbd2b516181c1141603bf0e5d4ab80128dc7132843dc8b",
+    "source_files": 685,
+    "authority_spans": 64
+  },
+  "caffeinate_pid": 57744,
+  "heartbeat": "2026-10-22T07:06:07.187145+00:00",
+  "end": "2026-10-22T07:06:12.446490+00:00",
+  "source_unchanged": true
+}

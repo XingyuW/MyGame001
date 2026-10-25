@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0599]: no method named `push` found for struct `std::collections::BTreeSet<T, A>` in the current scope
+   --> crates/sim/src/ai/ra8_attrition_tests.rs:501:25
+    |
+501 |         controller.wave.push(replacement);
+    |                         ^^^^
+    |
+help: you might have meant to use `insert`
+    |
+501 -         controller.wave.push(replacement);
+501 +         controller.wave.insert(replacement);
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `sim` (lib test) due to 1 previous error

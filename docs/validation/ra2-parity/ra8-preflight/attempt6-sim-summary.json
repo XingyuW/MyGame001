@@ -1,0 +1,13 @@
+{
+  "command": "cargo test --release -p sim --all-targets -- --test-threads=1",
+  "test_result_targets": 72,
+  "counts": [
+    943,
+    0,
+    0
+  ],
+  "elapsed_seconds": 873.5823474169883,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all3.log",
+  "sha256": "a7fc310eea98641ae76f9cf77819e9676e9fd33f02fd32ed6e914c3a525984e2",
+  "policy": "Complete all-target simulation batch; prior focused passes overlap and are not added"
+}

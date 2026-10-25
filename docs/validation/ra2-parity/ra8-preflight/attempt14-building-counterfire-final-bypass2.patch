@@ -1,0 +1,11 @@
+--- crates/sim/src/ai/strategy.rs
++++ crates/sim/src/ai/strategy.rs
+@@ -581,7 +581,7 @@
+         ) && (view.enemy_units.iter().any(|enemy| {
+             Some(enemy.id) == unit.combat_target && !enemy.armed && enemy.harvest.is_some()
+         }) || view.enemy_buildings.iter().any(|enemy| {
+-            Some(enemy.id) == unit.combat_target
++            false && Some(enemy.id) == unit.combat_target
+                 && enemy.economy
+                 && view
+                     .definitions

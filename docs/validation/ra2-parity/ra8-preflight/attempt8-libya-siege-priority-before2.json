@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-libya-siege-priority-before2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Strengthened unchanged-data before control explicitly verifies source V3/Demo owner/prerequisite/producer legality and800/1500 costs before real mixed-lane paid/spawn sequence.",
+  "start_utc": "2026-10-19T00:51:56.452688+00:00",
+  "elapsed_seconds": 18.60191887494875,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "4d0a46ae961b61c38626654ba35f65cadb145c10f6cb92020a48d3cc42d96dd4"
+}

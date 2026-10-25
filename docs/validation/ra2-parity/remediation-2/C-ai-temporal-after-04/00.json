@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "cargo",
+    "fmt",
+    "--all"
+  ],
+  "exit": 0,
+  "pid_pgid": 89764,
+  "native_group_empty": true,
+  "utc": "2026-10-23T02:46:35.746168+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "8f5baf8b5cbbe045eb7010d3bfffb1317da26c09dbe3254ec7ebff4a79bc545a",
+    "crates/sim/tests/ra8_ai.rs": "22ee928f01fe895965d837416096206510379bba3f73ce69ff9fb111757c3f09",
+    "crates/game/tests/m6_production_matches.rs": "987bc1ebced44d8bdc7cdc4178bfc1b5e91c36c4640ad8f21bdb2772aefbf0d2"
+  }
+}

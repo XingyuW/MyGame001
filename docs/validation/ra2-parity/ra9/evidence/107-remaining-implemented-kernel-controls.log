@@ -1,0 +1,44 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.92s
+     Running tests/ra4_aircraft.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra4_aircraft-23a22b18c92315cf)
+
+running 1 test
+test an_aircraft_fires_its_volleys_returns_and_reloads_a_round_at_a_time ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.07s
+
+     Running tests/ra4_spawns.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra4_spawns-9da791a0a1b28385)
+
+running 4 tests
+test a_boat_sends_its_hunter_against_a_submerged_target_only ... ok
+test a_carrier_launches_its_aircraft_one_after_another_and_takes_them_back ... ok
+test a_launcher_launches_a_missile_that_flies_to_the_target_and_goes_off_there ... ok
+test a_missile_that_is_shot_down_deals_nothing ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.34s
+
+     Running tests/ra5_ore.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_ore-c39c9605dcd753e6)
+
+running 3 tests
+test a_full_miner_is_paid_25_a_bail_of_ore_and_50_a_bail_of_gems ... ok
+test nothing_is_built_on_ore_that_spread_onto_building_ground ... ok
+test ore_grows_by_a_bail_on_schedule_up_to_the_densest ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.46s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_infantry-25553fff35365e86)
+
+running 2 tests
+test ra6_dog_bite_kills_infantry_even_above_nominal_weapon_damage ... ok
+test ra6_tanya_swims_and_sapper_is_exclusive_to_naval_targets ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.16s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra6_vehicles-6e8e476b02377690)
+
+running 2 tests
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.20s
+

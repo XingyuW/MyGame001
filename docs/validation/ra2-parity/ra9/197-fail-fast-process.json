@@ -1,0 +1,89 @@
+{
+  "start_utc": "2026-10-21T16:20:32.354084+00:00",
+  "pid": 13263,
+  "source_commit": "8f1b1dcf399d23b89cbadce1cb1e322439ef85a8",
+  "source_manifest": "docs/validation/ra2-parity/ra9/195-actual-canonical-input-scope.json",
+  "source_manifest_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+  "runner_sha256": "920e26813ec8407f730948efb9aafde9b0e60c8082efa7691488092421205f68",
+  "source_before": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  },
+  "status": "FAILED",
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-21T16:20:32.508710+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pgid": 13302,
+      "pid": 13302,
+      "exit": 0,
+      "end_utc": "2026-10-21T16:20:35.656240+00:00",
+      "seconds": 3.040543583978433,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197-fmt.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-21T16:20:35.767877+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "FAIL",
+      "pgid": 13322,
+      "pid": 13322,
+      "exit": 101,
+      "end_utc": "2026-10-21T16:20:36.626695+00:00",
+      "seconds": 0.7523860840010457,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197-clippy.log",
+        "bytes": 150,
+        "sha256": "4517ce4a7588a4c6cf2e6708514e9e768903f839f37e947c532073e600ba3839"
+      }
+    }
+  ],
+  "order": "Root-directed strict compilation, actual whole-positive, exactly six repaired cases, and the one unexecuted difficulty regression before isolated5 and mandatory fresh full13. No full181 target or debug/workspace native sweep.",
+  "end_utc": "2026-10-21T16:20:36.746952+00:00",
+  "source_after": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  }
+}

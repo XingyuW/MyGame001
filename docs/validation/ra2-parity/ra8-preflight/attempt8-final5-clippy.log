@@ -1,0 +1,12 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error: using `clone` on type `Mobile` which implements the `Copy` trait
+   --> crates/sim/src/ai/ra8_composition_tests.rs:568:35
+    |
+568 |             .map(|(_, o, m)| (*o, m.clone()))
+    |                                   ^^^^^^^^^ help: try dereferencing it: `*m`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#clone_on_copy
+    = note: `-D clippy::clone-on-copy` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::clone_on_copy)]`
+
+error: could not compile `sim` (lib test) due to 1 previous error

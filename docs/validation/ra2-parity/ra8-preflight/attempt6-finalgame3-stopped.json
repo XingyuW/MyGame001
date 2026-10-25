@@ -1,0 +1,7 @@
+{
+  "time_utc": "2026-10-16T18:24:42.146740+00:00",
+  "pid": 37578,
+  "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831 --test-threads=1 --nocapture",
+  "signal": "SIGTERM",
+  "reason": "Completed Liberty Iraq/America Brutal seed0 failed None at unchanged288000; preserve complete first failure and partial subsequent-case output, stop dependent long validation."
+}

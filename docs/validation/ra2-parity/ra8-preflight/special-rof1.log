@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0599]: no method named `insert` found for struct `Mut<'_, Props>` in the current scope
+   --> crates/sim/tests/ra8_ai.rs:161:83
+    |
+161 |         let cell=CellPos::new(20,20);app.world_mut().resource_mut::<sim::Props>().insert(cell,sim::PropKind::Civilian1);
+    |                                                                                   ^^^^^^
+    |
+help: there is a method `iter` with a similar name, but with different arguments
+   --> crates/sim/src/props.rs:248:5
+    |
+248 |     pub fn iter(&self) -> impl Iterator<Item = (CellPos, &Prop)> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant, associated function, or constant named `Civilian1` found for enum `PropKind` in the current scope
+   --> crates/sim/tests/ra8_ai.rs:161:110
+    |
+161 |         let cell=CellPos::new(20,20);app.world_mut().resource_mut::<sim::Props>().insert(cell,sim::PropKind::Civilian1);
+    |                                                                                                              ^^^^^^^^^ variant, associated function, or constant not found in `PropKind`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `sim` (test "ra8_ai") due to 2 previous errors

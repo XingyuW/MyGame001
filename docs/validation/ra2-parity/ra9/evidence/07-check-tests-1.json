@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-20T21:59:05.095676+00:00",
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "sim",
+    "--tests"
+  ],
+  "exit_code": 101,
+  "seconds": 5.486966208030935,
+  "status": "ACTUAL preliminary compile only; bounded lease1of5"
+}

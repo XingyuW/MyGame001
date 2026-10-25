@@ -1,0 +1,8 @@
+{
+  "separate_post_finally_sha_read_confirmed": true,
+  "sources": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "prior_separate_read": "The immediately subsequent tool separately read both source SHAs before any dependent build; matches65a00aa3/3aed244c."
+}

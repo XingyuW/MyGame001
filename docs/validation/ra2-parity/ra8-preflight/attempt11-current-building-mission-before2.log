@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.32s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+
+thread 'ai::ra8_attrition_tests::ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target' (9469394) panicked at crates/sim/src/ai/ra8_attrition_tests.rs:1053:5:
+ordinary income-funded repairs must really compete with native damage
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ai::ra8_attrition_tests::ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target ... FAILED
+
+failures:
+
+failures:
+    ai::ra8_attrition_tests::ra8_a_current_observed_building_mission_is_not_replaced_by_a_repaired_home_nearer_target
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 115 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p sim --lib`

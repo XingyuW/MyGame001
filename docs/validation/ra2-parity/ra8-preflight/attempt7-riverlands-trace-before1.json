@@ -1,0 +1,25 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1",
+    "RA8_SERVICE_TRACE": "1",
+    "RA8_TRACE_FROM": "50000"
+  },
+  "exit": 101,
+  "seconds": 10.928894999990007,
+  "runtime_sha": "a8fbfc44e95073851fcf97bbbd57ed6607c20382d5c0fe4e8e74e25b267a5418",
+  "log_sha": "ed4fc044afdb816a070140bcd5fe0ce42ca2c55f2fe34ee30cd5548c90732c00"
+}

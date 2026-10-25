@@ -1,0 +1,61 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T20:23:05.174218+00:00",
+  "pid": 18158,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/C-ai-before-03-plan.json",
+  "plan_sha256": "c8d1a3713a23842c7e75eee9bb3965e11b25ff4386f84995f22ec5c70a650e11",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:23:05.264193+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-03/01-terrain-ivan-controls.log",
+      "pid": 18187,
+      "pgid": 18187,
+      "exit": 101,
+      "end": "2026-10-22T20:23:30.302245+00:00",
+      "raw_bytes": 60443,
+      "raw_sha256": "5c6ffbf9c97b710b5847e1dd7fa3af7ec36ff6f89f0b07c26cc268b703ab0539",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra8_lone_yuri_preserves_only_seen_reachable_controllable_building_damaging_recruits",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T20:23:30.440411+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-ai-before-03/02-useful-yuri-ivan-control.log",
+      "pid": 18278,
+      "pgid": 18278,
+      "exit": 101,
+      "end": "2026-10-22T20:23:35.453914+00:00",
+      "raw_bytes": 854,
+      "raw_sha256": "7b194c4e159d6780d33da912efb85df8199e7c20c59fcdd504aaf1894435638f",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T20:23:30.443522+00:00",
+  "end": "2026-10-22T20:23:35.525729+00:00",
+  "source_unchanged": true
+}

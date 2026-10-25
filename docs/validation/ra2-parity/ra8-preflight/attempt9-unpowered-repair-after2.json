@@ -1,0 +1,27 @@
+{
+  "label": "attempt9-unpowered-repair-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_unpowered",
+    "--",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:04:59.078828+00:00",
+  "elapsed_seconds": 28.69870433298638,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "log_sha256": "88dcc61da3a7ada02f80320d0df18007cf462171a8f37b2c5452f871a3aae3f6"
+}

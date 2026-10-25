@@ -1,0 +1,67 @@
+{
+  "utc": "2026-10-21T05:09:21.342908+00:00",
+  "root_authorization": "Root independently655source/64authority/88actualreceipt-logpairs/5minimaltesthelpers verified; factual166 binding-only authorization, no sourcechoice/runtime/finalacceptance",
+  "input_scope_sha256": "035f1cf6fa664f7a79f78012d4fbfb4e1eb7d73b29821fc7b397476adac8b875",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "before_sha256": "5786bb6bcbc0e03214f4e0c8d6762cb8bff0ce77e64ff3e4dce3fd371534d00d",
+      "after_sha256": "df185c9ecae4235b49c60a5b627bf49506d018c6ca22d1aa15569d77ff502293"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "before_sha256": "7ba0b5d9e7f29de4fd9ca0e65bb48951c3877a12cdb53c398571d4bbeb6064c7",
+      "after_sha256": "eab06ec1e4d8a74a0ce3c21604b28f48009b762d1e90989887ddb59f9c62746d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "before_sha256": "73abe2ddfd7a8b0deedba64acddcb2ef603d12ce2ad0f861a320dcf568e9e830",
+      "after_sha256": "4e0fb52bcefe1f7e1bff46a5dba728e607e387d692ecad64593148548c48799f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "before_sha256": "4b45c78e030f106a1f62aa4dbd57f4b973a1684ccd23bb41109d73d3a160e7f6",
+      "after_sha256": "b03c133a94443d744ac6919e07dd7573584213a45a10a5310a83171d4cdd2456"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-acceptance.tsv",
+      "before_sha256": "0799814fde5416fb9d2e32cf2157b123503c122c4dcc87fb35a51ee75927aefd",
+      "after_sha256": "00d2f443cfea507206a5bfd080dc8bd322fe3d517e53a817d7a1f5e32d2222b4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-acceptance.tsv",
+      "before_sha256": "cdd25d6d702b7c7f03e3e48530dfa5ed1eb423e38b49cb61513715d705d1c23f",
+      "after_sha256": "f5512a4344fdfce08ff9c18f8531a97a27421d64559f94fc913088f77e963c05"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-acceptance.tsv",
+      "before_sha256": "6b56f9fb5d01eb9f1a3f27c72bd32240c34cce939d0073fe1a13d1a58d112e49",
+      "after_sha256": "28f4720ed8f4115f226cc5d0c58669efe2b7e7ad127072ca6deb88c7a720bafb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-acceptance.tsv",
+      "before_sha256": "bc55e2d55ffdec31ec608aa6f040c728ba91c62bcfd8bc5ad4d5715c24f47192",
+      "after_sha256": "b7faed7be22e6fc46a0cd3f3af5a90e4527d1159d6ff4d82886380b730a5647c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/completion-acceptance.tsv",
+      "before_sha256": "a5c2a53573cf24158c9c2ac6f1504f9dd945261b42087fcde7f695649a74f9cb",
+      "after_sha256": "40bdae851b90a0eb555dfe3274a282e2fdd5f161ada493918e14f0452a08f2c8"
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "before_sha256": "fd0f2e2bacf513d3f55555c97269b3b79866983916c4950fb78295f8533336a3",
+      "after_sha256": "d038eb81b2d7cf3fc93dcacf945acb5f4afeff5d79282e2cfa6767ff8bbd7715"
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "before_sha256": "f443cd0aedcd3c2bb197933fc461cdf55a4cc90b1fca9897961aee327fc749ec",
+      "after_sha256": "e9ab987aacd25c8e187c11f80fdf0b573a59d914f143c5fc6f0f5804bb69c39f"
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "before_sha256": "253c975e5abcd5bf5e365818c9b15bc8c4500dd886ad8007af8c5ed9672aec3f",
+      "after_sha256": "413e316342a707ad881d5a3ac4f12ad76428d07f18ac1915447b74b233827a71"
+    }
+  ]
+}

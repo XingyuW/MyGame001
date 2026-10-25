@@ -1,0 +1,15 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 15.95s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 7 tests
+test ai::ra8_attrition_tests::ra8_actual_chronoshift_and_temporal_disable_keep_attack_attempts_alive ... ok
+test ai::ra8_attrition_tests::ra8_actual_death_and_mind_control_complete_only_the_lost_owned_attempt ... ok
+test ai::ra8_attrition_tests::ra8_each_building_job_field_is_value_hashed_in_canonical_order ... ok
+test ai::ra8_attrition_tests::ra8_exhausted_known_jobs_keep_legal_search_and_do_not_fabricate_a_winner ... ok
+test ai::ra8_attrition_tests::ra8_original_approach_survives_but_replacement_ids_cannot_renew_a_failed_job ... ok
+test ai::ra8_attrition_tests::ra8_real_cargo_and_depot_entry_do_not_fabricate_building_attack_losses ... ok
+test ai::ra8_attrition_tests::ra8_real_declining_hp_and_ammunition_reloads_keep_a_healthy_building_job ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 68 filtered out; finished in 1.26s
+

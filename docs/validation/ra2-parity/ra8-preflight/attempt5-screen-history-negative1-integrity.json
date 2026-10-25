@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_an_existing_aa_clearance_attack_keeps_its_chase_history",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "before_sha256": "512541a8fd7abe84a8061709ce40215008c774acdababf5fe1ed24c118a887be",
+  "old_source": "bbb09fe:crates/sim/src/ai/strategy.rs",
+  "old_sha256": "2cc8c63d13836e13d63baee36c9ce6bfda4c5fc60272d6d1a5174475461be4f5",
+  "restored_sha256": "512541a8fd7abe84a8061709ce40215008c774acdababf5fe1ed24c118a887be",
+  "restored_immediately_in_finally": true,
+  "exit": 101,
+  "elapsed_seconds": 26.588362665992463,
+  "raw_log": "docs/validation/ra2-parity/ra8-preflight/attempt5-screen-history-negative1.log",
+  "scope": "single schedule probe of a matching actual attack with a valid prior chase count; restoration before any subsequent test/check/commit"
+}

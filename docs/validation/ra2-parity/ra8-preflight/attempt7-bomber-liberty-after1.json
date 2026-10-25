@@ -1,0 +1,20 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 272.87774675001856,
+  "runtime_sha": "816b6b088ac4305752f4fd230be97c058a4acd33d038c5f88b9bccfb1034029f",
+  "log_sha": "4b0e8a0876aba7b2195e777f41186b3acfee9e77a7f4d6d57ff1d43f5dfce981"
+}

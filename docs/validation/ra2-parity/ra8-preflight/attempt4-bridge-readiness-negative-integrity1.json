@@ -1,0 +1,14 @@
+{
+  "source": "crates/sim/src/command.rs",
+  "test": "command::ra8_intent_tests::ra8_private_bridge_goal_waits_for_hidden_occupancy_then_consumes_engineer_only_after_clear",
+  "mutation": {
+    "old": "Ok(false) => continue,",
+    "new": "Ok(false) => crate::special::apply(world, &issued),"
+  },
+  "before_sha256": "f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4",
+  "mutated_sha256": "d706aad24092764ff303b6503b8d173d2749a3b68eb783e8e54774be88e1ae95",
+  "restored_sha256": "f34246f19382754be318b576cbaf19a11245768dfff3543f99c9240ef77acfe4",
+  "exact_restoration": true,
+  "exit": 101,
+  "elapsed_seconds": 19.214108042011503
+}

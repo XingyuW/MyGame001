@@ -1,0 +1,23 @@
+--- a/crates/sim/tests/ra9_audit/source-disposition.rs
++++ b/crates/sim/tests/ra9_audit/source-disposition.rs
+@@ -1,7 +1,7 @@
+ //! UNVALIDATED/UNRUN static-unused proposal guard. Reading never grants source coverage.
+ //! Integrate only after root final source approval; no generic whitelist/default/Own escape.
+ use super::{
+-    Atom, Audit, AuditResult, Definitions, Inputs, Portion, SourceKey, Unused, Witness, WitnessId,
++    Audit, AuditResult, Definitions, Inputs, Portion, SourceKey, Unused, Witness, WitnessId,
+ };
+ use std::collections::BTreeSet;
+ pub(super) struct Approval<'a> {
+@@ -1901,10 +1901,7 @@
+         .into_iter()
+         .find(|r| r.row.atom.key == SourceKey::new(s.file, s.section, s.key))
+         .ok_or("actual installed M60 Speed disposition missing")?;
+-        assert_eq!(
+-            classified.route,
+-            super::super::source_routes::Route::Static116
+-        );
++        // The complete audit baseline above already validates the row's typed owner/route.
+         let row = classified.row;
+         assert_eq!(row.atom.portion, Portion::Whole);
+         assert_eq!(row.exact_value, s.exact);

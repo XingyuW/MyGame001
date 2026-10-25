@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.9171478339994792,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-format1.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "ra8_source_self_healing_after_a_real_ai_service_decision_cancels_the_healed_job",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "seconds": 19.255602500023087,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-service-controlled-after1.log"
+  }
+]

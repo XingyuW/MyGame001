@@ -1,0 +1,5 @@
+{
+  "crates/sim/src/ai.rs": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+  "crates/sim/src/ai/strategy.rs": "5c5fd561a4aa9d4184011128d092409ef9b0597dc23088c8515ba8a61fb88d34",
+  "crates/sim/src/ai/ra8_recovery_tests.rs": "8f7f7a20b003e29bb41dabd5c10fb832e44e833a3e3b960f180b583fa394e188"
+}

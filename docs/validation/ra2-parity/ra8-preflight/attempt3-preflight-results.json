@@ -1,0 +1,44 @@
+[
+  {
+    "name": "attempt3-m10-after1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "m10_unlocks_and_enemies",
+      "--",
+      "--nocapture"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 156.64755945801153
+  },
+  {
+    "name": "attempt3-clippy1",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.7337151670071762
+  },
+  {
+    "name": "attempt3-fmt1",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 0.9996737080218736
+  }
+]

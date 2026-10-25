@@ -1,0 +1,29 @@
+{
+  "utc": "2026-10-21T02:03:43.845356+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--no-fail-fast",
+    "--",
+    "ra8_air_observation_reserves_then_trains",
+    "ra8_an_actual_loss_to_an_unseen_mirage",
+    "ra8_land_defenders_use_reachable",
+    "ra8_aircraft_complete_real_ammo_return",
+    "ra8_lost_prerequisites_cancel_only",
+    "ra8_ready_finite_cohorts_use_shorter",
+    "ra8_opted_in_last_stand_services_a_native_remnant",
+    "ra8_unseen_ore_does_not_change_real_worker",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "runtime/data/fixtures+selected ra8_ai controlled scenario target/helpers; unrelated mutable audit metadata/ra5_world excluded",
+  "ended_utc": "2026-10-21T02:05:32.978959+00:00",
+  "exit_code": 0,
+  "seconds": 109.132,
+  "lease": "RA8 serial functional phase jobs1; controlled existing scenarios, no fullmatch sweep/performance",
+  "input_mismatches": []
+}

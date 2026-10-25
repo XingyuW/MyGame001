@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ra8_service_recovery",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 22.985001208027825,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-service-boundaries1-01.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "ra8_ai",
+      "service_",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 26.03619912499562,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt5-service-boundaries1-02.log"
+  }
+]

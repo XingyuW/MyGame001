@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-20T22:28:28.885321+00:00",
+  "command": [
+    "cargo",
+    "check",
+    "-p",
+    "sim",
+    "--tests",
+    "--examples"
+  ],
+  "exit_code": 0,
+  "seconds": 34.507,
+  "lease": "RA8 explicit bounded three-command window22:26, jobs1 configured target unchanged",
+  "status": "actual preliminary copy compile; no final acceptance"
+}

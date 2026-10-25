@@ -1,0 +1,361 @@
+{
+  "state": "Stopped at first failing target; targets after ra5_ai not run",
+  "completed_targets": 50,
+  "passed": 704,
+  "failed": 1,
+  "ignored": 0,
+  "failure": "ra5_ai::equal_brutal_armies_finish_thousand_lakes_with_regrowing_ore; None at original288000",
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all4.log",
+  "target_results": [
+    {
+      "result": "ok",
+      "passed": 67,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.54
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.27
+    },
+    {
+      "result": "ok",
+      "passed": 33,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.09
+    },
+    {
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 1.37
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 3.69
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.3
+    },
+    {
+      "result": "ok",
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.09
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.21
+    },
+    {
+      "result": "ok",
+      "passed": 32,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.18
+    },
+    {
+      "result": "ok",
+      "passed": 16,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.73
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.32
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 480.63
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.57
+    },
+    {
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.05
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.24
+    },
+    {
+      "result": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 1.33
+    },
+    {
+      "result": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.06
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 13.99
+    },
+    {
+      "result": "ok",
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.41
+    },
+    {
+      "result": "ok",
+      "passed": 36,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 11.81
+    },
+    {
+      "result": "ok",
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 4.88
+    },
+    {
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 1.37
+    },
+    {
+      "result": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 4.06
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 20.6
+    },
+    {
+      "result": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.07
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.02
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.03
+    },
+    {
+      "result": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.08
+    },
+    {
+      "result": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.04
+    },
+    {
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.38
+    },
+    {
+      "result": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.04
+    },
+    {
+      "result": "ok",
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.62
+    },
+    {
+      "result": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.54
+    },
+    {
+      "result": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.06
+    },
+    {
+      "result": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.07
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.42
+    },
+    {
+      "result": "ok",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.21
+    },
+    {
+      "result": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 3.35
+    },
+    {
+      "result": "ok",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.2
+    },
+    {
+      "result": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.05
+    },
+    {
+      "result": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.58
+    },
+    {
+      "result": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.18
+    },
+    {
+      "result": "ok",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 5.35
+    },
+    {
+      "result": "ok",
+      "passed": 16,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.25
+    },
+    {
+      "result": "ok",
+      "passed": 22,
+      "failed": 0,
+      "ignored": 0,
+      "seconds": 0.56
+    },
+    {
+      "result": "FAILED",
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "seconds": 205.02
+    }
+  ]
+}

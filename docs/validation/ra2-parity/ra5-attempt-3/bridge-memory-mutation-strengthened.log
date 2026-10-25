@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.27s
+     Running tests/ra5_world.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra5_world-e59347360799a42c)
+
+running 1 test
+
+thread 'ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight' (1037071) panicked at crates/sim/tests/ra5_world.rs:764:17:
+lost_sight=true, approached_from_memory=false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight ... FAILED
+
+failures:
+
+failures:
+    ra5_ai_remembers_a_seen_collapse_and_approaches_its_hut_after_losing_sight
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 22 filtered out; finished in 4.48s
+
+error: test failed, to rerun pass `-p sim --test ra5_world`

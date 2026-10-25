@@ -1,0 +1,280 @@
+{
+  "preserved_utc": "2026-10-20T02:33:10.767473+00:00",
+  "source": "../ra8",
+  "frozen_commit": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+  "runtime_commit": "66d0defb46c084a339d5602c74dc53526a68425d",
+  "files": [
+    {
+      "file": "01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "03-clippy.log",
+      "bytes": 72,
+      "sha256": "c2ccae29be8ebbd8973f3201e5f6646ec32bdad22fe9c3866ff8d1618ed74896"
+    },
+    {
+      "file": "04-test.log",
+      "bytes": 27555,
+      "sha256": "ecaf25765b06553564d560cc729cf3b4fa7104422f6a4d28a0edb917b962bbc3"
+    },
+    {
+      "file": "05-build-release.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "checkpoint10-capacity-recovery1.json",
+      "bytes": 799,
+      "sha256": "03c25866a14e9b0f5688ea2f644d4608f14156f2c55316f6086dfef6b6bdf6a9"
+    },
+    {
+      "file": "checkpoint10-liveness1.json",
+      "bytes": 1140,
+      "sha256": "87f5aa2a8c40c6e12ef5a996ba0071b822f3c6224749c8e31cea8243f576bb58"
+    },
+    {
+      "file": "checkpoint10-liveness2.json",
+      "bytes": 971,
+      "sha256": "2aa8b7b26e8036d9efd1691b19c6c7726063850c70cd7407d0e02c7a8410429a"
+    },
+    {
+      "file": "checkpoint10-liveness3.json",
+      "bytes": 971,
+      "sha256": "18b549291e98c359471953293119b4082a86856d52f235140ed08260beffa0dd"
+    },
+    {
+      "file": "checkpoint10-liveness4.json",
+      "bytes": 981,
+      "sha256": "28066b2f910093779364f8fc1cc6f836535ab1f38fa3b2091da8c54614dd8ebe"
+    },
+    {
+      "file": "checkpoint10-liveness5.json",
+      "bytes": 981,
+      "sha256": "e7fd4e81d8652210f763e61c0b1a6aea80e87fe4a7194359abb69614803c5928"
+    },
+    {
+      "file": "checkpoint10-liveness6.json",
+      "bytes": 970,
+      "sha256": "b870c346019abe5e08fb508cb83f7e00e8c7e96b4082a7a22429100d878bbfb8"
+    },
+    {
+      "file": "checkpoint10-liveness7.json",
+      "bytes": 990,
+      "sha256": "fdbd615f30f2caed2cb06b8a0539a0c74ac3e681836c0a2c52a8531a1ff58cec"
+    },
+    {
+      "file": "checkpoint10-liveness8.json",
+      "bytes": 990,
+      "sha256": "9a180de7ff1af765015755a9b064b8df0600e498879d539eb490cdbc49343a88"
+    },
+    {
+      "file": "checkpoint10-liveness9.json",
+      "bytes": 991,
+      "sha256": "a5ec5b9212ad6b8e24487223c1cbc5d31853b5958fe2a1f76c7bd570017a3bd4"
+    },
+    {
+      "file": "checkpoint10-r29-baseline.json",
+      "bytes": 1352,
+      "sha256": "939cf975d6589302398d1fb07c1f0f4de9c8993ec5d84d91dc9f9b77485d9400"
+    },
+    {
+      "file": "checkpoint11-liveness1.json",
+      "bytes": 801,
+      "sha256": "55476055e74a07e018d256549371e102d3a40e3752bd87bd944e76f58aa70522"
+    },
+    {
+      "file": "checkpoint11-liveness2.json",
+      "bytes": 801,
+      "sha256": "e3f35a720cc3e9b7b4a4f901ed1e8d2c59183d875c7e7636d1da6fd38535c675"
+    },
+    {
+      "file": "checkpoint11-liveness3.json",
+      "bytes": 801,
+      "sha256": "4a0c513a6128074c0c27b87f8a0f1f3d556eae4314a91117077e4f70e9ad20c3"
+    },
+    {
+      "file": "checkpoint11-liveness4.json",
+      "bytes": 801,
+      "sha256": "e156955712014e14c559c8733d519a5f43f9433f3e6e219e60ecf1be0551f32d"
+    },
+    {
+      "file": "checkpoint11-liveness5.json",
+      "bytes": 877,
+      "sha256": "265fec8539e0fce8429632e9a95a1558c4b309a40211a1b695a94ca8bfd9be00"
+    },
+    {
+      "file": "checkpoint11-liveness6.json",
+      "bytes": 877,
+      "sha256": "60306195d0931dc8abd0bd86596f1bea5624c81d41e034f92ac18c2dab1aa87d"
+    },
+    {
+      "file": "checkpoint11-liveness7.json",
+      "bytes": 877,
+      "sha256": "12be39d289945bb7d27b8348d94ae8a5f486e6f3a56dd14b39ce941cb1916a2b"
+    },
+    {
+      "file": "checkpoint12-launch.json",
+      "bytes": 2869,
+      "sha256": "06e42e793d96b097f310591c2eb484c11071eaaecd58d31f6e7a1fb376b3affc"
+    },
+    {
+      "file": "checkpoint13-STOPPED.json",
+      "bytes": 1952,
+      "sha256": "abe8d811868ba6175f1698f3130ac5dac8b70c905dacc68f3b4a6b72f9ddf2b0"
+    },
+    {
+      "file": "checkpoint14-STOPPED.json",
+      "bytes": 2521,
+      "sha256": "9a95066316e41a9f569ac4ea755cfcef58cc4cfe1ee37206bf731ce64168e6a7"
+    },
+    {
+      "file": "checkpoint14-liveness1.json",
+      "bytes": 736,
+      "sha256": "bc750ebbfa9e3001870ea8b48ce61b29f9c1960da41e4535a79c9550c880dfbc"
+    },
+    {
+      "file": "gate-process-output.log",
+      "bytes": 146,
+      "sha256": "27f1d73bbf17bf0a522eae7bb1a28ccf2bac36321b833d74874a4339e474ddd4"
+    },
+    {
+      "file": "gate-process.json",
+      "bytes": 2230,
+      "sha256": "acaf372adc727742eaf01cabc3f915930326b1510687a3dec07988e270a9c6b6"
+    },
+    {
+      "file": "production-lengths-before.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "file": "production-lengths.tsv",
+      "bytes": 49763,
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435"
+    },
+    {
+      "file": "production-liveness1.json",
+      "bytes": 343,
+      "sha256": "f487d30b24682c3de2c54cf5db5dc60cd7b99b2d8259a2b04a28c0be623acc69"
+    },
+    {
+      "file": "production-liveness2.json",
+      "bytes": 664,
+      "sha256": "4057d3d73491aab06282400a98b9d3d4f3a034611afeedfd66d9ed9a2b344de0"
+    },
+    {
+      "file": "production-liveness3.json",
+      "bytes": 316,
+      "sha256": "abd692ed6fe97abfb76e6b15c77d75b2595c777ee067849146c7347e6f49e8d6"
+    },
+    {
+      "file": "production-liveness4.json",
+      "bytes": 445,
+      "sha256": "7f732f0ac0fe64ccf7958110e1abb1c20930774abcfb82dbdcd589debe24f049"
+    },
+    {
+      "file": "production-liveness5.json",
+      "bytes": 448,
+      "sha256": "b834f93b726bda6db30b206b653f4ba7b93f95f67bad4acac274afae297ec4fb"
+    },
+    {
+      "file": "production-liveness6.json",
+      "bytes": 448,
+      "sha256": "8e080ae715a1e70f2c662c5db1a500b723716fec9de4c22b6c77adc2dd87392f"
+    },
+    {
+      "file": "summary.txt",
+      "bytes": 146,
+      "sha256": "27f1d73bbf17bf0a522eae7bb1a28ccf2bac36321b833d74874a4339e474ddd4"
+    }
+  ],
+  "files_per_set": 38,
+  "bytes_per_set": 157388,
+  "truth": {
+    "utc": "2026-10-20T02:33:10.759060+00:00",
+    "freeze_commit": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+    "runtime_commit": "66d0defb46c084a339d5602c74dc53526a68425d",
+    "command": [
+      "env",
+      "-u",
+      "RA2_DUEL_SEED",
+      "-u",
+      "RA2_DUEL_PAIR",
+      "RUST_TEST_NOCAPTURE=1",
+      "sh",
+      "scripts/validate_ra2_parity.sh",
+      "ra8"
+    ],
+    "status": "FAILED assertion / INTERRUPTED partial workspace,not a completed756 sweep",
+    "failure": "crossroads AmericaEasy/RussiaEasy seed0 None at original72000limit",
+    "completed_phases": [
+      {
+        "phase": 1,
+        "exit": 0,
+        "script_seconds": 1,
+        "observed_monotonic_phase_seconds": 1.0914363330230117,
+        "summary_line": "01 exit 0  1 s  cargo fmt --all -- --check"
+      },
+      {
+        "phase": 2,
+        "exit": 0,
+        "script_seconds": 0,
+        "observed_monotonic_phase_seconds": 0.04451070900540799,
+        "summary_line": "02 exit 0  0 s  git diff --check"
+      },
+      {
+        "phase": 3,
+        "exit": 0,
+        "script_seconds": 1,
+        "observed_monotonic_phase_seconds": 0.4194800829864107,
+        "summary_line": "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings"
+      }
+    ],
+    "workspace_phase4_partial_seconds": 443.36345641699154,
+    "total_monotonic_seconds": 444.91888354200637,
+    "script_process_exit": -15,
+    "workspace_completed_targets": 8,
+    "workspace_completed_rust_counts": [
+      248,
+      0,
+      0
+    ],
+    "visible_m6_companion_successes": [
+      "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+      "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+      "crossroads_armies_finish_after_new_terrain_changes",
+      "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes"
+    ],
+    "m6_main756": "INCOMPLETE, actual job failure; no completed winner count or new production table",
+    "unrun_phases": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "production_table": {
+      "sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+      "bytes": 49763,
+      "mtime_ns": 1792155643228129596,
+      "stale": true
+    },
+    "source_unique": 495,
+    "source_mismatches": [],
+    "owned_group_after_signal": [],
+    "failure_raw_sha256": "ecaf25765b06553564d560cc729cf3b4fa7104422f6a4d28a0edb917b962bbc3",
+    "failure_raw_bytes": 27555,
+    "note": "Later phase log files,if present,are older labels and not execution evidence. Capture-wrapper shell returned0 only because it recorded the terminated script; not a gate pass."
+  }
+}

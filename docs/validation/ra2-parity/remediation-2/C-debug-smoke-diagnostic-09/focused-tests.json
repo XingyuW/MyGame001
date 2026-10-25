@@ -1,0 +1,43 @@
+{
+  "status": "PASS_AFTER_REPRODUCIBLE_TEST_HARNESS_CORRECTION_FULL13_STILL_REQUIRED",
+  "utc": "2026-10-25T01:29:35.224605+00:00",
+  "commands": [
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-07/07-smoke-debug.log",
+      "bytes": 12099,
+      "sha256": "5c9894f041b16a08441df99361004e47df1871470ec6a0d004d17c5ff8e12168",
+      "expected_exit": 1,
+      "scope": "C8 complete-gate command 7 reproducible final-frame-only movement false negative; prior commands and all logs preserved in that gate directory."
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-debug-smoke-diagnostic-09/debug-smoke-rerun.log",
+      "bytes": 150,
+      "sha256": "4517ce4a7588a4c6cf2e6708514e9e768903f839f37e947c532073e600ba3839",
+      "expected_exit": 101,
+      "scope": "Exact uncorrected debug 600-frame smoke reproduction; Cargo cache access setup failure only."
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-debug-smoke-diagnostic-09/debug-smoke-rerun-2.log",
+      "bytes": 687,
+      "sha256": "62f6d1026afec0d3059f73652a1c6521218bccf7d49374f0283d3b111f03fe32",
+      "expected_exit": 1,
+      "scope": "Exact uncorrected debug 600-frame smoke reproducibly rejects final-frame-only movement observation."
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-debug-smoke-diagnostic-09/focused-regression.log",
+      "bytes": 3892,
+      "sha256": "7f90d5fadf33ea9117419be9473c0a3ce77c7b18b7908860582c2bb947a27bab",
+      "expected_exit": 0,
+      "scope": "Focused cumulative movement observation regression after correction."
+    },
+    {
+      "path": "docs/validation/ra2-parity/remediation-2/C-debug-smoke-diagnostic-09/debug-smoke-fixed.log",
+      "bytes": 576,
+      "sha256": "82d17eea4431a403fb080cce67f848ede803bc500dba797b907fdbd5234be854",
+      "expected_exit": 0,
+      "scope": "Exact corrected debug 600-frame smoke."
+    }
+  ],
+  "unchanged_acceptance": "600 frames, 40-tick movement threshold and exact validator command remain unchanged.",
+  "production_scope": "No production simulation/game behavior/data/balance/cap change; smoke evidence accumulation only."
+}

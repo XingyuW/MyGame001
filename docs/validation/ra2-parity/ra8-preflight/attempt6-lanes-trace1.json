@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra2_shipped",
+    "a_computer_player_builds_in_both_lanes_of_its_yard",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "environment": {
+    "RA8_LANE_TRACE": "1"
+  },
+  "exit": 101,
+  "elapsed_seconds": 4.15935004100902,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-lanes-trace1.log",
+  "sha256": "f195609a548a64bae51cc8def48056920b1ff672d888df92126d2afb3d57c109"
+}

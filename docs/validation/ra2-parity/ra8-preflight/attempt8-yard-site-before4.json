@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-yard-site-before4",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Strengthen the same native paid-yard failure with exact initial source buildability and a shared normal-geometry legal safe same-sea alternative before any runtime policy change.",
+  "start_utc": "2026-10-19T03:17:00.324778+00:00",
+  "elapsed_seconds": 19.865732708014548,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "log_sha256": "efbdfc3646c261adab1ab06cf8da34ad42c18a21a46f416e5ac36e2418453bf4"
+}

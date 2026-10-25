@@ -1,0 +1,601 @@
+{
+  "utc": "2026-10-20T12:23:34.990262+00:00",
+  "summary": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-summary.json",
+  "summary_sha256": "606c99d696ec5ca67e97deac79b09235c2534170856a1a326a68350ca2d6dac0",
+  "validation_commands": 9,
+  "rust_target_invocations": 73,
+  "rust_counts": [
+    1084,
+    0,
+    0
+  ],
+  "command_elapsed_sum_seconds": 1217.169874040992,
+  "remaining_batch_wrapper_monotonic_seconds": 1108.1912840410369,
+  "timing_context": "Three earlier eleven-path exact receipts plus six-command fresh495 freeze; their durations are summed as command times, not a fabricated continuous wrapper duration. No source timing or host-clock subtraction.",
+  "commands": [
+    {
+      "receipt": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.json",
+      "receipt_sha256": "d85c2b435e956641bf4a226beae55881cb5dc867d5d6413ef937080ad4cfc57e",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate13_crossroads_russia_america_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:01:20.540513+00:00",
+      "elapsed_seconds": 86.48866945802001,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-after1.log",
+      "log_sha256": "dc6c37c42b3be295c988cf3554287ea369d877b88211d5aadf6d32c470ffb099",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_scope": 11
+    },
+    {
+      "receipt": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.json",
+      "receipt_sha256": "d2c0a1674b53465935f828dd908bad387dcaf17cebc323f73b62a392b0daf679",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:03:06.302972+00:00",
+      "elapsed_seconds": 13.741086542024277,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-crossroads-reverse-after1.log",
+      "log_sha256": "b9a4d5b4af20326c0f7a641b5c30f88f5d99c7cc2bccd9cc776b5088d11931ca",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_scope": 11
+    },
+    {
+      "receipt": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.json",
+      "receipt_sha256": "b4f8c6a93349e7237d30fb7fa163e1975660122d5de58e699f3388d96287ec88",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "ra8_gate14_riverlands_france_germany_easy_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:03:39.626954+00:00",
+      "elapsed_seconds": 9.251985708018765,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-live-history-riverlands-after1.log",
+      "log_sha256": "7da056a5c2c8abd705dffb56abf7bc4888fc6b87c6213610f5a10664d6f22cf3",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_scope": 11
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T12:04:19.035437+00:00",
+      "end_utc": "2026-10-20T12:04:21.192926+00:00",
+      "elapsed_seconds": 2.1575057079899125,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T12:04:21.274595+00:00",
+      "end_utc": "2026-10-20T12:04:21.428406+00:00",
+      "elapsed_seconds": 0.15382166701601818,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T12:04:21.503862+00:00",
+      "end_utc": "2026-10-20T12:04:35.593976+00:00",
+      "elapsed_seconds": 14.090053708001506,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-03-clippy.log",
+      "log_sha256": "f59e788a97737a2431269fd539c01af335f9e0c3b3a04a5ee4650ce198e70c2d",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "demo10",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:04:35.676825+00:00",
+      "end_utc": "2026-10-20T12:06:16.482852+00:00",
+      "elapsed_seconds": 100.80549345898908,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-04-demo10.log",
+      "log_sha256": "bfae6996231b173bca8d4cd5d9baf44edabbc9f3bca2e0b45f6d64f7a5d8890d",
+      "rust_results": [
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "grown3",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m13_grown_maps",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-20T12:06:16.563887+00:00",
+      "end_utc": "2026-10-20T12:07:08.144332+00:00",
+      "elapsed_seconds": 51.58017795794876,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-05-grown3.log",
+      "log_sha256": "faf1acb483f209e6d11c19db4a108598557ccb13de746a8a560fc0c514db621c",
+      "rust_results": [
+        [
+          3,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    },
+    {
+      "name": "full-sim",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim"
+      ],
+      "start_utc": "2026-10-20T12:07:08.226123+00:00",
+      "end_utc": "2026-10-20T12:22:47.133428+00:00",
+      "elapsed_seconds": 938.9010798329837,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt15-final3-06-full-sim.log",
+      "log_sha256": "dfbd2c8532e85d5769bfa9b8c1c88ff8062f9b24ebbd2ceb86119c5aa9ebb604",
+      "rust_results": [
+        [
+          123,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          33,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          37,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          32,
+          0,
+          0
+        ],
+        [
+          16,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          15,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          0
+        ],
+        [
+          24,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          36,
+          0,
+          0
+        ],
+        [
+          20,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          15,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          13,
+          0,
+          0
+        ],
+        [
+          14,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          17,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          18,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          17,
+          0,
+          0
+        ],
+        [
+          16,
+          0,
+          0
+        ],
+        [
+          22,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          19,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          19,
+          0,
+          0
+        ],
+        [
+          9,
+          0,
+          0
+        ],
+        [
+          23,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          30,
+          0,
+          0
+        ],
+        [
+          32,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          12,
+          0,
+          0
+        ],
+        [
+          10,
+          0,
+          0
+        ],
+        [
+          131,
+          0,
+          0
+        ],
+        [
+          4,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ],
+        [
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_mismatches": []
+    }
+  ],
+  "actual_outcome_lines": [
+    "crossroads seed0 [\"russia\", \"america\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 62005 })",
+    "crossroads seed0 [\"america\", \"russia\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 41738 })",
+    "riverlands seed0 [\"france\", \"germany\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 33776 })",
+    "demo seed0 [\"germany\", \"great_britain\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 15172 })",
+    "demo seed0 [\"germany\", \"great_britain\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 29953 })",
+    "demo seed0 [\"france\", \"iraq\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 33428 })",
+    "demo seed0 [\"france\", \"cuba\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(1), tick: 22017 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"easy\", \"easy\"]: Some(Won { winner: PlayerId(0), tick: 62722 })",
+    "demo seed0 [\"cuba\", \"germany\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 32001 })",
+    "demo seed0 [\"cuba\", \"russia\"] [\"medium\", \"easy\"]: Some(Won { winner: PlayerId(1), tick: 25093 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"medium\", \"medium\"]: Some(Won { winner: PlayerId(1), tick: 29185 })",
+    "demo seed0 [\"cuba\", \"russia\"] [\"brutal\", \"medium\"]: Some(Won { winner: PlayerId(0), tick: 18049 })",
+    "demo seed0 [\"russia\", \"libya\"] [\"brutal\", \"brutal\"]: Some(Won { winner: PlayerId(0), tick: 18461 })",
+    "grown exact Some(Won { winner: PlayerId(1), tick: 45321 }) after 45322 ticks, defeated {PlayerId(0): 39060, PlayerId(2): 10868, PlayerId(3): 12658, PlayerId(4): 6927, PlayerId(5): 7094, PlayerId(6): 18715, PlayerId(7): 22828, PlayerId(8): 45321, PlayerId(9): 27228}"
+  ],
+  "continuity_against_final2": {
+    "path_sets_equal": true,
+    "changed_only": [
+      "crates/sim/src/ai.rs"
+    ],
+    "other_files_unchanged": 494
+  },
+  "deferred_required_acceptance": "Full13 first after clean committed checkpoint/root release; both actual fresh756 distributions. Then same-source isolated all21, three actual256 benchmarks and three explicit example guards before RA8 closure.",
+  "not_claimed": "No full13/duel756/current isolated performance/RA9 or independent review acceptance."
+}

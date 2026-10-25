@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--bin",
+      "game",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 127.39290220898692,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-game-units3.log",
+    "sha256": "f60c18a4f0e95d9076dc38cfccd304a1a624dbd12bf8feb8e4e810caa023ec9d"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "game",
+      "--test",
+      "ra8_ai_matches",
+      "--",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 17.43890158299473,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-game-ai2.log",
+    "sha256": "6d7bca4c5c3876f5c9bee805b93202dc4544c6fa3f92c17d66a8617f36f75e53"
+  }
+]

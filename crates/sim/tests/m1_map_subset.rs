@@ -143,7 +143,7 @@ fn load(path: &Path) -> Result<LoadedMap, MapError> {
 const IMAGE: &str = r#"<image source="fixture_tiles.png" width="192" height="32"/>"#;
 const MAP_SIZE: &str = r#"width="4" height="3" tilewidth="64" tileheight="32""#;
 const LAYER_HEAD: &str = r#"<layer id="1" name="terrain" width="4" height="3">"#;
-const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="1"/>"#;
+const SCHEMA_PROPERTY: &str = r#"<property name="schema_version" type="int" value="2"/>"#;
 const ORE_PROPERTY: &str = r#"<property name="ore" type="int" value="750"/>"#;
 const DATA_HEAD: &str = r#"<data encoding="csv">"#;
 const VALID_DATA: &str = "1,1,2,3,\n1,2,2,1,\n3,1,1,1\n";
@@ -267,7 +267,8 @@ fn files_inside_the_subset_load() {
     assert_eq!(demo.tileset_image.file_name, "demo_tiles.png");
     assert_eq!(
         (demo.tileset_image.width, demo.tileset_image.height),
-        (512, 32)
+        // Eleven 64 px tiles: terrain, three markers, and road, forest and cottage looks.
+        (704, 32)
     );
     let (map, _) = external_variant(
         "external_ok",
@@ -1507,4 +1508,171 @@ fn seeded_mutations_of_the_demo_map_return_a_map_or_a_typed_error_and_never_pani
         accepted > 0 && rejected > 0,
         "accepted {accepted}, rejected {rejected}"
     );
+}
+
+#[cfg(unix)]
+fn ra9_owned_child(test: &str, mode: &str, path: &std::path::Path) {
+    struct Owned(std::process::Child);
+    impl Drop for Owned {
+        fn drop(&mut self) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+    let mut child = Owned(
+        std::process::Command::new(std::env::current_exe().expect("test executable"))
+            .args(["--exact", test, "--nocapture"])
+            .env("MYGAME_RA9_BOUNDARY_CHILD_MODE", mode)
+            .env("MYGAME_RA9_BOUNDARY_CHILD_PATH", path)
+            .spawn()
+            .expect("owned bounded child"),
+    );
+    let started = std::time::Instant::now();
+    loop {
+        if let Some(status) = child.0.try_wait().expect("child status") {
+            assert!(status.success(), "native child test failed: {status}");
+            return;
+        }
+        assert!(
+            started.elapsed() < std::time::Duration::from_secs(5),
+            "native child blocked; owned child is killed and waited during unwinding"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+}
+// Append to m1_map_subset.rs. Reuse all existing error-context assertions and original limits.
+#[test]
+fn ra9_every_csv_entry_is_a_u32_before_tiled_and_retains_full_context() {
+    for (name, index, token, found) in [
+        ("empty", 0, "", ""),
+        ("text", 1, "no", "no"),
+        ("negative", 2, "-1", "-1"),
+        ("overflow", 3, "4294967296", "4294967296"),
+        ("entity", 4, "&#45;1", "-1"),
+        ("late", 11, "late", "late"),
+    ] {
+        let mut entries: Vec<_> = VALID_DATA.trim().split(',').map(str::trim).collect();
+        assert_eq!(entries.len(), 12);
+        entries[index] = token;
+        let path = variant(
+            &format!("ra9_csv_{name}"),
+            &[(VALID_DATA, &entries.join(","))],
+        );
+        assert_rejected(
+            &path,
+            &format!("layer \"terrain\" data[{index}]"),
+            MapErrorKind::InvalidValue {
+                found: found.into(),
+                expected: "an unsigned 32-bit tile id".into(),
+            },
+        );
+    }
+    for token in ["1", " 1 ", "2147483649", "1073741825", "536870913"] {
+        let mut entries: Vec<_> = VALID_DATA.trim().split(',').map(str::trim).collect();
+        entries[11] = token;
+        let path = variant(
+            &format!("ra9_csv_valid_{}", token.trim()),
+            &[(VALID_DATA, &entries.join(","))],
+        );
+        let loaded =
+            load(&path).expect("native supported u32 tile ID including existing flip flags");
+        assert_eq!((loaded.grid.width(), loaded.grid.height()), (4, 3));
+    }
+    let path = variant("ra9_csv_count_precedence", &[(VALID_DATA, "bad,too,few")]);
+    assert_rejected(
+        &path,
+        "layer \"terrain\" data",
+        MapErrorKind::TileCountMismatch {
+            expected: 12,
+            found: 3,
+        },
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded() {
+    if let Some(mode) = std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_MODE") {
+        let path = PathBuf::from(std::env::var_os("MYGAME_RA9_BOUNDARY_CHILD_PATH").expect("path"));
+        let error = load_map(&path).expect_err("FIFO native loader");
+        assert_eq!(error.file, path);
+        if mode == "map" {
+            assert_eq!(error.field, "file");
+            assert_eq!(error.kind, MapErrorKind::Read("not a regular file".into()));
+        } else {
+            assert!(
+                error.field.starts_with("tileset ")
+                    && error.field.ends_with("attribute \"source\""),
+                "{error}"
+            );
+            assert!(
+                matches!(error.kind, MapErrorKind::Read(ref reason) if reason.ends_with(": not a regular file")),
+                "{error}"
+            );
+        }
+        return;
+    }
+    use std::os::unix::fs::symlink;
+    let dir = temp_dir();
+    let pipe = dir.join("ra9_owned_map_pipe.tmx");
+    assert!(
+        std::process::Command::new("mkfifo")
+            .arg(&pipe)
+            .status()
+            .expect("mkfifo")
+            .success()
+    );
+    ra9_owned_child(
+        "ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded",
+        "map",
+        &pipe,
+    );
+    let link = dir.join("ra9_map_pipe_link.tmx");
+    symlink(&pipe, &link).expect("FIFO symlink");
+    ra9_owned_child(
+        "ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded",
+        "map",
+        &link,
+    );
+    let (map, tsx) = external_variant(
+        "ra9_owned_tsx_pipe",
+        &[],
+        r#"<tileset firstgid="1" source="{source}"/>"#,
+    );
+    std::fs::remove_file(&tsx).expect("own tileset");
+    assert!(
+        std::process::Command::new("mkfifo")
+            .arg(&tsx)
+            .status()
+            .expect("mkfifo")
+            .success()
+    );
+    ra9_owned_child(
+        "ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded",
+        "tsx",
+        &map,
+    );
+    std::fs::remove_file(&tsx).expect("own FIFO");
+    symlink(&pipe, &tsx).expect("referenced FIFO symlink");
+    ra9_owned_child(
+        "ra9_native_map_and_referenced_tileset_fifo_reads_are_owned_and_bounded",
+        "tsx",
+        &map,
+    );
+    let regular = temp_file("ra9_regular.tmx", valid_text().as_bytes());
+    let regular_link = dir.join("ra9_regular_link.tmx");
+    symlink(&regular, &regular_link).expect("regular symlink");
+    let a = load(&regular).expect("regular");
+    let b = load(&regular_link).expect("linked regular");
+    for y in 0..3 {
+        for x in 0..4 {
+            assert_eq!(
+                a.grid.cell(sim::CellPos::new(x, y)),
+                b.grid.cell(sim::CellPos::new(x, y))
+            );
+        }
+    }
+    for path in [pipe, link, map, tsx, regular, regular_link] {
+        std::fs::remove_file(path).expect("own tiny fixture");
+    }
 }

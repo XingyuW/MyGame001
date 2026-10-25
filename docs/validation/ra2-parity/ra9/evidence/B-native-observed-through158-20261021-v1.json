@@ -1,0 +1,54 @@
+{
+  "status": "FACTUAL_LOG_INDEX_ONLY_NO_EXECUTION_OR_ACCEPTANCE",
+  "cutoff": 158,
+  "excluded_command": 159,
+  "old_through129_pairs": 324,
+  "old117_and245_facts_preserved": true,
+  "latest_pairs": 331,
+  "phases": {
+    "EDITED_PRELIMINARY_COPY": {
+      "distinct_target_test_pairs": 318,
+      "latest_observed_ok": 318,
+      "latest_observed_failed": 0,
+      "latest_observed_ignored": 0
+    },
+    "IMMUTABLE_BEFORE_SNAPSHOT": {
+      "distinct_target_test_pairs": 11,
+      "latest_observed_ok": 7,
+      "latest_observed_failed": 4,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_LATE_PRODUCTION_OBSERVER_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_RNG_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    }
+  },
+  "receipts": 77,
+  "per_receipt_unique_observations": 417,
+  "harness_summaries_verified": 127,
+  "collapsed_child_duplicate_lines": 9,
+  "scenario_observations": 6,
+  "closure_observations": 10,
+  "outputs": [
+    {
+      "path": "native-observed-results.tsv",
+      "bytes": 194037,
+      "sha256": "d781a466b5a7a6620ee79eb91354357814bdecdaae2637980dde0fbd19268cbf"
+    },
+    {
+      "path": "native-observed-results.json",
+      "bytes": 558096,
+      "sha256": "30966ac84af081a7b365c1d2d80ba2a4279a63dd1c17126d684e2dfd54ac1a27"
+    }
+  ],
+  "new_directories": 0,
+  "source_writes": false
+}

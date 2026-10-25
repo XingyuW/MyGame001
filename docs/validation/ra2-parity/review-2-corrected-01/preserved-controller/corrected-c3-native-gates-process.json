@@ -1,0 +1,96 @@
+{
+  "status": "STOPPED_ON_FAILURE_OR_GUARD",
+  "start": "2026-10-23T00:44:31.598261+00:00",
+  "pid": 66652,
+  "runner_sha256": "bab3e2bc2189aa4af2ced796575cf8571c4fbdc4f0a08b6f8ba35fa208fb53b3",
+  "plan_sha256": "f5406e2d020148ecae05f86f989d6c15f71e15942431543962396e94676dbe09",
+  "commands": [
+    {
+      "name": "isolated-five",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-bounded-v4.py",
+        "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/remediation2-c3-isolated-five-02-plan.json"
+      ],
+      "start": "2026-10-23T00:44:31.793472+00:00",
+      "raw": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-isolated-five.log",
+      "pid": 66657,
+      "exit": 0,
+      "end": "2026-10-23T01:54:18.252737+00:00",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0
+    },
+    {
+      "name": "isolated-summary",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/summarize-remediation2-isolated-five.py",
+        "docs/validation/ra2-parity/remediation-2/C-isolated-five-02",
+        "689"
+      ],
+      "start": "2026-10-23T01:54:18.389525+00:00",
+      "raw": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-isolated-summary.log",
+      "pid": 78389,
+      "exit": 0,
+      "end": "2026-10-23T01:54:23.404076+00:00",
+      "raw_sha256": "ee25a5bea833300ee696664f36886522188bfbe8999303ab520cb08deb8d7a01",
+      "raw_bytes": 1777
+    },
+    {
+      "name": "preserve-isolated",
+      "command": [
+        "git",
+        "add",
+        "--",
+        "docs/validation/ra2-parity/remediation-2/C-isolated-five-02"
+      ],
+      "start": "2026-10-23T01:54:23.640323+00:00",
+      "raw": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-preserve-isolated.log",
+      "pid": 78405,
+      "exit": 0,
+      "end": "2026-10-23T01:54:28.670644+00:00",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0
+    },
+    {
+      "name": "commit-isolated",
+      "command": [
+        "git",
+        "commit",
+        "-q",
+        "-m",
+        "RA9 preserve corrected-source isolated match acceptance"
+      ],
+      "start": "2026-10-23T01:54:28.671382+00:00",
+      "raw": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-commit-isolated.log",
+      "pid": 78413,
+      "exit": 0,
+      "end": "2026-10-23T01:54:33.704059+00:00",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0
+    },
+    {
+      "name": "full13",
+      "command": [
+        "/opt/homebrew/opt/python@3.15/bin/python3.15",
+        "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/run-frozen-candidate-c3-v2.py",
+        "809010ec545a5a51051ddce9ca89d936235f9cd2",
+        "review-2-corrected-01",
+        "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-03/frozen-validation-inputs.json"
+      ],
+      "start": "2026-10-23T01:54:33.806208+00:00",
+      "raw": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/corrected-c3-native-gates-full13.log",
+      "pid": 78428,
+      "exit": 241,
+      "end": "2026-10-23T02:28:57.018781+00:00",
+      "raw_sha256": "27d8d8a82e6036eaa43fa73c93a2cd9d15b4e99ccf102fdbc842370414fcb9ba",
+      "raw_bytes": 157
+    }
+  ],
+  "limits": "Sequential unchanged gates only. No policy waiver, independent approval, merge or tag. Stops on failed command/guard.",
+  "heartbeat": "2026-10-23T02:28:57.038764+00:00",
+  "full13_launch_tip": "809010ec545a5a51051ddce9ca89d936235f9cd2",
+  "error": "AssertionError(('full13', 241))",
+  "traceback": "Traceback (most recent call last):\n  File \"/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/continue-frozen-native-gates-c3-v3.py\", line 33, in <module>\n    run('full13',[sys.executable,S/plan['full13_runner'],tip,LABEL,Fpath]);frozen()\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/continue-frozen-native-gates-c3-v3.py\", line 24, in run\n    row.update(end=now(),raw_sha256=sha(log.read_bytes()),raw_bytes=log.stat().st_size);save();assert row['exit']==0,(name,row['exit'])\n                                                                                                      ^^^^^^^^^^^^^^\nAssertionError: ('full13', 241)\n",
+  "end": "2026-10-23T02:28:57.038751+00:00"
+}

@@ -1,0 +1,27 @@
+{
+  "label": "attempt8-composition-ra4-after1",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra4_ai",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Preserve every explicit fog-on neutral legacy last-stand/assertion and companion default-fog behavior after opted-in composition correction.",
+  "start_utc": "2026-10-18T20:39:24.632885+00:00",
+  "elapsed_seconds": 33.41631833399879,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "7d04ce45f0650848bc668f56397a670e78bafb2d8bb012c5479035011129690e",
+    "crates/sim/src/ai/strategy.rs": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a"
+  },
+  "log_sha256": "a047f71e8f9bb6fb89375d467eff4bf0596b728cff8ea488ab9bc24473353022"
+}

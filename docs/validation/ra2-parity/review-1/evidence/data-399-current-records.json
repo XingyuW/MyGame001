@@ -1,0 +1,11 @@
+{
+  "rows": 399,
+  "counts": {
+    "static116": 116,
+    "masked19": 19,
+    "residual117": 117,
+    "metadata147": 147
+  },
+  "current_installed_binding_or_route_errors": [],
+  "finding": "Current installed cells are factually correct. Missing fail-closed comparator/route validation for these record classes is independently demonstrated by full code-path read, not by alleging fabricated current evidence."
+}

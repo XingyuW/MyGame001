@@ -1,0 +1,102 @@
+{
+  "frozen_runtime": "b6eac0c7c31e69ff8dff91dc154a9497143b7484",
+  "previous_checkpoint": "e01d7e5b6a7dcfb0c381805572558c43d936a12b",
+  "main_unchanged": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "gate_state": "Ready for parent committed milestone; no validator active; full13 not started",
+  "next_command": "env -u RA2_DUEL_SEED -u RA2_DUEL_PAIR sh scripts/validate_ra2_parity.sh ra8",
+  "acceptance": "docs/validation/ra2-parity/RA8_ACCEPTANCE.md",
+  "decisions": "docs/DECISIONS.md R88\u2013R131; latest concrete corrections R124\u2013R130",
+  "fixture_migration_ledger": "R94/R96/R102/R110 prior exact migrations; R108 neutral strategy; R124 exact3 bootstrap functions ordering only; R125 exact3 M2 initial/pending-hash observation with posttick/rejection assertions retained; R128 named real post-reload shot predicate strengthened beyond source Burst. R126 original both-lane test retains setup/assertions/6000. R127/R129/R130 new regressions, no old assertion/limit/rejection exemption changes. See acceptance/decisions for full function names.",
+  "static_tests": 1238,
+  "baseline_static_tests": 1124,
+  "added_tests": 114,
+  "removed_or_renamed_tests": 0,
+  "ignores": 0,
+  "test_inventory": "attempt6-test-inventory4.json",
+  "serial_preflight": {
+    "targets": 81,
+    "passed": 1201,
+    "failed": 0,
+    "ignored": 0,
+    "sim_targets": 72,
+    "sim_passed": 952,
+    "game_units": 217,
+    "demo_functions": 1,
+    "demo_explicit_winners": 10,
+    "multiplayer_tests": 5,
+    "original_production_companions": 5,
+    "exact_functions": 21,
+    "exact_explicit_winners": 21,
+    "summary": "attempt6-final-preflight-summary.json",
+    "strict_checks": "attempt6-preflight7.json; first5 all0,all16 commands0; same-source earlier Demo already passed; focused proof repeats overlap and are not added"
+  },
+  "runtime_manifest": "attempt6-final-runtime-manifest5.json",
+  "runtime_manifest_files": 339,
+  "runtime_manifest_sha256": "132667c0730673308068963e09047ad8d8a118fa823212ed8e90b4db5bd47d27",
+  "runtime_manifest_verification": "attempt6-manifest5-verification.json; all339 zero mismatches",
+  "m13_metrics": "attempt6-final-m13-metrics.json",
+  "m13_explicit_winners": 21,
+  "m13_limit_unchanged": 400000,
+  "m13_ending_median": 85128,
+  "m13_ending_p90": 125479,
+  "m13_ending_maximum": 174450,
+  "m13_command_seconds": 1408.6352612919873,
+  "m13_measured_seconds": 1403.896,
+  "m13_map_elapsed_seconds": 1404.023,
+  "m13_worst_reported_mean_ms": 1.051,
+  "m13_longest_reported_tick_ms": 725.867,
+  "ten_player256_means_ms": [
+    0.953828,
+    1.006,
+    0.757202
+  ],
+  "fixed_256_command_seconds": 65.7581029170251,
+  "mean_budget_ms_unchanged": 5,
+  "storage": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/tmp/ra8_definitions",
+    "files": 58,
+    "file_bytes": 584038,
+    "allocated_bytes": 733184,
+    "retention": "Recreatable parser scratch retained for reruns; unnecessary for release. No other substantial new external task directory."
+  },
+  "ra9_handoff": [
+    "R83 Size/SizeLimit/loaded boarding and actual attached-Squid host WeaponFired debt",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal resolution boundaries: source-inspected, not ability-support claims",
+    "R99 source-only unproven hypothetical bombable=false capability lead; broader audit explicitly deferred",
+    "R126 legal idle-lane candidate fallback; R127 observed actual weapon/terrain defence admission/current-position bonus contract; R128/R130 airport-bound subset focus/local threat/healthy-job ownership while preserving original surface/artillery policy; R129 conservative repair-recovery admission/ordinary stop. Review against source capabilities and earlier policies."
+  ],
+  "R97_status": "Mechanism closed R103; not an open default-path defect",
+  "assumptions": "Prior R91/R92 and RA5/RA6 data/policy assumptions; R114/R116\u2013R118 observed-AA job progress/en-route priority/source-range endpoint coordination; R120 retains frozen missions and conservative known eligible-fire landing endpoints; R121 cancels only fully certified and currently revalidated erasure-only changes. No closed-source AI/global air-route guarantee claimed. R127 static-terrain actual firing reach; R129 conservative owned finishing/income/production recovery for paid repairs; R130 airport-bound subset job ownership in escorted waves. No new balance quota/timer/schema/state added R126\u2013R130.",
+  "before_R29": {
+    "production": {
+      "source": "docs/validation/ra2-parity/ra7/production-lengths.tsv",
+      "count": 756,
+      "tick_median": 31540.0,
+      "tick_p90_nearest_rank": 64532,
+      "tick_maximum": 209163,
+      "R29_ratio_median": 0.13147048611111112,
+      "R29_ratio_p90_nearest_rank": 0.2807579365079365,
+      "R29_ratio_maximum": 0.7824722222222222
+    },
+    "duel": {
+      "source": "docs/validation/ra2-parity/ra7/duel-lengths.tsv",
+      "count": 756,
+      "tick_median": 32782.5,
+      "tick_p90_nearest_rank": 69184,
+      "tick_maximum": 157564,
+      "R29_ratio_median": 0.1386996527777778,
+      "R29_ratio_p90_nearest_rank": 0.3236736111111111,
+      "R29_ratio_maximum": 0.7664722222222222
+    }
+  },
+  "R29_comparison_pending": "Fresh final756-winner production and duels required under unchanged72000*max(128,width+height)/128; nearest-rank p90",
+  "verification_pending": [
+    "all13 frozen gates and both756-winner fresh R29 distributions",
+    "independent final review",
+    "user visual/audio/play-feel verification"
+  ],
+  "preserved_failures": "All ra8-attempt1..6, partial following phases/cases, all failed/insufficient/negative probes and source restoration evidence retained. Finalgame3 complete Liberty failure plus partial following Liberty captured before stopping only verified owned child37578. Initial worst-mean compact observation corrected by full parse: Arctic Floes1.051ms.",
+  "sampling_overhead": "Earlier fifth-gate native sample5.241876s retained there. Current fullsim M6 read-only native process metadata0.031560s; no stack sample/debugger. Final m13 and fixed-budget timing unprofiled with no competing validation simulation.",
+  "staged_hygiene_runtime": "checkpoint7-source-hygiene.json; standalone unfiltered exit0 inspected before separate runtime commit",
+  "staged_hygiene_evidence": "checkpoint7-staged-hygiene.json: separate unfiltered exit2,not passed;80 exact intentional raw-log/captured-snapshot EOF or trailing-space diagnostics,zero source/data/test/document errors;full stdoutSHA be046cb06220eec38ad474775eee4e91d2d8a401551e8b2b38297137f071d1b5. Require identical final stdout/stderr/exit before separate evidence commit."
+}

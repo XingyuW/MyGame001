@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 32.02s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 1 test
+test ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever ... prospective finisher charged1600 cost700 refunds[] recruits{} building_shots0 requeuedfalse
+
+thread 'ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever' (7591707) panicked at crates/sim/src/ai/ra8_recovery_tests.rs:1239:5:
+assertion `left == right` failed
+  left: []
+ right: [1600]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 89 filtered out; finished in 0.41s
+
+error: test failed, to rerun pass `-p sim --lib`

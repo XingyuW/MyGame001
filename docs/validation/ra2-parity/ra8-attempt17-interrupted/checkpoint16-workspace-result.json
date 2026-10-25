@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-20T15:26:42.098443+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "runtime_commit": "b411bed120ca05bfe909afc071d044e7928ecb78",
+  "workspace_log": "docs/validation/ra2-parity/ra8/04-test.log",
+  "bytes": 1485783,
+  "sha256": "5a58b1e59817218eb8c4b04c244f47641b670ffeaae834b161bed7a0d60d2342",
+  "target_results": 82,
+  "passed": 1389,
+  "failed": 0,
+  "ignored": 0,
+  "test_failed_lines": [],
+  "production_table": {
+    "path": "docs/validation/ra2-parity/ra8/production-lengths.tsv",
+    "sha256": "f896198edf4615e8c7ebe8e2742ea3b0e7e17bfdf85f0d87dd9afda384191ba0"
+  },
+  "phase4": {
+    "line": "04 exit 0  10426 s  cargo test --workspace --release  [1389 passed, 0 failed, 0 ignored]",
+    "number": 4,
+    "exit": 0,
+    "script_date_seconds": 10426,
+    "completion_observed_utc": "2026-10-20T15:25:56.073727+00:00",
+    "wrapper_elapsed_seconds": 8248.068310540984,
+    "observed_interval_seconds": 8245.943370374967
+  },
+  "full13_status": "Still running; not accepted from workspace result alone."
+}

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra9_temporal_garrison",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "utc": "2026-10-23T02:39:03.143523+00:00"
+}

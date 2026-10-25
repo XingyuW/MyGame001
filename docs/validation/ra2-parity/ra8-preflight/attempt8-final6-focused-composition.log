@@ -1,0 +1,16 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 9 tests
+test ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties ... ok
+test ai::ra8_composition_tests::ra8_legacy_composition_keeps_its_existing_paid_traversal ... ok
+test ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture ... ok
+test ai::ra8_composition_tests::ra8_libya_shipped_land_cycle_funds_and_spawns_siege_alongside_its_national_reserve ... ok
+test ai::ra8_composition_tests::ra8_libya_siege_priority_keeps_the_normal_locked_tech_tank_opening ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_pays_and_spawns_every_declared_entry_in_order_and_wraps ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_a_funded_locked_entry_and_pays_later_legal_units ... ok
+test ai::ra8_composition_tests::ra8_opted_in_composition_skips_locked_and_unaffordable_entries_without_losing_legal_work ... ok
+test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_and_paid_capacity ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 99 filtered out; finished in 1.19s
+

@@ -1,0 +1,68 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T03:32:23.052861+00:00",
+  "pid": 34013,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/A-client-before-01-plan.json",
+  "plan_sha256": "909a36d4ae512f388b617af31b3ac401640d1b25ebf75cbcd55790efede0f8d5",
+  "runner_sha256": "27fba42d1b6099862e05bc55f9a7ccf90ea7f5c70f5fc289b4728888bc100a37",
+  "snapshot_exclude": [
+    "crates/sim/tests/ra9_runtime_liveness.rs",
+    "crates/sim/tests/ra9_temporal_sources.rs",
+    "crates/sim/tests/ra9_specialist_firepower.rs",
+    "crates/sim/tests/ra9_crate_cargo_census.rs",
+    "crates/sim/tests/ra9_bay_current_state.rs",
+    "crates/sim/tests/ra9_guard_effective_targets.rs",
+    "crates/sim/tests/ra9_runtime_common/mod.rs"
+  ],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "game",
+        "--bin",
+        "game",
+        "ra9_privacy_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T03:32:23.184524+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-client-before-01/01-game-privacy-debug-before.log",
+      "pid": 34017,
+      "pgid": 34017,
+      "exit": 101,
+      "end": "2026-10-22T03:33:08.290713+00:00",
+      "raw_bytes": 3665,
+      "raw_sha256": "7647cbf7579fa059178f901d73958b1a0dd599986fd2771cec9ca8fd077b7fe2",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra8_ai",
+        "ra9_privacy_",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T03:33:08.547090+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/A-client-before-01/02-ai-privacy-before.log",
+      "pid": 34161,
+      "pgid": 34161,
+      "exit": 101,
+      "end": "2026-10-22T03:33:48.634202+00:00",
+      "raw_bytes": 1148,
+      "raw_sha256": "c7a917d1fc4a66fa257a45fbe2c0ef095682c4c87b4401138a8ee89cdf86f7fc",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T03:33:43.633153+00:00",
+  "end": "2026-10-22T03:33:48.770547+00:00",
+  "source_unchanged": true
+}

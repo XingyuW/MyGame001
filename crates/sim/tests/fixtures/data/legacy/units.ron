@@ -1,0 +1,112 @@
+// Unit definitions, schema version 1 (PLAN.md section 5; docs/DECISIONS.md D18).
+//
+// id:     unique name, 1 to 32 characters from a-z, 0-9, and _, starting with a letter
+// speed:  subcells per tick, 1 to 128 (256 subcells per cell, 20 ticks per second;
+//         cells per second = speed x 20 / 256)
+// sprite: name of the sprite sheet assets/sprites/units/<sprite>.png (8 facings of 64x64 px)
+//
+// The roster of each faction is in skirmish.ron (M7): the Vanguard fields riflemen, rocket
+// soldiers, scouts, light tanks, and artillery; the Meridian conscripts, grenadiers, raiders,
+// heavy tanks, and rocket launchers; both use the harvester.
+(
+    schema_version: 1,
+    units: [
+        (
+            id: "rifleman",
+            speed: 14,
+            sprite: "rifleman",
+        ),
+        (
+            id: "rocket_soldier",
+            speed: 12,
+            sprite: "rocket_soldier",
+        ),
+        (
+            id: "conscript",
+            speed: 14,
+            sprite: "conscript",
+        ),
+        (
+            id: "grenadier",
+            speed: 12,
+            sprite: "grenadier",
+        ),
+        (
+            id: "scout",
+            speed: 40,
+            sprite: "scout",
+        ),
+        (
+            id: "raider",
+            speed: 44,
+            sprite: "raider",
+        ),
+        (
+            id: "light_tank",
+            speed: 24,
+            sprite: "light_tank",
+        ),
+        (
+            id: "heavy_tank",
+            speed: 18,
+            sprite: "heavy_tank",
+        ),
+        (
+            id: "artillery",
+            speed: 16,
+            sprite: "artillery",
+        ),
+        (
+            id: "rocket_launcher",
+            speed: 16,
+            sprite: "rocket_launcher",
+        ),
+        (
+            id: "harvester",
+            speed: 16,
+            sprite: "harvester",
+        ),
+        (id: "gi", speed: 14, sprite: "rifleman"),
+        (id: "engineer", speed: 14, sprite: "rifleman"),
+        (id: "attack_dog", speed: 36, sprite: "scout"),
+        (id: "rocketeer", speed: 30, sprite: "rifleman"),
+        (id: "spy", speed: 16, sprite: "rifleman"),
+        (id: "tanya", speed: 22, sprite: "rifleman"),
+        (id: "chrono_legionnaire", speed: 14, sprite: "rifleman"),
+        (id: "sniper", speed: 12, sprite: "rifleman"),
+        (id: "flak_trooper", speed: 12, sprite: "rocket_soldier"),
+        (id: "tesla_trooper", speed: 10, sprite: "rocket_soldier"),
+        (id: "crazy_ivan", speed: 16, sprite: "grenadier"),
+        (id: "yuri", speed: 12, sprite: "rifleman"),
+        (id: "desolator", speed: 10, sprite: "grenadier"),
+        (id: "terrorist", speed: 22, sprite: "conscript"),
+        (id: "chrono_miner", speed: 20, sprite: "harvester"),
+        (id: "war_miner", speed: 16, sprite: "harvester"),
+        (id: "grizzly", speed: 28, sprite: "light_tank"),
+        (id: "rhino", speed: 20, sprite: "heavy_tank"),
+        (id: "ifv", speed: 40, sprite: "scout"),
+        (id: "flak_track", speed: 32, sprite: "raider"),
+        (id: "terror_drone", speed: 64, sprite: "scout"),
+        (id: "v3_launcher", speed: 16, sprite: "rocket_launcher"),
+        (id: "mcv", speed: 12, sprite: "harvester"),
+        (id: "mirage_tank", speed: 28, sprite: "light_tank"),
+        (id: "prism_tank", speed: 20, sprite: "artillery"),
+        (id: "apocalypse", speed: 12, sprite: "heavy_tank"),
+        (id: "tank_destroyer", speed: 20, sprite: "artillery"),
+        (id: "tesla_tank", speed: 22, sprite: "heavy_tank"),
+        (id: "demolition_truck", speed: 24, sprite: "harvester"),
+        (id: "harrier", speed: 96, sprite: "scout"),
+        (id: "black_eagle", speed: 110, sprite: "scout"),
+        (id: "nighthawk", speed: 56, sprite: "scout"),
+        (id: "kirov", speed: 8, sprite: "heavy_tank"),
+        (id: "amphibious_transport", speed: 28, sprite: "harvester"),
+        (id: "destroyer", speed: 24, sprite: "artillery"),
+        (id: "aegis_cruiser", speed: 20, sprite: "artillery"),
+        (id: "dolphin", speed: 40, sprite: "artillery"),
+        (id: "aircraft_carrier", speed: 16, sprite: "artillery"),
+        (id: "typhoon", speed: 24, sprite: "artillery"),
+        (id: "sea_scorpion", speed: 36, sprite: "artillery"),
+        (id: "giant_squid", speed: 32, sprite: "artillery"),
+        (id: "dreadnought", speed: 14, sprite: "artillery"),
+    ],
+)

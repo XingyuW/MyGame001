@@ -1,0 +1,15 @@
+{
+  "frozen_source": "0ef4a53",
+  "attempt_status": "failed workspace fixture timing; interrupted before remaining gate",
+  "ratio_basis": "ticks / (72000 * max(128, width + height) / 128); p90 nearest-rank",
+  "production": {
+    "count": 756,
+    "median": 0.13147048611111112,
+    "p90": 0.2807579365079365,
+    "maximum": 0.7824722222222222,
+    "worst_match": "crossroads: libya (easy) against iraq (easy)",
+    "worst_ticks": 56338,
+    "worst_limit": 72000,
+    "target_elapsed_seconds": 5141.62
+  }
+}

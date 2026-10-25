@@ -1,0 +1,17 @@
+{
+  "reason": "Root requested identical selected proof in release; no debug-only assertion requires debug. Preserve interrupted compiler attempt, no native pass claimed.",
+  "stopped_only_pgid": 64010,
+  "recorded_command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--test",
+    "m6_production_matches",
+    "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ]
+}

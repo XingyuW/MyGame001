@@ -1,0 +1,163 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 1.94s
+     Running tests/m11_repair.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m11_repair-23353c8c1907bf3b)
+
+running 4 tests
+test selling_a_building_under_repair_ends_the_repair ... ok
+test a_second_repair_order_stops_the_repair ... ok
+test only_the_owner_may_repair_and_a_broke_player_waits_for_credits ... ok
+test repair_restores_a_building_for_a_quarter_of_its_price_and_then_stops ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/m9_arsenal.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m9_arsenal-98aacf4c50d9ae04)
+
+running 24 tests
+test exact_unified_roster_and_categories ... ok
+test anti_air_defence_ignores_ground_and_stops_without_power ... ok
+test gap_satellite_and_direct_vision_use_the_existing_fog_grid ... ok
+test deterministic_extended_state_includes_abilities ... ok
+test carrier_launches_and_recovers_real_aircraft_without_airbase ... ok
+test lost_prerequisites_pause_queued_progress_and_refund_exactly ... ok
+test mind_control_reverts_when_controller_is_destroyed ... ok
+test mcv_deploys_and_new_yard_produces ... ok
+test cloning_produces_one_extra_infantry_without_recursive_clones ... ok
+test aircraft_strike_returns_to_air_facility_and_rearms ... ok
+test spy_infiltration_steals_refinery_credits_and_dogs_reveal_spies ... ok
+test power_loss_disables_defence_and_pauses_superweapon_charging ... ok
+test purifier_adds_income_and_radiation_spares_air_and_its_operator ... ok
+test prerequisites_refunds_ready_cancellation_and_low_power ... ok
+test timed_explosives_radiation_and_vehicle_disable_have_effects ... ok
+test transport_ifv_and_engineer_commands_execute ... ok
+test aircraft_fly_over_ground_units_and_ground_units_drive_under_them ... ok
+test a_clone_goes_to_the_rally_point_of_the_cloning_vats ... ok
+test shoreline_and_domain_navigation_are_enforced ... ok
+test collectors_deliver_and_chrono_miner_teleports ... ok
+test ore_attack_orders_repeat_deliveries_remember_field_and_stop_on_override ... ok
+test super_me_every_item_costs_one_and_finishes_in_tenth_time ... ok
+test superweapons_charge_activate_and_reset_without_resource_duplication ... ok
+test every_item_executes_queue_cost_completion_and_placement_or_spawn ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.19s
+
+     Running tests/ra1_commands.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra1_commands-f40f329f2af0ad14)
+
+running 21 tests
+test a_seen_enemy_is_reported_as_not_owned ... ok
+test a_building_destroyed_by_a_strike_is_not_sold_repaired_or_given_a_rally_point ... ok
+test a_base_unit_destroyed_by_a_strike_is_not_deployed_in_the_same_tick ... ok
+test a_weak_yard_dies_in_the_strike ... ok
+test a_building_destroyed_by_a_strike_is_not_captured_by_an_engineer_who_arrives_in_that_tick ... ok
+test a_destroyed_building_is_no_prerequisite_and_no_anchor_in_the_same_tick ... ok
+test an_engineer_who_arrives_captures_a_building_that_stands ... ok
+test a_unit_destroyed_by_a_strike_takes_no_order_and_is_no_target_in_the_same_tick ... ok
+test a_silo_destroyed_by_a_strike_does_not_fire_in_the_same_tick ... ok
+test a_unit_destroyed_by_a_strike_does_not_embark_and_a_destroyed_transport_takes_nobody ... ok
+test ra5_garrison_destroyed_earlier_in_the_command_tick_cannot_deploy ... ok
+test every_command_answers_for_a_submerged_enemy_as_for_an_id_that_names_nothing ... ok
+test deploying_names_nothing_in_a_footprint_the_player_does_not_see ... ok
+test every_command_answers_for_an_unseen_enemy_as_for_an_id_that_names_nothing ... ok
+test a_yard_destroyed_by_a_strike_is_not_undeployed_in_the_same_tick ... ok
+test the_chronosphere_answers_for_an_unseen_enemy_vehicle_as_for_an_id_that_names_nothing ... ok
+test a_vehicle_destroyed_by_a_strike_is_not_repaired_back_to_life_in_the_same_tick ... ok
+test ra5_unseen_neutral_tech_and_enemy_garrison_ids_answer_exactly_as_missing_targets ... ok
+test ra5_same_tick_dead_actors_cannot_capture_repair_enter_hospital_or_occupy ... ok
+test ra6_shipped_interaction_targets_hidden_unseen_and_missing_have_identical_answers ... ok
+test ra6_trait_injected_specialists_and_transport_passengers_cannot_act_after_same_tick_death ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/ra3_damage.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra3_damage-13cc6a54580392dd)
+
+running 14 tests
+test a_shell_with_a_spread_damages_everything_within_it_by_its_distance ... ok
+test a_suicide_unit_blows_up_with_its_own_weapon_where_it_stands ... ok
+test a_nuclear_strike_goes_through_its_warhead_and_the_armour_table ... ok
+test an_effect_the_combat_file_does_not_list_keeps_the_rule_of_m9 ... ok
+test the_damage_of_an_impact_falls_linearly_to_the_percentage_at_the_edge ... ok
+test a_building_takes_one_hit_for_every_cell_of_its_footprint_within_the_spread ... ok
+test an_impact_deals_at_most_the_largest_damage_of_the_rules ... ok
+test an_impact_in_the_air_spares_the_ground_and_one_on_the_ground_the_air ... ok
+test only_a_warhead_for_walls_damages_a_wall ... ok
+test the_spread_ends_exactly_at_its_radius ... ok
+test only_a_warhead_for_wood_damages_trees ... ok
+test a_commandos_charge_and_a_radiation_zone_go_through_their_warheads ... ok
+test the_bolts_of_a_storm_go_through_their_warhead ... ok
+test a_planted_bomb_goes_off_after_the_rules_delay_through_its_warhead ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/ra6_infantry.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_infantry-d56508d84fa18a35)
+
+running 30 tests
+test ra6_dog_bite_kills_infantry_even_above_nominal_weapon_damage ... ok
+test ra6_control_chain_returns_to_original_owner_after_second_controller_dies ... ok
+test ra6_elite_gi_uses_elite_para_and_elite_temporal_has_double_rate ... ok
+test ra6_repeat_psi_deploy_cannot_bypass_weapon_reload ... ok
+test ra6_desolator_emits_on_deploy_and_radiation_spares_buildings_and_immune_infantry ... ok
+test ra6_each_spy_factory_and_lab_entry_sets_only_its_own_unlock ... ok
+test ra6_spy_disguise_default_copy_and_dog_detection ... ok
+test ra6_spy_refinery_steals_half_once_and_power_causes_only_blackout ... ok
+test ra6_gi_deploy_persists_uses_para_and_does_not_move_or_gain_armour ... ok
+test ra6_specialists_enter_friendly_hospital_instead_of_infiltrating_or_bombing ... ok
+test ra6_spy_superweapon_resets_charge_and_radar_resets_only_old_shroud ... ok
+test ra6_chrono_infantry_distance_delay_and_stolen_abilities_are_independent ... ok
+test ra6_stolen_units_require_lab_flags_and_proper_barracks_and_prime_limit_is_same_tick ... ok
+test ra6_tanya_c4_is_delayed_and_does_not_kill_on_entry ... ok
+test ra6_specialists_embark_and_unload_preserving_identity_health_and_rank ... ok
+test ra6_specialist_replay_and_each_new_runtime_state_are_hashed ... ok
+test ra6_terrorist_death_explodes_once_with_shipped_weapon ... ok
+test ra6_temporal_sums_beams_freezes_and_releases_unharmed ... ok
+test ra6_yuri_prime_limit_counts_cargo_and_releases_on_carrier_death ... ok
+test ra6_tanya_c4_hut_collapses_bridge_only_when_enabled ... ok
+test ra6_tanya_swims_and_sapper_is_exclusive_to_naval_targets ... ok
+test ra6_tesla_charge_two_low_power_three_overpowered_one_with_power ... ok
+test ra6_temporal_removal_has_no_terrorist_death_blast_and_frozen_actor_cannot_move ... ok
+test ra6_yuri_psi_pulse_and_undeploy_boundary ... ok
+test ra6_factory_training_never_promotes_a_paid_ship ... ok
+test ra6_yuri_releases_previous_and_releases_on_controller_death ... ok
+test ra6_radiation_diagonal_decay_edge_expiry_and_reirradiation ... ok
+test ra6_radiation_overlap_caps_damage_and_empty_sites_expire ... ok
+test ra6_veteran_infiltration_applies_to_paid_production_not_free_spawns ... ok
+test ra6_ivan_normal_elite_and_engineer_defuse_on_due_tick ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/ra6_vehicles.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra6_vehicles-dcf06dc108fcbc82)
+
+running 32 tests
+test ra6_dolphin_sonic_hit_releases_squid_without_killing_it ... ok
+test ra6_chronosphere_rejects_unseen_area_and_kills_bad_or_occupied_landings ... ok
+test ra6_hidden_strategic_sources_do_not_disclose_type_through_legacy_unit_arguments ... ok
+test ra6_depot_and_repair_ifv_remove_drone_before_its_first_damage_tick ... ok
+test ra6_drone_infantry_bite_and_protected_vehicle_negative ... ok
+test ra6_chronosphere_square_moves_both_owners_kills_organic_and_preserves_offsets ... ok
+test ra6_drone_blocked_escape_retries_with_identity_hp_and_experience ... ok
+test ra6_ifv_mode_twelve_uses_cow_shot_with_an_independent_mode_fixture ... ok
+test ra6_gunner_area_fire_does_not_enable_yuri_automatic_deploy_pulse ... ok
+test ra6_ifv_psi_pulse_attacks_from_vehicle_with_immunity_and_reload ... ok
+test ra6_ivan_ifv_death_uses_crnuke_and_loses_its_passenger ... ok
+test ra6_drone_enters_then_ticks_and_exits_only_on_its_own_kill ... ok
+test ra6_kirov_crash_and_demo_death_damage_nearby_allies ... ok
+test ra6_pending_parasite_and_strategic_state_changes_affect_replay_hash ... ok
+test ra6_anti_air_destroys_paradrop_plane_before_it_drops ... ok
+test ra6_public_timers_and_nuclear_marks_do_not_disclose_unseen_sources ... ok
+test ra6_shipped_curtain_death_prevents_later_same_tick_infantry_command ... ok
+test ra6_reactor_chain_radiation_and_temporal_suppression ... ok
+test ra6_squid_prevents_motion_but_ship_keeps_its_weapon ... ok
+test ra6_repair_ifv_reaches_diagonal_but_not_two_cells_and_obeys_reload ... ok
+test ra6_stationary_mirage_is_a_tree_to_adjacent_nondetectors ... ok
+test ra6_prism_caps_eight_supporters_and_supports_again_at_tick_80 ... ok
+test ra6_storm_rejects_a_second_launch_and_preserves_its_charge ... ok
+test ra6_nuclear_missile_delays_200_ticks_and_radiates ... ok
+test ra6_squid_culls_on_the_crossing_hit_and_cannot_cull_through_curtain ... ok
+test ra6_airport_paradrops_one_shootable_plane_and_full_side_payload ... ok
+test ra6_ifv_uses_reference_modes_and_restores_empty_missiles ... ok
+test ra6_strategic_recharges_power_option_and_readiness_edges ... ok
+test ra6_ifv_temporal_and_suicide_modes_execute_on_attack ... ok
+test ra6_paradrop_blocked_landing_retains_payload_until_space_opens ... ok
+test ra6_curtain_covers_both_owners_kills_infantry_and_expires_at_1000 ... ok
+test ra6_storm_warning_exclusivity_duration_and_cloud_separation_are_deterministic ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+

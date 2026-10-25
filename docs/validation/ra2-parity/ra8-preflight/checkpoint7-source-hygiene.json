@@ -1,0 +1,24 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source_commit": "b6eac0c7c31e69ff8dff91dc154a9497143b7484",
+  "staged_paths_at_check": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/m0_bootstrap.rs",
+    "crates/sim/tests/m2_movement.rs",
+    "crates/sim/tests/ra2_shipped.rs",
+    "crates/sim/tests/ra8_ai.rs",
+    "docs/DECISIONS.md"
+  ],
+  "policy": "Observed in a standalone tool call and inspected before a separate commit. No raw evidence was staged."
+}

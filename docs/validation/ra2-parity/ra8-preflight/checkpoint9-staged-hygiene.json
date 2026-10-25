@@ -1,0 +1,1423 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "check_passed": false,
+  "classification": "nonzero retained raw-log-only diagnostics; NOT a passed check; no whitespace suppression or raw byte alteration",
+  "diagnostic_count": 140,
+  "counts": {
+    "trailing whitespace": 23,
+    "new blank line at EOF": 117
+  },
+  "source_data_test_document_errors": [],
+  "stdout_sha256": "9d882e024ac396b890dad6631776fec9edc8f30d0e0f3b1667b11edc9636fbe8",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "full_raw_capture": "checkpoint9-staged-hygiene-raw.json",
+  "diagnostics": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-ai-after1.log",
+      "line": 115,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "007cb7bada0678322f8d990230727691a11255a512b95ffff08d012c96257d44",
+      "including_eol_line_sha256": "b9b9b00818832e14b6bdc24b4430a2af2f91a85eede23a790399051376c0a5fc",
+      "including_eol_line_utf8": "test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... \n",
+      "staged_git_blob": "1ec2977dc9b72e9f0d5e4fa0674ee5796d0aabe3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-ai-after2.log",
+      "line": 121,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3a0ac1afb837b147f2eb4db7b4585dac46b6fe2ad7193b9b62aa4080540afccb",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ef69641d3ad28ee292907fa4874b67a9c059465a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-ai-after3.log",
+      "line": 123,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "213b37a0cb937a3f98b76ff1b8ae96f92dc6eaae8e8a000df9c01c04e682b258",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "f507ce624f30fb3ad8c8bbf05ea8b9abcab8617a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-artillery-replacement-after1.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "c607a19bd5a5853dc3117fdc70b23d38354fd6d8c480db9ebfba72049973e982",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8bdf61e5bf0cf80ebaeddd75b6bab347045158df"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-artillery-replacement-before2.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "0a8d0f5ea0315049deb0293f1fd2e3d5c4992ac1b8125a20c526ee7d7b11705a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ecd0525f17f265516f1a87b9e49411566397cb9e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-composition-after1.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "46846970f7b0ee5bb02dc514a0abe8f446f6104a0727643e06bc26086e7a39a5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "e91a4531cc6c2b4b14d3b6275738aa9dd7cf024e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-composition-after2.log",
+      "line": 14,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "4bf207909ec8b1e32ea19074d9afc012011d92b2b0086e4c909f2b362ce417c9",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1671d6065c5a6a3393a3a873c353943e9bbff00a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-composition-before1.log",
+      "line": 16,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "d9582b588e9c146106886f587e9574ae8c29d1aff7c3c883b896a2a0825fdec8",
+      "including_eol_line_sha256": "0895aafc61325338f8a8b91bf8da108259b2890661bd3cfd795b616037b261d3",
+      "including_eol_line_utf8": "test ai::ra8_composition_tests::ra8_opted_in_tier_reserves_share_real_queue_bounds_then_allow_declared_tanks ... \n",
+      "staged_git_blob": "86d96bf8b61619d5d06726a29ffd24a342164b1a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-composition-ra4-after1.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "a047f71e8f9bb6fb89375d467eff4bf0596b728cff8ea488ab9bc24473353022",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8bd08b4ce44cedc7263bea135b1bd8f5bba302b5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-crossroads-after1.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "fb959459323f57677be2c72b858179db5566724ccb551d87ef704fcab7b42666",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "bf04c9610d459cd05af7aedb6d90c2af911690a3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-existing-hull-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "03349cfd6eb5179629fd9c13ddb95dbb5b64ba7a0eff17300f90dc340aa661ce",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4696ccd39dd5afe23677faef4d053d38c1a5d1bf"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-existing-hull-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "65c3ba03ae8212f9cd22e0fc118a3cdc62e54247f730e73e66411b1e757391dd",
+      "including_eol_line_sha256": "c5d16bbd78896dd81d967adada2d748318d727ed3ae8a1130daa62f86d2250d5",
+      "including_eol_line_utf8": "test ra8_an_existing_hull_uses_its_reachable_shore_job_instead_of_a_prospective_yards_other_pond ... \n",
+      "staged_git_blob": "a32549bcfbbc4f868d35490027e0354ae2cf9bfd"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-existing-hull-before2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "286cb1cac784ab02e7cd984a8a769ba928dd70c685023bd54742509cda58e9d6",
+      "including_eol_line_sha256": "c5d16bbd78896dd81d967adada2d748318d727ed3ae8a1130daa62f86d2250d5",
+      "including_eol_line_utf8": "test ra8_an_existing_hull_uses_its_reachable_shore_job_instead_of_a_prospective_yards_other_pond ... \n",
+      "staged_git_blob": "a4f9a2cdbf658671c0a1ca33df49efa8a680c6c4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-existing-hull-minimum-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3b0dbbaa04503dcbf8873db701688a03ebb9a3530073c8ec1af43b3c9124bf10",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "c10c304b9d00836765a79dccc030a86a22e6f54f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-default-demo10.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "34af980790a2b587d149c3e8adb9e93a7eee6b33dc32101db239aed718b7a15a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "fcbbbac00e45ec8425d1260c4bcf606656917904"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "25c7dac16562f683555d702191e32caa3e9240963220074cbcf25f7305027b13",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "c83f58c2e307923c7926063bc2a30e2c328f4a1e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "aba08286307f7918f556c2d00f466eca12715c6fef79b87a05c48ee890160e0d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "70d813818a3edb1fd079e6e531b2cbac015b9589"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 100,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6bf2adee13d3a5ea96238af588b4aa25f54d6ed10083aa4d4379085404282aff",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1528190f1a2ce317f78682eb12ae7329485205f2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "d55613e83a708cad4a0fe63c6c908692e39e7b750b178b0e46decab573b4a3fa",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "d1e9acb4d78cda44da2a658ba7205cb2cdf478d1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 140,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "e699a2cb45dcf77699b90ecd238afd8e3387a7ee480afbccca44ba722a8b9ccc",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8deeafad623e6fbf4d324e6a55858e772d776870"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "a1f886b197bb00e34844d4d97a334bc7e582282db6d480e45ffa25203e0d6362",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "829c0ffd59ed2daa77127e61c6f182476cac8fd0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "0fa8461b240943992f39433d311bbec841ed06c6abdb456e6a4c5eef8ae5da55",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "44ef6bbd68064e84632fb67992c9d6ce8a6d7938"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 298,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8fc2a5e07a8f0621352a48d2b58a15c66d5922c4d238d8eab5f76952dbc3ff51",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "caa3a2b3d9406678855cfb0648d21e6f74894fad"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 187,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "656bccefc1682f4eb934168c0d4811259beee7d70f6711d03ca44acc532087c1",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "6f10930cb0a89e5ca8c35058a5571b10f1ccf4ec"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "c4dbe8ae63119e669cac5b8fc37bc1f72193ab01205c9a38cd0313f0178a5640",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "6a9671d9dfed3cc3a3d594eccd3a182a6e865bf3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log",
+      "line": 293,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8e14da32ebca85ffa18f927f6d13aa8935ad02859e9e6c2340546fa5f38394e3",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "429b33991ed7e16743c09edac84ac4bb090bd95c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes.log",
+      "line": 209,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "45da24881281c57be5a78e60eb3611c1c2b1a2d8db4c6256f80226c91d978fe2",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "527ef0f76153f2fd6ba2a550d3ce7032ede0cade"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes.log",
+      "line": 139,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "ec702daf945dd9ce112c72c22ccb8e5ee60e8a5b9b36551a17c10104af321332",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "528a3a6a9ee09ad2f214a4fccc6b1b4e76ddbe4b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes.log",
+      "line": 133,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6175250e6d3bfba68c97e9cae3e9fe0c56473fa3de4870c0a0274df05280a0e5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1368f9dcb6a51e7738b83c9adb32e378f16ab001"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-15-ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes.log",
+      "line": 193,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "693ca31301ec5571412b527e63d8a8774e9c8f8359c7be871f2f650569430f26",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "6efd80a2837864c1289b61ae2941f674465dc175"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-16-ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "93474d3bd743dadb267574340a72b804c8a678ffd0ec445d227323a737ac3af5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "caf784662bf4e441522185b638885ee4b537f56e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-17-ra8_gate_steel_france_germany_medium_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6484b6a117712241c53fa7093f230aafe31a8e9c5795f38a4d90f2c82e9e388b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4b394fe70df052e8e55e08ed9a248a1bbef5c7a9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-18-ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes.log",
+      "line": 161,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "deae9381974613c2e3744c424831c10a2ce80bb68df1f183c03e6664395bc60b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "7b116af74da961a9123c224377338958ef2edf68"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-19-ra8_gate_black_water_libya_america_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "cf4f9fa16f88a2330f99f2aa2831af25fd4b4b3b57554eea42603645d19baabd",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "e8ef86a98a84918c3c319bd2e53cd7982be4ead7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-20-ra8_gate_black_water_korea_france_brutal_seed_zero_finishes.log",
+      "line": 114,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "669ca26842d7476b4f13c562cc223d224f424ee2060cdb22ecc3061ba565d661",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "759f2df3e51ba30d28fc9aae37bf6002c65ac424"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final1-exact-21-ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "34ce604ddfc8abd1a6583696a18b1fd0e9631d4d0d9db9d9724e16e9b7dd3cc5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1a4a042020de80d2f90c2a4f43e44c8f5d9bf80a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-default-demo10.log",
+      "line": 50,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "be029f924b5c77b0003f77dff1cc90fdb39b217ec1bee831a10220a276bd44c8",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "7253763268ca01d7cda67777742c4b59b45bab03"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-01-ra8_gate_demo_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "c6b0592a7a24bae71ded03a673e047ac30b874a0bc9eab2c5ba3e90ca70c4ff7",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ddf7f59c5d363c1342836662364e4c703cc0de25"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-02-ra8_gate_demo_france_cuba_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "75835162fe71cc048b57378417784d37124af555911af76eb6a12b434d018781",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "806e8623ec97a359c61df77b131843aceadefbe7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-03-ra8_gate_liberty_seed_zero_finishes.log",
+      "line": 118,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "121f8ea56f5d01d7a30daed28e25b8eb7b5495b55c5ab2503b328dd7cb28210c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "a02942163891f39d25720fb6a7e16808ac2ac2bf"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-04-ra8_gate_red_canyon_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "2dbecb89884707d320a20d8c3e654a4666dd2bee7c7e71bacd12914522e13a3b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1e6f0aa5b63eeb6318bb75564745f0c7c936ba06"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-05-ra8_gate_steel_harbor_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "4fd68011ebacd06208cabc9d1ea1f08e47fc2d113d6fd6c473b71965a11a5b5b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "419a7b80ce6ed2238657fe544070c0ce73ef2281"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-06-ra8_gate_continental_stall_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "7c50b774349ff855cd3baab3837dfff4188d4be83c48fa060ecea7aec3d75a29",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8662cfb2db8502a2b942bb13f46837572fa17717"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-07-ra8_gate_ember_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "f7c9c2dd9eb2ee6f0f6bd88ad5e9c3c0595b4b824d4bc2c92d53a559fb12a6b7",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "d5b4fb2ae6f8f0590afff083a47eb4e50705e39e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-08-ra8_gate_wheel_seed_zero_finishes.log",
+      "line": 296,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "7cb6eb3356b519a2f70b9a4a3c4b2453feeea00c931319d19d75e5403941601f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "32a708910a570cdfbc959f04564b97340a7eeb81"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-09-ra8_gate_continental_bridge_seed_zero_finishes.log",
+      "line": 173,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "7b11e564f41fa66431b32034bce4a2d0a6418d4e505a78fdfffa17cc30538652",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "e76360322437a7fef962e09df58d96246878d368"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-10-ra8_gate_glacier_bridge_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6a975a55e4a6c9c24649c0e52171dfd8d22f5adacf9d0dae8570dd4240a8bd2e",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "69a55592c22fcfdfffd26e089d51c6c66c60dca3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-11-ra8_gate_harvest_bridge_seed_zero_finishes.log",
+      "line": 298,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "ec44e77349df12d580b23fe516644819d4be2b27ff492c72eec31e72de4d3538",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "20cb3bfb71a1bebb871cc0a5369f23d33e680574"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-12-ra8_gate_steel_harbor_america_cuba_bridge_seed_zero_finishes.log",
+      "line": 354,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "cbf9413b05282c1a86a6f3bc3158e18e34d126c8445d84edbfc120accade0cdb",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "468c697284e707c7ae92bdde52277f1fe4c69eb0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-13-ra8_gate_thousand_lakes_great_britain_america_seed_zero_finishes.log",
+      "line": 101,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "1108e34ea2507d5c4d8f079faa6c11df20be46d2f01cfcd1364f92a0d78185ab",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "20895b58f2ee522b6b37667cc68fde98f6e83497"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-14-ra8_gate_thousand_lakes_france_germany_seed_zero_finishes.log",
+      "line": 133,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "5ced1f40d02cb84677a9e7a7d30fc1a14e81313b823856ba2342bcd6c27ac3e2",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "299c630f9ec86e3d87d2d4bc2424e527ff70419e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-15-ra8_gate_liberty_iraq_america_brutal_seed_zero_finishes.log",
+      "line": 168,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "b33905a6ce273ca491bae430810758dfab6c65d1f3ea973ff3ac42b19073f4cc",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "f399b9069cc7436288f0b9d918460bdeeaa5b87c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-16-ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "ef20a1d2b3912cedbeffb926502bce8fd5521cf22b64cbc687f63e4f77af78b5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "e355c57edd695db53110dc0814167ce1159fe050"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-17-ra8_gate_steel_france_germany_medium_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "c486f77a541b2f9fc7d587c2a356096ece6106ffccddaaaa3f8c416083d30786",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "5ef750c22730f62e6b0e6dd54bca2da0db0a39f0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-18-ra8_gate_frozen_cuba_germany_brutal_seed_zero_finishes.log",
+      "line": 167,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "9662a1d26f1e983cd5c43f4e3ef2f6b16a4e531dc67af2904cb52c8b1c3757e3",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8461f50fbce994c69f8982b413497a9631025675"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-19-ra8_gate_black_water_libya_america_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "681a0936c41ae7c6b46562088c5d5b6e643db2a9e75c6abb6c53d28ec2297cac",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ccc9d5eb0259cf1dabe209b1901e45849341772f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-20-ra8_gate_black_water_korea_france_brutal_seed_zero_finishes.log",
+      "line": 88,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "519d05ebfd9afc82824ad5bc87301ed581d7cffb64b75b128334ba6e9f0e05d7",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "9ad41a714dded7094cb923e39860eeef7f7044ed"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-21-ra8_gate_wheel_germany_great_britain_brutal_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "28c28b668f8045a27e5a3ceefba4c1f2e3c3db608f6ad0ebae572614697207b6",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "fed20f8fb2b72d2762dea70c17d001a6e2c5dd1c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-22-ra8_gate7_riverlands_iraq_cuba_easy_seed_zero_finishes.log",
+      "line": 32,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "e9510709ef6c68ff8eed57f25c30b1d450047c69d20664aac212ff11be316ac2",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "d4f542b05bcf61a72b4c07372a0141a07523b463"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-exact-23-ra8_gate7_jungle_cuba_russia_easy_seed_zero_finishes.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "f0704270b879d78d63d4cc71045d95e94b3af7bf23c39b3766f8b9ce84c5a17a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "7fdaa06558ace141e28670aa09491f122f2ee5e6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-focused-composition.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "12b80515357abcf612f41f9d60035965989af045b1fbeba51c2a3b27bd51945b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "16aa1a65bc55e0a480ea5929956e1e3b3dec7c69"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-focused-ra4.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "2ee61a5d4ab619ac9ecd67b7c0847b3436127b802a3512e3701cb2fa01e0332a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "50ccfb00010821dec755cba200d0f97dbe8077c2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-focused-ra8-ai.log",
+      "line": 90,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "51b448ed8a0de53c37ccfc67549bcf8b02f235a5c620260b39505707ba28247d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "f1c2649ccbffe24f4269cf0a6d65ad765c51652b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final2-focused-recovery.log",
+      "line": 28,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "81a5c3396d13a718b2a80c74f33c118886069eb3d8402c744e17d2152ff9298a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "dd47798521047f40e2ea6d80782502ac8d657ab6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final4-default-demo10.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "26de87b3bdb43adb8b8e2581623334aea8c929259f1e3352dd7a51981657c210",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "3c47034b1eedc60e17ff52db22ff5e1fc12701bf"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final4-focused-composition.log",
+      "line": 13,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "59dec5c7a4bf037f36150fe43179b7a53a6d041ad7f944d6d0cdd97b1b98e3b0",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ca36ea8524c24101c3115fc298dbab36dccaadf1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final4-focused-ra4.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "9a0a2e30671f58a9ad4e44f4788e564290f5cb2f981132e657ce3396d8e66992",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "7476bccffe24a3f654d63383d8499720732bbeb4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final4-focused-ra8-ai.log",
+      "line": 94,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "48252efe19044c4f2dad67683a8d6d4d1a15d9f5b505398438e47caad7e7c374",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "828b55d56eb72114a2887b57468db4856424d6b7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final4-focused-recovery.log",
+      "line": 28,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3986a9a0badb7f8f7a2a14695bec4b8cda790683ae968411ad1a981fe3094bef",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "2eec0342457b97b3e354411b4c4bd175553931b4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-default-demo10.log",
+      "line": 48,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "0bf0da9623c8cb5e8cfb0c382d86ba502b324606c70c9f25b52845b355a924ec",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "0bc40ee4c44558ab9412841c33236eb5927f4084"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-focused-composition.log",
+      "line": 16,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "f052330f96f44d9663a06ab3026cccd8b53a1882ced433a8a9ae6dbde24d78fd",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "199089855a2d44361a62249d47918fe5a9668e47"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-focused-ra4.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "0f2c96347d040b0d0a13013153e29a405f1c7534160bbdb829873cbc70dbedf3",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1c52a2659aed57e1ffe181f9adf9fdcba70cdb21"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-focused-ra8-ai.log",
+      "line": 93,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "1bf35953dd17e75f0882986cfea930cbb0a04231067ac449b4ada31b707626a5",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "b875b5107ac6573baefac18650a9c607e0025037"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-focused-recovery.log",
+      "line": 28,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "f8ba436e918ea6740e2029954b4df1fc1cae80e00c178c77bc87282ebb4e2e9c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "3327108de5e486d14e72fb8e812e073936820eac"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final6-retained31-four-threads.log",
+      "line": 2788,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "135c97ca307a8d77224a1167d24072ca22d55d7d5fcf3754061f589c52807d3b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "c84042ab897b048c67e14b341b3b3f412659a747"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-default-demo10.log",
+      "line": 50,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "682adb031be4346e5706d9426acfe6b6a2d75f7c2e2b8b2240d2ee031c92d988",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "3bd58e72666b807ff818bf08c9ac02c180ebc3d5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-attrition.log",
+      "line": 17,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "88b2105928ed85a9146d23e77673e6e20bf20d5b7ff35ab4de7968247e7e716b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4573c50c55cbe02ea1f528d9e24cadc5cebe0206"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-composition.log",
+      "line": 16,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "28858e5336710f895088993122fe8e4aaa64c1081c62640133c6c3aad189017c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "5501b5f754089103b78c8175e84bd7bf9caa6e85"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-ra4.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "ea6a779d7b2d542d270dbb86cbdea967cac5ddf4b28a049a4f8dd592ba9914cd",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4ffe6ee3243ab7e2f14973c66fd0e51667ade25c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-ra8-ai.log",
+      "line": 93,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "57a6da08f6c1ca73d2cb4018ee7c352b7c332892f95c02a9e72050d5c798db77",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "18de607fa926bbedd45dff6dd1c39ebbeddccf5d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final7-focused-recovery.log",
+      "line": 27,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6b8166ef39538a6def1582e6a42d9c805e2b451c53e7b2fecd4a11daed91fe7f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8aaf36678c38f04263d81bf7ffcc55cdca46d2a4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-default-demo10.log",
+      "line": 49,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "ca60b952b2cecd66daa223e099dfc8488bb2d014c1a3291dc355514578a3b58b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "aac0301f48f0caac6b57a46bf7029a680c9db0bb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-example-guard-m13_ten_players.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "340d8c33d451a860f3933eb146d1594d9bd0bb1c7fab56193a07a32fa275e00f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "94a8c9afe051ccd0dc4f6248f78e256d15067a47"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-example-guard-m14_duels.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "4a4aef357a0be1d76a1e2760ee63c38f65f8cfeddc8a59ca0613f50f16f4d73b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "54bb6191f301014a6b58a9c8c1322499277a0d33"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-example-guard-m7_soak.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "b81624db2438dcc5997f23c7ff4a561b8bafe3d1869654b81d7c03604d9f6e1f",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "f70b828138f7aadc2e5c676fa670f2e6e8b80689"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-focused-attrition.log",
+      "line": 18,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "97409c0e156dfa3b41d85337b08fd87aa900521199283ddaedaf67176d220cda",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "d2f82f941fce2d33cb0224439a19ff04033cf88e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-focused-composition.log",
+      "line": 19,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "e42408304bceac96c9c67678fb36187fd278e087bf92897fddc7adb82b5e7f14",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "2671458520637b8a97a9976315e73acbfb06722d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-focused-ra4.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "db78dd531e4e5cf10fd2b5ba1289493063ea5512d1378f446aa1ecbf123b9cde",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "63c7eecd7ffc23fe11668c7c0359ef921d43f285"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-focused-ra8-ai.log",
+      "line": 94,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "28f55376932c19c8748f65c65003044733c54d73cd051dc8ee50906a324c418a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "8fa53a131311d0dc1104d68cd28b23b6cdae3cb1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-focused-recovery.log",
+      "line": 27,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3e797899dcb28f60d2164b57d44dc476114facd62e7121d77cad249adc20dbd7",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "6ee6d8c1980f4917cdc1e33ff53e328c964f4169"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-final8-retained31-four-threads.log",
+      "line": 3229,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "2bd24bfc0fdd3f79c0ca58acb404d94d3fb0241b4248278b4b60ebe443250b6c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "501d7f92438c5f5aa43b72fe23e662d9beefc6b3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-finite-repair-reserve-after1.log",
+      "line": 15,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "369d2c13530a8df7e1749051ddb62882b38799de352cc449983a49a0a18f8bcd",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "deb612ad0da94bb3e13b6d85958b9b0f47d6de7a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-finite-repair-reserve-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "2dae642d2d80eceebb521676663e88815daf7b201b0a4c1c88ae54b3b80ed23c",
+      "including_eol_line_sha256": "2ec3ae3832b7b90226bd9aea452157acb63c2c7f464106d852190f3b0b9e81fb",
+      "including_eol_line_utf8": "test ai::ra8_recovery_tests::ra8_finite_unit_funding_is_not_spent_on_repairs_before_the_paid_recruit_can_finish ... \n",
+      "staged_git_blob": "f1fee67df35c41b2d6a7ce371a5ca5df7abef6fc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-gap-naval-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3ea19df55845c0b7cd6ec92ff8850487d07df94a277e023c9252e996875da05b",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "f2553264044f2de34b4ebae9ca05a5eb0654db56"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-gap-naval-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "9cc53bfa713acea8cf25b53804d868ffb3a551fcada6fb71ae315064846ab8ee",
+      "including_eol_line_sha256": "af1b22276775fa692b7d1723c0f89f33aca481930411bcb1de9313d104702f9b",
+      "including_eol_line_utf8": "test ra8_gap_hidden_shore_requires_a_real_naval_observation_path_but_allied_sight_keeps_long_range_fire ... \n",
+      "staged_git_blob": "c34007fc8b760b8facfc399bfde45f24d883bdef"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-harvest-siege-weight-candidate1.log",
+      "line": 146,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "92351b6c27ac50c4ff701cf712339d788652e98d5e777f5e9f897c742fd28ac8",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "2b06cf6a93bb0923afb5c27b39172aafb2359e09"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-endpoint-positive4.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "1eb6b93d3a0f019c609a94cb435d2508126837da51ac42a6072723152fbb6df9",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "9cce1baa6c9c4402c3f85870e3d6e4217846ebac"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-negative-component5.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "4bf3f8bc167759307e963a00dd17333d4f80357f62d1a2eae6edcc1ff1e71cac",
+      "including_eol_line_sha256": "7a671bc935c4ee43191fbedba11778be4549857f4e39cf2e9ed19d2f5429f7ce",
+      "including_eol_line_utf8": "test ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning ... \n",
+      "staged_git_blob": "80af3f641ffce0eccf1863b727de7275a7a11d12"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-negative-endpoint4.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "52053f74473e85bdda08602ab212a6028521615e48a1f9bb4696412642a07b26",
+      "including_eol_line_sha256": "7a671bc935c4ee43191fbedba11778be4549857f4e39cf2e9ed19d2f5429f7ce",
+      "including_eol_line_utf8": "test ra8_unseen_water_obstacle_before_the_edge_range_endpoint_cannot_change_naval_planning ... \n",
+      "staged_git_blob": "fd1d523c245859a3789a49e6e57380b60e64dbf4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-negative-geometry3.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "5590ac15c8088f015ebed6347ce2ac68bfcb2c4f593092639d32e01ee70ee523",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "dec1b317c785c64a614b3378cd3bc3902e087afa"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-negative1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "3112966b02c71d8ad543701e76c4e9c48f6ace73742394070912d56445690d9f",
+      "including_eol_line_sha256": "b9b9b00818832e14b6bdc24b4430a2af2f91a85eede23a790399051376c0a5fc",
+      "including_eol_line_utf8": "test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... \n",
+      "staged_git_blob": "addb4f3f1fb1de44c578408901884148d639c837"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-hidden-water-release-after7.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8bd9e09488b8d490c4816e54402f53a2d3c51b10bb1e8ff75e11d4f537bd1f3a",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "92457c8d05814c2006aecceec2d50853c55100b7"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-independent-strategic-ai-controls1.log",
+      "line": 94,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "65a7057672e194f6420b343105736bc9e2821515a910d867c37d51eaa0c58b5d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "509a4285e6e72d7c1fc077ba11794f0bf67113ab"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-independent-strategic-attrition-controls1.log",
+      "line": 19,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "fc05ad17e053a6d78911f061d1bedcb22d63c2a6abe607847c7362153bddab38",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "96d402a518f7f17251325f2d5a82a3eb54fd22c5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-independent-strategic-cohort-after1.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "9002bd1834521e8d5e622f1c298cff919d9645dffb849d0edbd12c4d5a2a0643",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4bca3865c4fd54964ecc85d4d23e4e4083b35e64"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-independent-strategic-cohort-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "624c798fe88260b6b76e5d621f1140b296611ebf429188941746199ad05949a3",
+      "including_eol_line_sha256": "8a1fdfa0894b1358721d2cb2884059ed6183d974f4b795c9eff968be1a0508a0",
+      "including_eol_line_utf8": "test ai::ra8_attrition_tests::ra8_failed_real_sorties_do_not_blacklist_a_naturally_charged_strategic_strike ... \n",
+      "staged_git_blob": "6e378a59299d0aeca971127e5bce31aec87ffb9f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-libya-siege-controls-after2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "6372720a56dbb0352fe8b81f3cbfa9cfb6cf41de7aa56c78d8f3f7798b6a376b",
+      "including_eol_line_sha256": "b3e9ad1f242a5672e0b69efb7ac5c633582cfe4c7650495f3a6334d101859262",
+      "including_eol_line_utf8": "test ai::ra8_composition_tests::ra8_libya_replaces_its_national_with_paid_production_after_real_enemy_capture ... \n",
+      "staged_git_blob": "35c7801280092b1ad5d9e220f9feedca5ee27f41"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-libya-siege-controls-after3.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "d3a9c61e313803c5292cc5b199605238038a3ef6282b0aa833e13e90de46a7ba",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "bd5cfcb207b30eedd44ee3979b23f16d11a63d4e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-libya-siege-priority-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "b205abbf9808fdd335c549c71e610de0eaa9fffaf8f16949c3d3950e92605f3d",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "21e9181623e3b758314c5154034b259233d21d6d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-mixed-naval-component-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "5b348b6e2bed56530b4245123d7f255f6ac6a06a91ecac2686bf7d8f4119996e",
+      "including_eol_line_sha256": "d12add48d703859ea90e99f9bb118c97fcf50a9833adb634e17157abf1a0d7d9",
+      "including_eol_line_utf8": "test ra8_mixed_naval_recruitment_uses_each_hulls_legal_cells_in_the_same_sea ... \n",
+      "staged_git_blob": "c8c4fb9e70c14548c954a6dd9aed7a52b6df0573"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-all86-after1.log",
+      "line": 145,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "e301d4bf7976634e2d299c887a5af25aa131dd0cabb0ba6d968a137bb4f7f030",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "4752af360334ada52973946e573ac957cf09bab4"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-controls-after1.log",
+      "line": 8,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "a8e930dec69fec1bba57b2cce02be790b8b4ce21da5d3fa87a48ac6a4a0b5c08",
+      "including_eol_line_sha256": "b9b9b00818832e14b6bdc24b4430a2af2f91a85eede23a790399051376c0a5fc",
+      "including_eol_line_utf8": "test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... \n",
+      "staged_git_blob": "0a769109eeac00d764feef26781c2cf8121c425a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-controls-after2.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "a26408c17ba136feb48ea84db8f88b958f2f95bd15b85982633f207c421b0797",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "14d7c2d66c4dc935966d391849b2f3d8bdac03ff"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-geometry-after2.log",
+      "line": 89,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "e7acf931dc831d5fe9a830fd614c716852284eafa0dd6a9c575816b14f5d2dad",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "d1a53423979042eb8069c77df25772b3ef1c2894"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-minimum-after1.log",
+      "line": 12,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "954a284661465f8469c2fcfb2cbe633b9052e19280f364a076db8d6883f6d2e9",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "1b03c9040bcfe6c3bcf755b21f62577f5ed19555"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-minimum-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "88a7015921ee688d5c8a9e1f3835d50c3a7497390165fbeb98c837edbb93d5f3",
+      "including_eol_line_sha256": "006955ee74c67277165fcb4f36a1b2664cf8d00c0ecbf482e50990069939bb7a",
+      "including_eol_line_utf8": "test ra8_a_dreadnought_wholly_inside_source_minimum_cannot_pin_last_stand ... \n",
+      "staged_git_blob": "c64bdb067ac3696b8acc595e23dc4d4cb24c7813"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-minimum-before1.log",
+      "line": 11,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "88a7015921ee688d5c8a9e1f3835d50c3a7497390165fbeb98c837edbb93d5f3",
+      "including_eol_line_sha256": "d26a8f7295898a93f00d4b5b8cfb3873dae837d3a473c8e76443257c0c4a5357",
+      "including_eol_line_utf8": "test ra8_a_dreadnought_wholly_inside_source_minimum_is_not_recruited_for_that_shore ... \n",
+      "staged_git_blob": "c64bdb067ac3696b8acc595e23dc4d4cb24c7813"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-mixed-component-after1.log",
+      "line": 9,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8171141e0596da4609f2b5ca47d619087dd353e4d0febec6abb691540e536fb9",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "07ad1c6d78f1188cddd76da533bd62c861d0f365"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-unit-component-after1.log",
+      "line": 21,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6fd4be20df21fe1d2a3e5f3a86130d7feae89342bd86c6f80291ee4c04018103",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "281b7fdc6c1c0cd51120a2875646ceb25c1de476"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-unit-points-before2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "a6d715a65aa72c6a7ef47db794138085c218ac3c7841e1afdaa565ac4b3b716e",
+      "including_eol_line_sha256": "64afe956c566d64114cf8c03c28abc5fd9efd30f4b0932eaee999c78ad524df3",
+      "including_eol_line_utf8": "test ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs ... \n",
+      "staged_git_blob": "21a9b9fc131155f40637128c40fd20712a9b7d6f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-unit-points-before3.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "4df80a71f4d866c94acf2e6cd27ca963121aaed243c6a17fce5b3654c470a92f",
+      "including_eol_line_sha256": "64afe956c566d64114cf8c03c28abc5fd9efd30f4b0932eaee999c78ad524df3",
+      "including_eol_line_utf8": "test ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs ... \n",
+      "staged_git_blob": "f0ec74976232b16a80a965849ada550bb3eb4319"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-unit-points-before3.log",
+      "line": 11,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "4df80a71f4d866c94acf2e6cd27ca963121aaed243c6a17fce5b3654c470a92f",
+      "including_eol_line_sha256": "417097e17c89b198829e0612ba9b282282100a2ac15cdfe0751311bb62cef033",
+      "including_eol_line_utf8": "test ra8_naval_unit_points_at_source_maximum_support_real_paid_fire ... \n",
+      "staged_git_blob": "f0ec74976232b16a80a965849ada550bb3eb4319"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-naval-unit-points-before4.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "dbf785ade0033ab9ce1582dfee59d52cdcdf54194596ce1aa1d0905adec32689",
+      "including_eol_line_sha256": "64afe956c566d64114cf8c03c28abc5fd9efd30f4b0932eaee999c78ad524df3",
+      "including_eol_line_utf8": "test ra8_naval_unit_movement_positions_and_observed_destinations_drive_jobs ... \n",
+      "staged_git_blob": "cff5da4d1aa84e98181c94a41e8b9eb5abd9152c"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-oasis-composition-after1.log",
+      "line": 376,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "16aa9bb03f8f3d79ca5a1def5b3bd7275df2cd80d97c6e491106fbfc0b72c444",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "ddda665bf02c49f340c99b4e41c4a1dc9c267a2f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-oasis-libya-iraq-siege-priority-after1.log",
+      "line": 267,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "0724d03e1f7d0f5ccba48da27077baf52772fc939963941883d82af6749b8625",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "83d3a03c7da6cfae297f927bfa53213138125f29"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-pacific-component-geometry-after1.log",
+      "line": 11,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "317211448ff460be11383211e0362222b66b3f1da9acfba216f50e0cb56cd059",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "95f18e4a342dada31a09fce9d702e965ae5ebcf3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-repair-aggregate-after5.log",
+      "line": 66,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "42cf0f81f63b563e4caa2dbf4ebdac9eb026adc67fce717e504125cf8bfc351c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "13a15d9e6ff7cc87e7bc4ec602883502e35b8516"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-repair-cadence-after3.log",
+      "line": 15,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6443023f0ea9521acce98e7520bea5a4a5d9b1adb18b97e6c7b6a14bf0c61732",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "7360d3bd5ac46a45ac0baf058d93a79a27417ff0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-repair-capacity-after7.log",
+      "line": 75,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "684860b5d1f7317d248d91b8cba99a94d826e26d5f41a05a3a3a1a21319241c2",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "cc6d58b208591be3a1b806bba7c1b27157694937"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-repair-completed-after6.log",
+      "line": 67,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "fdb88dd18fe0ee8916957cc20d80f2a147c8308f25e9e55555fe730d6e0d2123",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "48148dfecca73aaaf3bcf5aa391ba900d0255758"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-repair-prefix-before1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "d83e18478f1e2477b89e5e56454e70994aa285844ea077160bef6da8c335c05d",
+      "including_eol_line_sha256": "e907350c42bae4c39809c81a3a27315b56cf5fdf7e52b032db087666b8de2f88",
+      "including_eol_line_utf8": "test ai::ra8_recovery_tests::ra8_a_refund_outside_the_emitted_prefix_cannot_fund_repairs_of_a_real_paid_head ... \n",
+      "staged_git_blob": "f08ea2fb060f7f3451475659f8fc1855308917a5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-riverlands-bounded-repair-after2.log",
+      "line": 34,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "6a41756e543ab12e77aeca8a501cba994c269ddc18518f5591b28c83ce576e89",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "6aee74fc74f0e850a59a7da4d7f84048815ed495"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-riverlands-finite-repair-after1.log",
+      "line": 34,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "5e8d5bed5d21b7b909c8c8a40f301204fff1cae092d905a3e521636952625d9c",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "c9323dc625978ac1045633bedbf2b20ae80fbaa3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-siege-paid-after1.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "cb3335d26aecceae1c3304f2e42480df6c95939c1737980cea781e63d3e90d3d",
+      "including_eol_line_sha256": "d908e60d48a228c3cd97bba39fc29ad10a0fe87bf1def2b274fc4844a5a33042",
+      "including_eol_line_utf8": "test ai::ra8_composition_tests::ra8_germany_pays_its_declared_siege_pair_and_national_unit_again_after_real_casualties ... \n",
+      "staged_git_blob": "be061b04810ed69565d6be9f6ef58ddc72a6e9bf"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-siege-paid-after2.log",
+      "line": 15,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "903679523176de23400af9080e21e2dcdc8e2e7c97e9a3f3102eb4fc11d1b2af",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "bae8011331b19dfd799bfceecdf58954bd055adc"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-steel-yard-site-after1.log",
+      "line": 199,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "3e264935a7d907ea805f439522e243ef008f3b3904b542ad8d05f39de85874ae",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "b621891fc99ade22e72f9aecd624b72e05be975e"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-yard-controls-after4.log",
+      "line": 7,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "8043c754c3b8faf9ed260d8153ba04d43cfb10c5b34d4990493fffc9799961d9",
+      "including_eol_line_sha256": "578795a4cfdf1383da20acfaf5379107b52a1d05313e7d49cc2cbed069c45573",
+      "including_eol_line_utf8": "test ai::ra8_composition_tests::ra8_naval_site_preference_retains_source_minimum_target_eligibility_and_exposed_fallback ... \n",
+      "staged_git_blob": "899961b05d3d74e251e7debca8e4351e4de0e850"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-yard-controls-after7.log",
+      "line": 137,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8e00c34fc787b271905bc5e2e3702ee1077ff0bffd65ad53441da0c22eade054",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "304f2f417cb46f32d5494171b223d6bd9aaeba47"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-yard-site-after2.log",
+      "line": 10,
+      "diagnostic": "new blank line at EOF",
+      "classification": "preserved native captured raw blank EOF",
+      "raw_file_sha256": "8436bf3e2982bf300686a0d2a88b6c5cf2a53b63f0d49246aa4f4427d1c2b1a7",
+      "including_eol_line_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "including_eol_line_utf8": "\n",
+      "staged_git_blob": "032244ec984f89420f5d18cd3fb9b706d718aa64"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt8-yard-site-before2.log",
+      "line": 6,
+      "diagnostic": "trailing whitespace",
+      "classification": "preserved native unfinished/interleaved test-progress trailing space",
+      "raw_file_sha256": "9b5968e3e51df73a5db20de8031032487d0702bb1a7c956ca850f4618e5b7093",
+      "including_eol_line_sha256": "165f8faf6301059e5029049763c3d3883786cefb4b8527ed8b430284a0429ce5",
+      "including_eol_line_utf8": "test ai::ra8_composition_tests::ra8_paid_shipyard_uses_an_available_same_sea_site_outside_observed_bombardment ... \n",
+      "staged_git_blob": "02e788defcfba097a60c23a045cc024be180e1fa"
+    }
+  ],
+  "final_recheck_required": "After staging this classification and doc records, require identical exit/stdout/stderr before the separate deliberate commit."
+}

@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.34s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+crossroads seed0 ["america", "russia"] ["easy", "easy"]: Some(Won { winner: PlayerId(0), tick: 41738 })
+test ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 40 filtered out; finished in 6.43s
+

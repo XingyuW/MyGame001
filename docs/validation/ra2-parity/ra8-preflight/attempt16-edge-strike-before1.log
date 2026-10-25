@@ -1,0 +1,14 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+error[E0609]: no field `nuclear_flight` on type `&Rules`
+   --> crates/sim/src/ai/ra8_attrition_tests.rs:887:47
+    |
+887 |     let flight = definitions.rules().unwrap().nuclear_flight;
+    |                                               ^^^^^^^^^^^^^^ unknown field
+    |
+help: one of the expressions' fields has a field of the same name
+    |
+887 |     let flight = definitions.rules().unwrap().superweapons.nuclear_flight;
+    |                                               +++++++++++++
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `sim` (lib test) due to 1 previous error

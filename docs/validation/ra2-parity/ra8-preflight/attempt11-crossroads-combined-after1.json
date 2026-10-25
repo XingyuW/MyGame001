@@ -1,0 +1,31 @@
+{
+  "label": "attempt11-crossroads-combined-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "ra8_gate_matches",
+    "ra8_gate8_crossroads_great_britain_america_brutal_seed_zero_finishes",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_ECONOMY_TRACE": "1"
+  },
+  "start_utc": "2026-10-19T11:39:40.534698+00:00",
+  "elapsed_seconds": 7.964243791997433,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "8b57bcdfd20d7de715d2e5ec62f052408640127804f18d580e90090de6bad087"
+  },
+  "log_sha256": "fd587dfbdc0ed9c4b06bde5a25d911ef01ffdab4c184ecd6aabd45cccff3aea1"
+}

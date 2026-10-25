@@ -54,6 +54,11 @@ pub enum SimSet {
     EndOfTick,
 }
 
+/// Core work inside a stage. Instrumentation and extensions can run after this set without
+/// racing an exclusive specialist system; the outer SimSet still fixes stage order.
+#[derive(SystemSet, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct SimCoreSet(pub SimSet);
+
 impl SimSet {
     /// All stages in execution order.
     pub const ORDER: [SimSet; 10] = [
@@ -111,20 +116,77 @@ impl Plugin for SimPlugin {
                 .chain(),
         );
         schedule.add_systems((
-            (advance_events, process_commands)
+            // The ore grows after the commands and before the computer players look at the
+            // map (RA5, `crate::ore`): a placement decided in a tick is applied in the next
+            // one before any ore can have spread onto its ground.
+            (advance_events, process_commands, crate::ore::grow)
                 .chain()
+                .in_set(SimCoreSet(SimSet::Commands))
                 .in_set(SimSet::Commands),
-            run_ai.in_set(SimSet::Ai),
-            (update_power, advance_production, harvest)
+            (run_ai, crate::command::certify_ai_strategic_intents)
                 .chain()
+                .in_set(SimCoreSet(SimSet::Ai))
+                .in_set(SimSet::Ai),
+            (
+                update_power,
+                advance_production,
+                crate::economy::repair_buildings,
+                harvest,
+                crate::crates::appear,
+                crate::special::advance,
+                crate::world_objects::advance,
+            )
+                .chain()
+                .in_set(SimCoreSet(SimSet::Economy))
                 .in_set(SimSet::Economy),
-            find_paths.in_set(SimSet::Pathfinding),
-            move_units.in_set(SimSet::Movement),
-            combat.in_set(SimSet::Combat),
-            remove_dead.in_set(SimSet::Cleanup),
-            update_visibility.in_set(SimSet::Visibility),
-            check_win_condition.in_set(SimSet::WinCondition),
-            advance_tick.in_set(SimSet::EndOfTick),
+            (
+                crate::special::refresh_concealment,
+                crate::tactics::advance,
+                find_paths,
+            )
+                .chain()
+                .in_set(SimCoreSet(SimSet::Pathfinding))
+                .in_set(SimSet::Pathfinding),
+            (move_units, crate::crates::collect)
+                .chain()
+                .in_set(SimCoreSet(SimSet::Movement))
+                .in_set(SimSet::Movement),
+            (
+                crate::special::refresh_concealment,
+                combat,
+                crate::garrison::fire,
+                crate::special::resolve,
+            )
+                .chain()
+                .in_set(SimCoreSet(SimSet::Combat))
+                .in_set(SimSet::Combat),
+            (
+                crate::bridges::collapse,
+                crate::garrison::cleanup,
+                crate::special::vehicles::cleanup,
+                crate::veterancy::award,
+                remove_dead,
+                crate::crew::escape,
+                crate::props::remove_dead_props,
+                crate::combat::update_conditions,
+            )
+                .chain()
+                .in_set(SimCoreSet(SimSet::Cleanup))
+                .in_set(SimSet::Cleanup),
+            (
+                update_power,
+                update_visibility,
+                crate::special::reconnaissance,
+            )
+                .chain()
+                .in_set(SimCoreSet(SimSet::Visibility))
+                .in_set(SimSet::Visibility),
+            check_win_condition
+                .in_set(SimCoreSet(SimSet::WinCondition))
+                .in_set(SimSet::WinCondition),
+            advance_tick
+                .in_set(SimCoreSet(SimSet::EndOfTick))
+                .in_set(SimSet::EndOfTick),
         ));
 
         // The event buffer is advanced by the simulation itself, once per tick (`event.rs`), so
@@ -133,11 +195,28 @@ impl Plugin for SimPlugin {
             .insert_resource(CommandQueue::default())
             .insert_resource(SimIdAllocator::default())
             .insert_resource(SimRng::new(self.seed))
+            .insert_resource(crate::TacticalState::default())
             .insert_resource(Grid::default())
             .insert_resource(Definitions::default())
             .insert_resource(Players::default())
+            .insert_resource(crate::SpecialState::default())
             .insert_resource(Projectiles::default())
-            .insert_resource(MatchState::default())
+            .insert_resource(crate::veterancy::Kills::default())
+            .insert_resource(crate::crew::Wrecks::default())
+            .insert_resource(crate::Props::default())
+            .insert_resource(crate::WorldObjects::default())
+            .insert_resource(crate::Bridges::default())
+            .insert_resource(crate::Crates::default())
+            .insert_resource({
+                // Scenario-only worlds retain the historical current-sight rules. Actual
+                // setup_match installs MatchOptions, whose RA2 default is shroud only.
+                let mut state = MatchState::default();
+                state.set_rules(crate::MatchRules {
+                    fog_of_war: true,
+                    ..Default::default()
+                });
+                state
+            })
             .insert_resource(AiPlayers::default())
             .insert_resource(Messages::<SimEvent>::default())
             .add_schedule(schedule);

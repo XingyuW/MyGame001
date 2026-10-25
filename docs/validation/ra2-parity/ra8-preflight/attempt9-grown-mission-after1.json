@@ -1,0 +1,31 @@
+{
+  "label": "attempt9-grown-mission-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "m13_grown_maps",
+    "a_ten_player_match_on_the_smallest_map_is_played_to_its_end",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "env": {
+    "RA8_GROWN_MISSION_TRACE": "1"
+  },
+  "start_utc": "2026-10-19T05:09:32.246546+00:00",
+  "elapsed_seconds": 36.816353957983665,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "log_sha256": "b64f474ed2aef1a05c027a140cf5b73ac6f501a04cd9fde20b272f7a4642d36c"
+}

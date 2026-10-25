@@ -1,0 +1,31 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "RA2_DUEL_SEED",
+    "-u",
+    "RA2_DUEL_PAIR",
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "ra8"
+  ],
+  "frozen_head": "e01d7e5b6a7dcfb0c381805572558c43d936a12b",
+  "runtime": "d1aa0f09bb7b69cb3827c2a79acdbbb5cdac66a3",
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "started_utc": "2026-10-16T12:10:50.193347+00:00",
+  "pid": 94800,
+  "process_group": 94800,
+  "wrapper_pid": 94774,
+  "runtime_manifest_files": 339,
+  "policy": "No source edits/competing simulation; stop owned group only after a completed nonzero phase; preserve complete failed output and partial following phase; no overwrite",
+  "phase_lines": [
+    "01 exit 0  1 s  cargo fmt --all -- --check",
+    "02 exit 0  0 s  git diff --check",
+    "03 exit 0  1 s  cargo clippy --workspace --all-targets -- -D warnings",
+    "04 exit 101  3458 s  cargo test --workspace --release  [366 passed, 3 failed, 0 ignored]"
+  ],
+  "exit": -15,
+  "elapsed_seconds": 3460.5489401249797,
+  "finished_utc": "2026-10-16T13:08:30.760779+00:00",
+  "stopped_after_failed_phase": "04 exit 101  3458 s  cargo test --workspace --release  [366 passed, 3 failed, 0 ignored]"
+}

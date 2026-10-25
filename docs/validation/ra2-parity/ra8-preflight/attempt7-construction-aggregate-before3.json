@@ -1,0 +1,30 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all"
+    ],
+    "exit": 0,
+    "seconds": 0.8612249580037314,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-format13.log"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--lib",
+      "ai::ra8_recovery_tests::ra8_finite_funds_preserve_paid_head_and_finance_source_cost_finisher_after_unpaid_tails",
+      "--",
+      "--exact",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "seconds": 16.40198500000406,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt7-construction-aggregate-before3.log"
+  }
+]

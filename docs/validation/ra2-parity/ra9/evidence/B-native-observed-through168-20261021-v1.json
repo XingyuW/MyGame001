@@ -1,0 +1,64 @@
+{
+  "status": "FACTUAL_LOG_INDEX_ONLY_NO_EXECUTION_OR_ACCEPTANCE",
+  "cutoff": 168,
+  "old_through158_pairs": 331,
+  "old117_and245_and129_facts_preserved": true,
+  "latest_pairs": 490,
+  "phases": {
+    "EDITED_PRELIMINARY_COPY": {
+      "distinct_target_test_pairs": 477,
+      "latest_observed_ok": 477,
+      "latest_observed_failed": 0,
+      "latest_observed_ignored": 0
+    },
+    "IMMUTABLE_BEFORE_SNAPSHOT": {
+      "distinct_target_test_pairs": 11,
+      "latest_observed_ok": 7,
+      "latest_observed_failed": 4,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_LATE_PRODUCTION_OBSERVER_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_RNG_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    }
+  },
+  "receipts": 82,
+  "per_receipt_unique_observations": 604,
+  "harness_summaries_verified": 129,
+  "collapsed_child_duplicate_lines": 9,
+  "scenario_observations": 6,
+  "full159": {
+    "passed": 175,
+    "failed": 6,
+    "command_exit": 101
+  },
+  "focused168": {
+    "passed": 6,
+    "failed": 0,
+    "command_exit": 0
+  },
+  "no_full181_pass_claim": true,
+  "canonical_required13_pending": true,
+  "outputs": [
+    {
+      "path": "native-observed-results.tsv",
+      "bytes": 315099,
+      "sha256": "6c124827c7f411011bcaa16e6c6d3e406440df0cb81266000b88c55005683aa3"
+    },
+    {
+      "path": "native-observed-results.json",
+      "bytes": 810180,
+      "sha256": "879ac19797a561a47e8b772462d4c16a7d1f6718794cd4c33c1661a02217a4a3"
+    }
+  ],
+  "new_directories": 0,
+  "source_writes": false
+}

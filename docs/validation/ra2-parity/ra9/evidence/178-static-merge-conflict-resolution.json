@@ -1,0 +1,7 @@
+{
+  "status": "STATIC_THREE_WAY_EOF_APPEND_CONFLICT_NO_NATIVE_OR_COMPILER_RUN_NO_SOURCE_WRITE_BEFORE_RESOLUTION",
+  "git_merge_exit": 1,
+  "path": "crates/sim/tests/ra8_ai.rs",
+  "preserved_conflict_output": "ra9-preliminary-logs/178-merge-output-crates__sim__tests__ra8_ai.rs",
+  "resolution": "Exact append/append EOF conflict: preserve copy R176 comment correction and161-line RA9 difficulty test; append byte-exact165-line new RA8 regression/helper block. Frozen RA8 existing base unchanged."
+}

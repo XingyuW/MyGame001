@@ -1,0 +1,29 @@
+{
+  "label": "attempt8-naval-controls-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "naval",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "affected actual naval recruitment/hidden occupancy/active travel/Gap observation controls",
+  "start_utc": "2026-10-18T19:41:59.384147+00:00",
+  "elapsed_seconds": 1.5624947500182316,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "19661bccc0092c15903d1b44986eec68df7b36f23b14c3372f264991011675f7",
+    "crates/sim/src/ai/strategy.rs": "9e539b2a5509ea1bc462ee8f9324bbf08106ddd7d4939afd258878730530cae2"
+  },
+  "log_sha256": "a8e930dec69fec1bba57b2cce02be790b8b4ce21da5d3fa87a48ac6a4a0b5c08"
+}

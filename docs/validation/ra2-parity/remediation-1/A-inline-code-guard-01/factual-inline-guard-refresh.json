@@ -1,0 +1,201 @@
+{
+  "utc": "2026-10-22T04:06:31.172793+00:00",
+  "status": "AUTHORIZED_FACTUAL_INLINE_RAW_BYTE_GUARD_REFRESH_ONLY_NOT_STAGE_B_ADMISSION_FIX_POLICY_APPROVAL_OR_NATIVE_EVIDENCE",
+  "authorization": "Root dispatch to /root/remediate1_data; exactly command.rs inline expectedFNV refresh after unchanged roster/unit-resale premise inspection.",
+  "git_predecessor": "af18ce22736ab98b516560d433384b5746774880",
+  "path": "crates/sim/tests/ra9_audit/completion-whole.rs",
+  "before_sha256": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e",
+  "after_sha256": "84d8fdbf23afbf5bc380e81eb6c1d845eab458dd84c30ccb82e0fb623193f482",
+  "preimage": "before-completion-whole.rs",
+  "changed_literal": {
+    "before": "0xfa6e7f66569e6b1fu64",
+    "after": "0x7db5befc95cc8e34u64",
+    "occurrences": 1
+  },
+  "command_predecessor": {
+    "path": "crates/sim/src/command.rs",
+    "bytes": 60822,
+    "fnv1a64": "fa6e7f66569e6b1f",
+    "sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e",
+    "matches_immutable195": true
+  },
+  "command_actual": {
+    "path": "crates/sim/src/command.rs",
+    "bytes": 60943,
+    "fnv1a64": "7db5befc95cc8e34",
+    "sha256": "69370c0679a683073042edaec5bbbf0d9e59b0839c7c31ca22af879bcb95ae56"
+  },
+  "exact_delta_proof": {
+    "sole_call_expression_replacement_reproduces_complete_current_file": true,
+    "added_bytes": 121,
+    "change": "Existing economy_commands::apply call expanded across lines with additional &special argument; all other command.rs bytes unchanged.",
+    "command_enum_unchanged": true
+  },
+  "inline_guard_inventory": [
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 92,
+      "path": "scripts/generate_ra2_data.py",
+      "old195_bytes": 110053,
+      "old195_sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+      "expected_before_fnv": "a7ce0c09a609cad9",
+      "actual_bytes": 110053,
+      "actual_fnv": "a7ce0c09a609cad9",
+      "actual_sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+      "matches_before": true,
+      "expected_after_fnv": "a7ce0c09a609cad9"
+    },
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 97,
+      "path": "crates/sim/src/command.rs",
+      "old195_bytes": 60822,
+      "old195_sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e",
+      "expected_before_fnv": "fa6e7f66569e6b1f",
+      "actual_bytes": 60943,
+      "actual_fnv": "7db5befc95cc8e34",
+      "actual_sha256": "69370c0679a683073042edaec5bbbf0d9e59b0839c7c31ca22af879bcb95ae56",
+      "matches_before": false,
+      "expected_after_fnv": "7db5befc95cc8e34"
+    },
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 102,
+      "path": "crates/sim/src/arsenal.rs",
+      "old195_bytes": 69288,
+      "old195_sha256": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5",
+      "expected_before_fnv": "40d7f3082d74ff37",
+      "actual_bytes": 69288,
+      "actual_fnv": "40d7f3082d74ff37",
+      "actual_sha256": "f4d5f0aa0ba47c575d7242c1a72a7e8a206fba53504dc0122ba0f2b6a06a89a5",
+      "matches_before": true,
+      "expected_after_fnv": "40d7f3082d74ff37"
+    },
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 107,
+      "path": "crates/sim/src/economy_defs.rs",
+      "old195_bytes": 26155,
+      "old195_sha256": "076ae99a442b552d00581df28add9da31131f7fe415f2bb6994af17ad65054d6",
+      "expected_before_fnv": "72658060a6fb85c8",
+      "actual_bytes": 26155,
+      "actual_fnv": "72658060a6fb85c8",
+      "actual_sha256": "076ae99a442b552d00581df28add9da31131f7fe415f2bb6994af17ad65054d6",
+      "matches_before": true,
+      "expected_after_fnv": "72658060a6fb85c8"
+    },
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 112,
+      "path": "crates/sim/src/veterancy.rs",
+      "old195_bytes": 22918,
+      "old195_sha256": "38f07941bb7b1e0c56a983dc8f108a063bd98f86d53ae9f156ea8e55337efb42",
+      "expected_before_fnv": "53186583ba89d820",
+      "actual_bytes": 22918,
+      "actual_fnv": "53186583ba89d820",
+      "actual_sha256": "38f07941bb7b1e0c56a983dc8f108a063bd98f86d53ae9f156ea8e55337efb42",
+      "matches_before": true,
+      "expected_after_fnv": "53186583ba89d820"
+    },
+    {
+      "kind": "whole_raw_source_literal",
+      "owner": "crates/sim/tests/ra9_audit/completion-whole.rs",
+      "owner_line": 117,
+      "path": "crates/sim/src/special/interaction.rs",
+      "old195_bytes": 10775,
+      "old195_sha256": "b4e0ade7d3c3b5ecc7023e92cbc5607c077fc8b87cea3191c98cbe245d51cf86",
+      "expected_before_fnv": "c80ce6fa4483e553",
+      "actual_bytes": 10775,
+      "actual_fnv": "c80ce6fa4483e553",
+      "actual_sha256": "b4e0ade7d3c3b5ecc7023e92cbc5607c077fc8b87cea3191c98cbe245d51cf86",
+      "matches_before": true,
+      "expected_after_fnv": "c80ce6fa4483e553"
+    },
+    {
+      "kind": "whitespace_normalized_function_literal",
+      "owner": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "path": "crates/sim/src/flight.rs",
+      "function_start": "fn docks(",
+      "expected_before_fnv": "cf7463c09df7be8c",
+      "expected_after_fnv": "cf7463c09df7be8c",
+      "actual_file_bytes": 40028,
+      "actual_file_sha256": "2107dd3f22193b0ef0aa830d90c3372b08260a32ed92da50fca8bf1ecb71412e",
+      "old_span_bytes": 8148,
+      "actual_span_bytes": 8148,
+      "old_normalized_bytes": 4955,
+      "actual_normalized_bytes": 4955,
+      "actual_fnv": "cf7463c09df7be8c",
+      "matches_before": true,
+      "original_span_proof": {
+        "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim/src/flight.rs",
+        "raw_file_sha256": "be2695a423f8f60789c38f20d20e87d071b198bead3a9ec660db24fac12fe80c",
+        "span_exact_bytes_equal": true
+      }
+    },
+    {
+      "kind": "whitespace_normalized_function_literal",
+      "owner": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "path": "crates/sim/src/economy.rs",
+      "function_start": "pub fn repair_step_cost(",
+      "expected_before_fnv": "68f52add6a541aec",
+      "expected_after_fnv": "68f52add6a541aec",
+      "actual_file_bytes": 54916,
+      "actual_file_sha256": "8e245e41dc6acfb065f3f92f928751ecf6a1776c08db08211915f6fe728eb165",
+      "old_span_bytes": 373,
+      "actual_span_bytes": 373,
+      "old_normalized_bytes": 298,
+      "actual_normalized_bytes": 298,
+      "actual_fnv": "68f52add6a541aec",
+      "matches_before": true,
+      "original_span_proof": {
+        "path": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim/src/economy.rs",
+        "raw_file_sha256": "9a47e1f74925711beb0359f28f7404aacf0726d5f442f9e3bc33cbb6f34e0249",
+        "span_exact_bytes_equal": true
+      }
+    }
+  ],
+  "additional_raw_source_metadata_guards": [
+    "crates/sim/tests/ra9_audit/legacy904-branch-files.tsv",
+    "crates/sim/tests/ra9_audit/completion-local-code.tsv",
+    "crates/sim/tests/reference/ra9_model_census.tsv"
+  ],
+  "policy_premise": "Command enum byte-identical; other5 whole guarded files byte-identical to195 preserve generator rosters, building refund schema/getters, Cost XP and interactions. SellBuilding still uses own BuildingIndex, ProductionItem::Building and refund(BuildingKind); &special supplies current frozen-building gates, no unit sale/Grinder/Soylent salvage added. Scope/source/class/reason/route/decision/qualified receipt semantics untouched.",
+  "not_credited": "A-audit-whole-before-01 is a baseline setup failure, not22 intended escapes. StageB checker patch remains unapplied; root fresh source packet/factual rebinding and actual whole-baseline controls still owed.",
+  "artifacts": [
+    {
+      "path": "before-completion-whole.rs",
+      "bytes": 16999,
+      "sha256": "0332985e6d31f75edd97966cba3137abc1d6e3621c904e76f4883e6972b2d95e"
+    },
+    {
+      "path": "command-current.rs",
+      "bytes": 60943,
+      "sha256": "69370c0679a683073042edaec5bbbf0d9e59b0839c7c31ca22af879bcb95ae56"
+    },
+    {
+      "path": "command-git-diff.raw",
+      "bytes": 742,
+      "sha256": "6d032b873626556e50940178cb70477aa5cf436b1657523850efaa10d9c4738a"
+    },
+    {
+      "path": "command-git-predecessor.diff",
+      "bytes": 650,
+      "sha256": "a3eea9cd0651a732c90f8fd6c2509a66ffff0176a87d9b2779ebe63baa1ee454"
+    },
+    {
+      "path": "command-git-predecessor.rs",
+      "bytes": 60822,
+      "sha256": "a98ad02236195a834d374326c933a507f3cf9d647f4c26b15761645cbaf7327e"
+    },
+    {
+      "path": "inline-guard-only.diff",
+      "bytes": 374,
+      "sha256": "1a9a5d2fc1733af3a6f7c7fbef00e65586cb4c2563e74eb0056019a9a6730ea4"
+    }
+  ]
+}

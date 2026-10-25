@@ -1,0 +1,10 @@
+{
+  "observed_at_utc": "2026-10-20T03:46:15.756958+00:00",
+  "status": "preparation failed before any source read/write or subprocess",
+  "error": "Python triple-quoted config interpreted JSON newline escapes; JSONDecodeError at line3",
+  "source": {
+    "crates/sim/src/ai.rs": "e836aa5ef8d86dc9f91c7bee81559c8612116a0c18b6d614095a60125fcb0771",
+    "crates/sim/src/ai/strategy.rs": "a3c5bd94053e2ffa85823beeb7e8521066938ca7572fa16b48c51857b380d79a",
+    "crates/sim/tests/ra8_ai.rs": "c3380b63dba8c7949f61973b78d9ada4704c9ba1b939afb9c4b2cbd529799011"
+  }
+}

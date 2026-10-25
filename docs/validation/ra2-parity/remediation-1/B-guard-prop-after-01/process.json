@@ -1,0 +1,102 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T05:07:01.423060+00:00",
+  "pid": 50348,
+  "head": "af18ce22736ab98b516560d433384b5746774880",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/B-guard-prop-after-01-plan.json",
+  "plan_sha256": "4839c339198c40a2dcbc8d06fe95a1efdbebcd4eefb2bef16813485a445589ba",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--no-fail-fast",
+        "--test",
+        "ra9_runtime_liveness",
+        "--test",
+        "ra9_temporal_sources",
+        "--test",
+        "ra9_specialist_firepower",
+        "--test",
+        "ra9_crate_cargo_census",
+        "--test",
+        "ra9_bay_current_state",
+        "--test",
+        "ra9_guard_effective_targets",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T05:07:01.578637+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-guard-prop-after-01/01-runtime-forty-three-after.log",
+      "pid": 50354,
+      "pgid": 50354,
+      "exit": 0,
+      "end": "2026-10-22T05:09:46.915342+00:00",
+      "raw_bytes": 4731,
+      "raw_sha256": "e4d9ee55cc0e5faadac34c78c7f4c0eb82b691ad3b1be1d85f2613327a3c7dad",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T05:09:47.183555+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-guard-prop-after-01/02-fmt-check.log",
+      "pid": 50833,
+      "pgid": 50833,
+      "exit": 0,
+      "end": "2026-10-22T05:09:52.224995+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T05:09:52.495969+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-guard-prop-after-01/03-diff-check.log",
+      "pid": 50847,
+      "pgid": 50847,
+      "exit": 0,
+      "end": "2026-10-22T05:09:57.518131+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start": "2026-10-22T05:09:57.785170+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-1/B-guard-prop-after-01/04-strict-clippy.log",
+      "pid": 50863,
+      "pgid": 50863,
+      "exit": 101,
+      "end": "2026-10-22T05:10:37.886106+00:00",
+      "raw_bytes": 798,
+      "raw_sha256": "52d2a2310adee4df71dc47f891490aabd4f182bc84b55610cd26c2d19fd68707",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T05:10:32.879431+00:00",
+  "end": "2026-10-22T05:10:38.020739+00:00",
+  "source_unchanged": true
+}

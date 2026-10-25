@@ -1,0 +1,94 @@
+{
+  "start_utc": "2026-10-21T16:21:14.555487+00:00",
+  "pid": 13510,
+  "source_commit": "8f1b1dcf399d23b89cbadce1cb1e322439ef85a8",
+  "source_manifest": "docs/validation/ra2-parity/ra9/195-actual-canonical-input-scope.json",
+  "source_manifest_sha256": "9c110cf4d961ac33b5025acb53d0f50eedfa3fe55fe76e9e2135789d388ba6b7",
+  "runner_sha256": "417e6a052800dae4bfeea820435b2bc93c8fabdd8abf2a27781a0fd01de5ff5b",
+  "source_before": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  },
+  "status": "FAILED",
+  "commands": [
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-21T16:21:14.701973+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "PASS",
+      "pgid": 13538,
+      "pid": 13538,
+      "exit": 0,
+      "end_utc": "2026-10-21T16:22:03.337847+00:00",
+      "seconds": 48.52904445800232,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197b-clippy.log",
+        "bytes": 231,
+        "sha256": "2b43bf05f37928f198f1ac5446903e1d46afb194281c3f7c6e09ea3162597f1d"
+      }
+    },
+    {
+      "name": "whole-positive",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_data_parity",
+        "every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+        "--",
+        "--nocapture"
+      ],
+      "start_utc": "2026-10-21T16:22:03.454825+00:00",
+      "source_before": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "status": "FAIL",
+      "pgid": 13791,
+      "pid": 13791,
+      "exit": 101,
+      "end_utc": "2026-10-21T16:25:17.145467+00:00",
+      "seconds": 193.57820029102731,
+      "source_after": {
+        "files": 669,
+        "authority_spans": 64,
+        "mismatches": []
+      },
+      "raw": {
+        "path": "docs/validation/ra2-parity/ra9/197b-whole-positive.log",
+        "bytes": 762,
+        "sha256": "9ad2ead762754484124c19bda2686295ae804ca985f25ce24038219788628c3b"
+      }
+    }
+  ],
+  "order": "Root-directed strict compilation, actual whole-positive, exactly six repaired cases, and the one unexecuted difficulty regression before isolated5 and mandatory fresh full13. No full181 target or debug/workspace native sweep.",
+  "end_utc": "2026-10-21T16:25:17.244909+00:00",
+  "source_after": {
+    "files": 669,
+    "authority_spans": 64,
+    "mismatches": []
+  }
+}

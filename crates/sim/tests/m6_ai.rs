@@ -12,8 +12,9 @@
 //! positions of the production skirmish file) and then runs only through `SimPlugin` and
 //! `CommandQueue`: the computer players push their commands into the queue, and the tests' own
 //! players do the same. The computer players' commands of a tick are read from the queue after
-//! the tick (`CommandQueue::iter`). The match length is bounded by [`MATCH_TICK_LIMIT`], and the
-//! armies by the AI file's `max_army`, so every test is bounded in time and memory.
+//! the tick (`CommandQueue::iter`). The match length is bounded by [`MATCH_TICK_LIMIT`] (on the
+//! large shipped maps by proportionally more, [`tick_limit`]), and the armies by the AI file's
+//! `max_army`, so every test is bounded in time and memory.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
@@ -159,8 +160,12 @@ fn owned_kinds(app: &mut App, player: PlayerId) -> BTreeMap<sim::BuildingKind, u
 /// Whether `player` owns every building of the build order as often as the build order lists it.
 fn build_order_complete(app: &mut App, ai: &AiDefinitions, player: PlayerId) -> bool {
     let owned = owned_kinds(app, player);
-    ai.build_order.iter().all(|kind| {
-        let listed = ai.build_order.iter().filter(|other| *other == kind).count();
+    ai.plans[0].build_order.iter().all(|kind| {
+        let listed = ai.plans[0]
+            .build_order
+            .iter()
+            .filter(|other| *other == kind)
+            .count();
         owned.get(kind).copied().unwrap_or(0) >= listed
     })
 }
@@ -245,9 +250,8 @@ fn the_ai_completes_its_build_order_within_the_tick_budget() {
             // during the match (the power building may come earlier than listed when power runs
             // short).
             let mut expected: Vec<sim::BuildingKind> = Vec::new();
-            for kind in data.ai.build_order.iter().collect::<BTreeSet<_>>() {
-                let listed = data
-                    .ai
+            for kind in data.ai.plans[0].build_order.iter().collect::<BTreeSet<_>>() {
+                let listed = data.ai.plans[0]
                     .build_order
                     .iter()
                     .filter(|other| *other == kind)
@@ -288,7 +292,20 @@ struct Run {
 
 /// Runs `app` until the match ends or [`MATCH_TICK_LIMIT`] ticks have run, checking the invariants
 /// and the bound on the commands of a turn on every tick.
-fn run_match(mut app: App) -> Run {
+fn run_match(app: App) -> Run {
+    run_match_within(app, MATCH_TICK_LIMIT)
+}
+
+/// The tick limit of a match on `grid`: [`MATCH_TICK_LIMIT`] on maps up to
+/// `sim::ARMY_SCALE_SPAN` cells wide and high together, and proportionally longer on larger
+/// ones, whose armies have farther to go (as `crates/game/tests/m6_production_matches.rs`).
+fn tick_limit(grid: &Grid) -> u64 {
+    let span = u64::from(grid.width() + grid.height()).max(u64::from(sim::ARMY_SCALE_SPAN));
+    MATCH_TICK_LIMIT * span / u64::from(sim::ARMY_SCALE_SPAN)
+}
+
+/// [`run_match`] with a tick limit of `limit`.
+fn run_match_within(mut app: App, limit: u64) -> Run {
     let computers: BTreeSet<PlayerId> = app.world().resource::<AiPlayers>().players().collect();
     let mut run = Run {
         outcome: None,
@@ -299,7 +316,7 @@ fn run_match(mut app: App) -> Run {
         pushed: BTreeMap::new(),
         commands: BTreeMap::new(),
     };
-    for at in 0..MATCH_TICK_LIMIT {
+    for at in 0..limit {
         let (events, pushed) = tick(&mut app, Vec::new());
         assert!(
             pushed.len() <= 2 * MAX_COMMANDS_PER_TURN,
@@ -616,7 +633,7 @@ fn the_ai_rebuilds_a_building_it_lost() {
         difficulty.first_wave = 20_000;
     }
     let mut app = fixture_match(&data, &[human(P0, 0, 0), computer(P1, 1, 1, 1)]);
-    let power = data.ai.power;
+    let power = data.ai.plans[0].power;
     for _ in 0..BUILD_ORDER_BUDGET {
         tick(&mut app, Vec::new());
         if build_order_complete(&mut app, &data.ai, P1) {
@@ -884,8 +901,13 @@ fn pairings(data: &Data) -> Vec<[PlayerSetup; 2]> {
 /// Runs the match twice and checks the end-to-end requirements: a winner within the tick limit,
 /// equal hashes on every tick of both runs, and every rejected command explained.
 fn assert_ends_with_a_winner_deterministically(name: &str, make: impl Fn() -> App) {
-    let first = run_match(make());
-    let second = run_match(make());
+    assert_ends_within(name, MATCH_TICK_LIMIT, make);
+}
+
+/// [`assert_ends_with_a_winner_deterministically`] with a tick limit of `limit`.
+fn assert_ends_within(name: &str, limit: u64, make: impl Fn() -> App) {
+    let first = run_match_within(make(), limit);
+    let second = run_match_within(make(), limit);
     assert!(
         matches!(first.outcome, Some(MatchOutcome::Won { .. })),
         "{name}: {:?} after {} ticks",
@@ -912,28 +934,46 @@ fn ai_against_ai_matches_on_the_fixture_map_end_with_a_winner() {
 fn ai_against_ai_matches_on_every_shipped_map_end_with_a_winner() {
     // The shipped maps are those of the production skirmish file, with its start positions; the
     // factions, units, buildings, and AI are fixture data (invariant I10).
-    let production = load_match_definitions(
-        assets().join("data/units.ron"),
-        assets().join("data/economy.ron"),
-        assets().join("data/combat.ron"),
-    )
-    .unwrap_or_else(|error| panic!("{error}"));
+    // The shipped skirmish file names countries of the shipped rules (RA1), so it is loaded
+    // against the whole shipped ruleset.
+    let production =
+        sim::load_ruleset(assets().join("data")).unwrap_or_else(|error| panic!("{error}"));
     let shipped = load_skirmish(assets().join("data/skirmish.ron"), &production)
         .unwrap_or_else(|error| panic!("{error}"));
     assert!(!shipped.maps.is_empty());
     let mut data = data();
     data.skirmish.maps = shipped.maps.clone();
+    // The matches are independent of each other, so they are played on all cores; a failed
+    // assertion of any of them fails the test when the workers are joined.
+    let mut jobs = Vec::new();
     for (map, def) in shipped.maps.iter().enumerate() {
         let grid = load_map(assets().join(map_asset_path(&def.id)))
             .unwrap_or_else(|error| panic!("{error}"))
             .grid;
         for (index, players) in pairings(&data).into_iter().enumerate() {
-            assert_ends_with_a_winner_deterministically(
-                &format!("map {}, pairing {index}", def.id),
-                || match_on(&data, grid.clone(), map, &players),
-            );
+            let name = format!("map {}, pairing {index}", def.id);
+            jobs.push((name, map, grid.clone(), players));
         }
     }
+    let (data, jobs) = (&data, &jobs);
+    let next = std::sync::atomic::AtomicUsize::new(0);
+    let played = std::sync::atomic::AtomicUsize::new(0);
+    let workers = std::thread::available_parallelism().map_or(4, usize::from);
+    std::thread::scope(|scope| {
+        for _ in 0..workers.min(jobs.len()) {
+            scope.spawn(|| {
+                while let Some((name, map, grid, players)) =
+                    jobs.get(next.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
+                {
+                    assert_ends_within(name, tick_limit(grid), || {
+                        match_on(data, grid.clone(), *map, players)
+                    });
+                    played.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                }
+            });
+        }
+    });
+    assert_eq!(played.into_inner(), jobs.len());
 }
 
 #[test]

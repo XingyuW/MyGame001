@@ -1,0 +1,20 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_locked_late_tech_item_leaves_its_lane_for_a_legal_early_defence",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "elapsed_seconds": 5.403896583011374,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-locked-lane-before1.log",
+  "sha256": "e8e56e2e31d8f913b7f76404b0a5a33d5353ad9f632f44c70cbf9590684746c4"
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "StrictClippy clone_on_copy in new test fixture; dependent phasesUNRUN. Equivalent *m replaces m.clone(); no production/data/assertion change.",
+  "commands": 3,
+  "failed_phase": "clippy",
+  "exit": 101,
+  "summary_sha256": "177f033dc446a73e9939e4ec2a8656dcdedc0c6abb917e1b79fb1871192fd1c3"
+}

@@ -42,7 +42,12 @@ fn consume_randomness(mut rng: ResMut<SimRng>) {
 
 fn sim_app_consuming_randomness(seed: u64) -> App {
     let mut app = sim_app(seed);
-    app.add_systems(SimSchedule, consume_randomness.in_set(SimSet::Ai));
+    app.add_systems(
+        SimSchedule,
+        consume_randomness
+            .in_set(SimSet::Ai)
+            .after(sim::SimCoreSet(SimSet::Ai)),
+    );
     app
 }
 
@@ -174,7 +179,9 @@ fn stages_run_once_per_tick_in_plan_order() {
     for set in SimSet::ORDER.into_iter().rev() {
         app.add_systems(
             SimSchedule,
-            (move |mut log: ResMut<StageLog>| log.0.push(set)).in_set(set),
+            (move |mut log: ResMut<StageLog>| log.0.push(set))
+                .in_set(set)
+                .after(sim::SimCoreSet(set)),
         );
     }
 

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_sha256": {
+    "crates/sim/src/ai.rs": "bae77a8bd942ae149ef79577c17e576de5994328cd142d7f80a4b18f05b553b5",
+    "crates/sim/src/ai/strategy.rs": "1d3ac444be92004109b4ceedb34aa0549b0e511a893507646ad4fca19239f2a2",
+    "crates/sim/tests/ra8_ai.rs": "2d160b7782b2f1fce600ec0e06e571a3fb5a458ce1b4ba68537edcda14a0cbb8"
+  },
+  "exit": 101,
+  "elapsed_seconds": 5.422103457996855,
+  "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-escorted-strike-before1.log",
+  "sha256": "3e78b859641e956e3d9c6aa1f359cb3a44b0841059aecfddd7989fcf744bc962"
+}

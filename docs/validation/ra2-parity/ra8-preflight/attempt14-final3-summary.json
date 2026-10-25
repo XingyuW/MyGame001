@@ -1,0 +1,82 @@
+{
+  "label": "attempt14-final3",
+  "head": "c1e84b39d8c533a665e01f759103950a40ee3be0",
+  "start_utc": "2026-10-20T05:42:22.744566+00:00",
+  "pid": 44305,
+  "pgid": 44305,
+  "runtime_paths": 344,
+  "additional_paths": 169,
+  "overlap": 18,
+  "unique": 495,
+  "commands": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T05:42:22.744621+00:00",
+      "end_utc": "2026-10-20T05:42:23.733574+00:00",
+      "elapsed_seconds": 0.9889829590101726,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-01-fmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "regenerate",
+      "command": [
+        "python3",
+        "scripts/generate_ra2_data.py",
+        "--check"
+      ],
+      "start_utc": "2026-10-20T05:42:23.777563+00:00",
+      "end_utc": "2026-10-20T05:42:23.850806+00:00",
+      "elapsed_seconds": 0.07326625002315268,
+      "exit": 0,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-02-regenerate.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rust_results": [],
+      "source_mismatches": []
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start_utc": "2026-10-20T05:42:23.895535+00:00",
+      "end_utc": "2026-10-20T05:42:30.009322+00:00",
+      "elapsed_seconds": 6.1138069170410745,
+      "exit": 101,
+      "log": "docs/validation/ra2-parity/ra8-preflight/attempt14-final3-03-clippy.log",
+      "log_sha256": "bf46aed326cc976d80b3fcd32942f70b523ff748ea3144f4d8d3ef9c4b0faedf",
+      "rust_results": [],
+      "source_mismatches": []
+    }
+  ],
+  "reordered_acceptance": "No duplicate workspace, extra756 or standalone retained41 preflight. Required full13 after clean checkpoint/root release; all21/fixed3/3exampleguards after successful unchanged-source full13 before closure.",
+  "elapsed_seconds": 7.311739417025819,
+  "status": "STOPPED on completed nonzero command/source mismatch; dependent phases unrun",
+  "end_utc": "2026-10-20T05:42:30.056524+00:00",
+  "unrun": [
+    "crossroads-russia-america",
+    "crossroads-america-russia",
+    "riverlands-france-germany",
+    "ra8-ai",
+    "attrition",
+    "slot",
+    "legacy",
+    "demo10",
+    "grown3"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "purpose": "one exact RA4 diagnostic: restrict new queue recovery to the documented RA8 strategy opt-in, then immediately restore original source",
+  "before_sha256": "bf9d35970f1fe1e392ed37b7d6817df611cf4b248c5756155779b1ac62f1df7e",
+  "probe_sha256": "48fbab1104d6683c4dbec1fe26d2f1533bc9fd0c3cfaec6ef8bd19083d596dcc",
+  "exit": 101,
+  "elapsed_seconds": 20.280751833022805,
+  "restored_sha256": "bf9d35970f1fe1e392ed37b7d6817df611cf4b248c5756155779b1ac62f1df7e",
+  "restored_identical": true
+}

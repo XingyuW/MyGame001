@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-21T11:04:54.783847+00:00",
+  "scope": "COPY_ONLY_COMPILER_FIX_NOT_NATIVE_RESULT",
+  "failure": "180 compile exit101 E0425 nonexistent ra7_common::rejected helper",
+  "change": "Use the actual SimEvent::CommandRejected enum negative directly; assertion purpose unchanged. No runtime/source-policy/authority change.",
+  "path": "crates/sim/tests/ra7_orders.rs",
+  "before": "7ba378e9c223ba32738c6ad7d6e9ba3b5c104535f652a480115666e21468ec38",
+  "after": "9c45df47d49a3e2058ff1c8b6bdb8cc760735ad64259b5f0ccaced99b34d95ed",
+  "preimage": "ra9-preliminary-logs/181-before-compiler-fix-ra7_orders.rs",
+  "failed_log": "ra9-preliminary-logs/180-00.log"
+}

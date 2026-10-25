@@ -1,0 +1,22 @@
+{
+  "utc": "2026-10-20T02:20:19.380723+00:00",
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 0,
+  "passed": true,
+  "stdout": "",
+  "stderr": "",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "paths": [
+    "crates/game/tests/ra8_gate_matches.rs",
+    "crates/sim/src/ai.rs",
+    "crates/sim/src/ai/ra8_attrition_tests.rs",
+    "crates/sim/src/ai/strategy.rs",
+    "crates/sim/tests/ra8_ai.rs"
+  ],
+  "stat": " crates/game/tests/ra8_gate_matches.rs    |   5 +\n crates/sim/src/ai.rs                     |  58 +-\n crates/sim/src/ai/ra8_attrition_tests.rs |  80 +++\n crates/sim/src/ai/strategy.rs            |   2 +\n crates/sim/tests/ra8_ai.rs               | 875 +++++++++++++++++++++++++++++++\n 5 files changed, 1001 insertions(+), 19 deletions(-)\n"
+}

@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.51s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission ... escorted strike joinedtrue returnedtrue resumedfalse shots2 destroyedfalse
+
+thread 'ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission' (6821946) panicked at crates/sim/tests/ra8_ai.rs:1656:5:
+a detector escort must retain its mission without suppressing the reloaded aircraft's focused job
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.69s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

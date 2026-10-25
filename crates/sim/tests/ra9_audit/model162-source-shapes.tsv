@@ -1,0 +1,5 @@
+file	section	key	exact_components
+rules	General	RadarEventDurations	6
+rules	General	RadarEventSuppressionDistances	6
+rules	General	RadarEventVisibilityDurations	6
+rules	General	DisabledDisguiseDetectionPercent	3

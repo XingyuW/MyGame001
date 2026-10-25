@@ -1,0 +1,14 @@
+{
+  "observed_utc": "2026-10-18T19:12:30.502004+00:00",
+  "purpose": "bounded read-only owned production process health requested by root; no profiler",
+  "command": [
+    "ps",
+    "-p",
+    "85023",
+    "-o",
+    "pid=,etime=,time=,%cpu=,stat=,command="
+  ],
+  "exit": 0,
+  "stdout": "85023 01:43:41 658:08.57 509.3 R    /Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6\n",
+  "stderr": ""
+}

@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-independent-strategic-ai-controls1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "All86 shipped AI capability/privacy/difficulty/strategic source availability/visibility controls after independent strategic selection correction.",
+  "start_utc": "2026-10-19T02:23:58.919035+00:00",
+  "elapsed_seconds": 182.1071192919626,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "9952e8d59968fdc21d36d4b8b236ae1cb74467cdc2142c10ec846e049ddb8c80"
+  },
+  "log_sha256": "65a7057672e194f6420b343105736bc9e2821515a910d867c37d51eaa0c58b5d"
+}

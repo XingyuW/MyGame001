@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-21T05:14:16.602440+00:00",
+  "scope": "Outcome-only STATUS/checklist outputs excluded from gameplayScope. No64authorityspan/runtime/contract/sourcepolicy edits. Full159failure/168sixfocused scopes preserved, no fabricated181pass.",
+  "files": [
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "809ec6aa942abd9c56655328de69e045d0de9543c299190d1ba226e6fd088c08",
+      "after_sha256": "c53134cee304bf5130b964406665b88e1ae34ed172eeac105862c3540fb73576"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "eaf05cd889a0556e248462b13fc70cbf51a259d9ce578ab97b5a1d9b4ea54534",
+      "after_sha256": "75ed2a7709754267b969b0f2790a2970b6bf44ba4e7cb0a2a35a614ebc2270ce"
+    }
+  ]
+}

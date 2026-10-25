@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-21T04:23:40.362907+00:00",
+  "command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit_code": 0,
+  "seconds": 3.791,
+  "scope": "149 exposed genuine HealBase/Reveal/Unit value0 GameOwned sentinels. Keep membership/share Compared, only5effective fourth arguments Compared; require all4owned zero fields/no source deps separately. Export preflights all real-neighbor errors together. No runtime/native/sourcecredit change.",
+  "completion_rs_sha256": "8f48231309349821050b7d1529b9e3dd83986cac3bd296086bf2c1ad2a60203b"
+}

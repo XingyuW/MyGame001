@@ -1,0 +1,123 @@
+{
+  "status": "PASSED_EXPECTED_CAUSAL_FAILURES_AND_RESTORED_POSITIVE",
+  "start": "2026-10-23T00:39:31.147416+00:00",
+  "pid": 65928,
+  "runner_sha256": "cad59b37f2b4542fabf6847b7287de647c47eb7b22cd2e94052d936ea4b02b40",
+  "packet_sha256": "1970717d4823842c16a453178f93e04d3e4a367163f3bdb1c63811a0d834e6b1",
+  "positive_raw_sha256": "f8377817c54a383a9a1d044e315ce1596c6fdd381e782b8f21957ae36b0dde83",
+  "original_target_sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b",
+  "scope": "Exact existing native36001 extraRNG and observer-only lateProductionComplete controls on corrected source; no cap, tuple, threshold, data or production mutation.",
+  "commands": [
+    {
+      "label": "rng-causal",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T00:39:31.395400+00:00",
+      "expected_exit": 101,
+      "mutated_target_sha256": "5bfd52f429ebc3c83339d62b402658c3652afe671adf31a6d272f49c46f4e25e",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-late-causal-02/01-rng-causal.log",
+      "pid": 65932,
+      "pgid": 65932,
+      "exit": 101,
+      "restoration_immediate": {
+        "utc": "2026-10-23T00:40:36.635542+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-23T00:40:36.695647+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "end": "2026-10-23T00:40:36.783830+00:00",
+      "raw_bytes": 1038,
+      "raw_sha256": "d3318a43df8025d777b29957acd537cd9ee42418b31523a0d59525b01ae1aa38",
+      "expected_result_verified": true
+    },
+    {
+      "label": "production-observer-causal",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T00:40:36.963220+00:00",
+      "expected_exit": 101,
+      "mutated_target_sha256": "6c79428f4787f6d6a73b2841d390030ea02e6c239dbc0432984e55712afeea56",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-late-causal-02/02-production-observer-causal.log",
+      "pid": 66125,
+      "pgid": 66125,
+      "exit": 101,
+      "restoration_immediate": {
+        "utc": "2026-10-23T00:41:37.140746+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-23T00:41:37.200955+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "end": "2026-10-23T00:41:37.258670+00:00",
+      "raw_bytes": 1232,
+      "raw_sha256": "43b03ed81e4269c3e0e8605afb47f5e0a7f0e847f3991b1911625db992fdf3f9",
+      "expected_result_verified": true
+    },
+    {
+      "label": "restored-positive",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra9_native_twins_remain_active_after_36000_and_reach_the_same_winner",
+        "--",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "start": "2026-10-23T00:41:37.375359+00:00",
+      "expected_exit": 0,
+      "mutated_target_sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-late-causal-02/03-restored-positive.log",
+      "pid": 66288,
+      "pgid": 66288,
+      "exit": 0,
+      "restoration_immediate": {
+        "utc": "2026-10-23T00:42:27.586848+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "restoration_separate_later_read": {
+        "utc": "2026-10-23T00:42:27.647058+00:00",
+        "sha256": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+      },
+      "end": "2026-10-23T00:42:27.762330+00:00",
+      "raw_bytes": 777,
+      "raw_sha256": "8e6c5a2b571115bee64d66bc6598da4ce3c8d4b03dac2901c826b75f3b934826",
+      "expected_result_verified": true
+    }
+  ],
+  "heartbeat": "2026-10-23T00:42:22.449262+00:00",
+  "source_restored_exact": true,
+  "end": "2026-10-23T00:42:27.883071+00:00"
+}

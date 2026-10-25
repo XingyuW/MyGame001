@@ -1,0 +1,148 @@
+{
+  "policy": "Final R126 runtime; serial stop at first failure; all retained19 plus game compatibility",
+  "commands": [
+    {
+      "name": "attempt6-game-units2",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--bin",
+        "game",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "attempt6-game-ai1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_ai_matches",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-m10-final1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m10_unlocks_and_enemies",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    {
+      "name": "attempt6-companion-a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "a_soviet_player_left_with_an_armed_miner_still_finishes_the_match",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-companion-the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "the_last_wave_looks_for_the_last_buildings_near_the_enemys_start_first",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-companion-crossroads_armies_finish_after_new_terrain_changes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "crossroads_armies_finish_after_new_terrain_changes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-companion-ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra6_coral_archipelago_brutal_libya_medium_iraq_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-companion-ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "m6_production_matches",
+        "ra5_coral_archipelago_brutal_libya_germany_seed_zero_finishes",
+        "--",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    },
+    {
+      "name": "attempt6-all-exact-final1",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "game",
+        "--test",
+        "ra8_gate_matches",
+        "--",
+        "--test-threads=1",
+        "--nocapture"
+      ]
+    }
+  ]
+}

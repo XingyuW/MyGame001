@@ -1,0 +1,16 @@
+{
+  "source": "docs/validation/ra2-parity/ra8/production-lengths.tsv",
+  "raw_sha256": "6c3ec135cec4acb23ec3489e7324cfc760e12c6e0da6727fef8675901548d435",
+  "parser": "Only normalize literal backslash-t separators in memory; raw copied byte-identically",
+  "count": 756,
+  "explicit_winners": 756,
+  "evidence": "Full production test requires explicitWon for all756; six-test target exits0 with0failed/ignored",
+  "target_elapsed_seconds": 2650.17,
+  "tick_median": 20485.0,
+  "tick_p90_nearest_rank": 51516,
+  "tick_maximum": 178917,
+  "R29_ratio_median": 0.09313955026455026,
+  "R29_ratio_p90_nearest_rank": 0.25247916666666664,
+  "R29_ratio_maximum": 0.86475,
+  "limit_policy": "Unchanged R29 72000*max(128,width+height)/128; each stored source limit unchanged"
+}

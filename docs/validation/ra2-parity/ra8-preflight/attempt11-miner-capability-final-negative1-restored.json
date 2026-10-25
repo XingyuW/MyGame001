@@ -1,0 +1,10 @@
+{
+  "utc": "2026-10-19T11:23:32.702686+00:00",
+  "separate_later_read": true,
+  "hashes": {
+    "crates/sim/src/ai.rs": "512fc9b69f9607301628ee5e1e8ba1d2127efab390e567afcefb420b130994d4",
+    "crates/sim/src/ai/strategy.rs": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1",
+    "crates/sim/tests/ra8_ai.rs": "fae6d530b3ad07a459276e3590200f5d20dd5cdd35c1e8a4fe4b6b1cd3bbc1db"
+  },
+  "restored": true
+}

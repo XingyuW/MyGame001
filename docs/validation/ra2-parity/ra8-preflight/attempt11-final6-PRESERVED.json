@@ -1,0 +1,108 @@
+{
+  "created_utc": "2026-10-19T17:30:36.484936+00:00",
+  "purpose": "Unique completed failed preflight prefix retained byte-identically in place; no label reuse/copy/normalization. All12completed command logs and ancillary manifests included before diagnostic/source changes.",
+  "count": 20,
+  "bytes": 2227545,
+  "files": [
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-RUNNING.json",
+      "bytes": 428,
+      "sha256": "e58e07449e465a49d5dfba1d0ac6fc2626a6913656bd6f39bc0d1bf8b4ad84c3"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-STOPPED.json",
+      "bytes": 872,
+      "sha256": "63eae798e297e1a1c3e887640cf2ec5e4cf7bd649013500ab8e80be9d0ad708b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-clippy.log",
+      "bytes": 230,
+      "sha256": "e57a03e301f7772892cdc97e074f807a9437547448df2ccc7c688ceac42432b6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-default-demo10.log",
+      "bytes": 7581,
+      "sha256": "c9e784ced0c2e5550401ce715af71e2fdc331e4744e9fcd18d362f437f3847eb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-failed-outcomes.json",
+      "bytes": 6369,
+      "sha256": "8528632f2306a16889e656be473e4aa50a7e242a40a33acf7b7ab154de5fd740"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-failed-smallest-ten-player-and-neighbors.log",
+      "bytes": 868,
+      "sha256": "0cdb25c635a4ff8ba705e3dee543215f08eb06377b76594c706507de7c930aaa"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-focused-attrition.log",
+      "bytes": 1708,
+      "sha256": "8d3075c8ec3be3d1d3b99c50361920eebb7f29829bc1f0d02611673b93df956d"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-focused-composition.log",
+      "bytes": 1934,
+      "sha256": "135c29bed551c009799d6892570ff5bc51b5ebe31b476e6c7d51b10dc9a4fca9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-focused-ra4.log",
+      "bytes": 719,
+      "sha256": "32412a7c816d0aa626d1a764b4c167ca07e96427ea81cb87c070deda1c24532b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-focused-ra8-ai.log",
+      "bytes": 10004,
+      "sha256": "1cdce53f6c282e3106cd87ce6d0921fa370da0fe37ca3798a6c042114135a4a1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-focused-recovery.log",
+      "bytes": 2692,
+      "sha256": "39ea3b5f66440b761dc8a5b902e7e4b7e833dfdd4110018a539e6d2ead1cbe2a"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-generator.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-preflight.json",
+      "bytes": 8095,
+      "sha256": "4e2cc2792b1bda2bfcea8a2322eb4e2f3452feb791fe1dc9f9809c0fdbdfa1ef"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-reference.log",
+      "bytes": 69,
+      "sha256": "5fa32e9687ef749dd76543b607f37bc835ddd9e7469e2b7b5874d233ee5cf964"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-retained37-observed-failure.json",
+      "bytes": 3467,
+      "sha256": "6b3d60800c98a9e2bc9bb3d769d19e934e066e854042b95e209e993c36127e92"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-retained37.log",
+      "bytes": 2090733,
+      "sha256": "fc2a993d12eef38e182f091af9ee74543cfd817091be6cb8be340f5549d52483"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-runtime-manifest.json",
+      "bytes": 38191,
+      "sha256": "c38d59757fdac5a470aef8a37e9ab8aada2b9b02515718324490bca77f5c9daa"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-test-example-manifest.json",
+      "bytes": 19436,
+      "sha256": "604c4336df150fa74a2feaf143a485de00781649355570c0263bd997c53ffaf8"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8-preflight/attempt11-final6-test-inventory.json",
+      "bytes": 34149,
+      "sha256": "7c950decb09f22cd7079c4ee29004709d1b72200b65fd6385c5dbfe49ed9a55a"
+    }
+  ]
+}

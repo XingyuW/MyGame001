@@ -1,0 +1,30 @@
+{
+  "label": "attempt8-frozen-sound-ten-player-before1",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "-p",
+    "sim",
+    "--example",
+    "m13_ten_players",
+    "--",
+    "to-the-end",
+    "frozen_sound",
+    "trace"
+  ],
+  "env": {},
+  "purpose": "Exact default ten-player seed13 Frozen Sound completed None400000 diagnosis using existing read-only trace; no budget/limit/source changes. Not an unsampled benchmark.",
+  "start_utc": "2026-10-19T02:06:49.072483+00:00",
+  "elapsed_seconds": 203.46122162498068,
+  "exit": 1,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "95fdb509b5a78c895f78deda38f9d4fa2677d20ac65aa880502a580baf373591"
+  },
+  "log_sha256": "a494c093f038206adf9272f1a70445c41519b93732a9db14c10a1c3163eb0c0a"
+}

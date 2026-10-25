@@ -1,0 +1,32 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 5.01s
+     Running tests/m13_grown_maps.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m13_grown_maps-ee40a9cea2db76e9)
+
+running 3 tests
+test a_ten_player_match_on_the_smallest_map_is_played_to_its_end ... grown exact None after 72000 ticks, defeated {PlayerId(2): 16943, PlayerId(3): 11034, PlayerId(4): 6766, PlayerId(5): 6584, PlayerId(6): 19670, PlayerId(7): 23595, PlayerId(9): 26648}
+
+thread 'a_ten_player_match_on_the_smallest_map_is_played_to_its_end' (9616833) panicked at crates/game/tests/m13_grown_maps.rs:801:5:
+None after 72000 ticks, defeated {PlayerId(2): 16943, PlayerId(3): 11034, PlayerId(4): 6766, PlayerId(5): 6584, PlayerId(6): 19670, PlayerId(7): 23595, PlayerId(9): 26648}
+PlayerId(0): 8983 credits, 1 buildings [CellPos { x: 15, y: 10 }], 1 units [CellPos { x: 53, y: 54 }], wave Some((0, None))
+PlayerId(1): 0 credits, 36 buildings [CellPos { x: 88, y: 87 }, CellPos { x: 84, y: 90 }, CellPos { x: 82, y: 95 }, CellPos { x: 90, y: 85 }, CellPos { x: 81, y: 92 }, CellPos { x: 84, y: 86 }, CellPos { x: 95, y: 94 }, CellPos { x: 86, y: 87 }, CellPos { x: 82, y: 90 }, CellPos { x: 93, y: 82 }, CellPos { x: 93, y: 88 }, CellPos { x: 84, y: 88 }, CellPos { x: 88, y: 85 }, CellPos { x: 97, y: 84 }, CellPos { x: 84, y: 95 }, CellPos { x: 95, y: 98 }, CellPos { x: 95, y: 92 }, CellPos { x: 88, y: 99 }, CellPos { x: 99, y: 89 }, CellPos { x: 95, y: 82 }, CellPos { x: 94, y: 90 }, CellPos { x: 90, y: 90 }, CellPos { x: 90, y: 99 }, CellPos { x: 93, y: 84 }, CellPos { x: 97, y: 86 }, CellPos { x: 90, y: 82 }, CellPos { x: 96, y: 89 }, CellPos { x: 86, y: 94 }, CellPos { x: 97, y: 97 }, CellPos { x: 84, y: 97 }, CellPos { x: 90, y: 87 }, CellPos { x: 83, y: 92 }, CellPos { x: 87, y: 90 }, CellPos { x: 90, y: 94 }, CellPos { x: 98, y: 92 }, CellPos { x: 87, y: 82 }], 22 units [CellPos { x: 14, y: 17 }, CellPos { x: 22, y: 28 }, CellPos { x: 13, y: 15 }, CellPos { x: 14, y: 10 }, CellPos { x: 14, y: 10 }, CellPos { x: 13, y: 15 }, CellPos { x: 84, y: 84 }, CellPos { x: 84, y: 84 }, CellPos { x: 84, y: 84 }, CellPos { x: 84, y: 83 }, CellPos { x: 84, y: 85 }, CellPos { x: 84, y: 84 }, CellPos { x: 83, y: 83 }, CellPos { x: 84, y: 83 }, CellPos { x: 28, y: 43 }, CellPos { x: 12, y: 14 }, CellPos { x: 84, y: 83 }, CellPos { x: 84, y: 83 }, CellPos { x: 82, y: 78 }, CellPos { x: 61, y: 65 }, CellPos { x: 54, y: 58 }, CellPos { x: 68, y: 64 }], wave Some((6, Some(Building(SimId(829)))))
+PlayerId(2): 3028 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(3): 159 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(4): 1195 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(5): 1271 credits, 0 buildings [], 0 units [], wave Some((19, Some(Waypoint(4))))
+PlayerId(6): 0 credits, 0 buildings [], 0 units [], wave Some((2, Some(Building(SimId(138)))))
+PlayerId(7): 0 credits, 0 buildings [], 0 units [], wave Some((0, None))
+PlayerId(8): 130 credits, 3 buildings [CellPos { x: 104, y: 2 }, CellPos { x: 103, y: 11 }, CellPos { x: 103, y: 7 }], 2 units [CellPos { x: 93, y: 20 }, CellPos { x: 100, y: 7 }], wave Some((1, Some(Waypoint(140))))
+PlayerId(9): 317 credits, 0 buildings [], 4 units [CellPos { x: 4, y: 102 }, CellPos { x: 3, y: 102 }, CellPos { x: 3, y: 102 }, CellPos { x: 3, y: 102 }], wave Some((4, None))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test every_shipped_map_grows_with_every_player_count ... ok
+test ten_computer_players_build_bases_and_bring_in_ore_on_enlarged_maps ... ok
+
+failures:
+
+failures:
+    a_ten_player_match_on_the_smallest_map_is_played_to_its_end
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 46.70s
+
+error: test failed, to rerun pass `-p game --test m13_grown_maps`

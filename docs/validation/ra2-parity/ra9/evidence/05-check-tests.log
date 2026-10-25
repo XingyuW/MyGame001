@@ -1,0 +1,36 @@
+    Checking sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+warning: unused import: `SpecialState`
+ --> crates/sim/tests/ra9_liveness.rs:5:64
+  |
+5 | use sim::{CellPos, Command, Players, ProductionItem, SimEvent, SpecialState};
+  |                                                                ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_liveness") generated 1 warning (run `cargo fix --test "ra9_liveness" -p sim` to apply 1 suggestion)
+warning: unused imports: `CellPos`, `SimEvent`, and `SpecialState`
+ --> crates/sim/tests/ra9_transport.rs:5:11
+  |
+5 | use sim::{CellPos, Command, ProductionItem, SimEvent, SimId, SpecialState, Weapon};
+  |           ^^^^^^^                           ^^^^^^^^         ^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sim` (test "ra9_transport") generated 1 warning (run `cargo fix --test "ra9_transport" -p sim` to apply 1 suggestion)
+error[E0308]: `if` and `else` have incompatible types
+  --> crates/sim/tests/ra9_prop_commands/../ra9_remaining_common/mod.rs:31:11
+   |
+30 |       let result=if defs(app).unit_kind(name).is_some() {sim::spawn_unit(app.world_mut(),p,name,CellPos::new(x,y))}
+   |                  -                                       --------------------------------------------------------- expected because of this
+   |  ________________|
+   | |
+31 | |     else {sim::spawn_building(app.world_mut(),p,name,CellPos::new(x,y))};
+   | |___________^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^- `if` and `else` have incompatible types
+   |             |
+   |             expected `Result<SimId, SpawnError>`, found `Result<SimId, SpawnBuildingError>`
+   |
+   = note: expected enum `Result<_, sim::SpawnError>`
+              found enum `Result<_, SpawnBuildingError>`
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `sim` (test "ra1_commands") due to 1 previous error

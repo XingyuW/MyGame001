@@ -1,0 +1,22 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.31s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+Russian finite factory opening charged{Unit(UnitKind(0)), Unit(UnitKind(20)), Unit(UnitKind(28))} born[UnitKind(28), UnitKind(20)]
+
+thread 'ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank' (10761726) panicked at crates/sim/tests/ra8_ai.rs:10741:5:
+assertion `left == right` failed: the declared opening must pay for and physically spawn a siege/tank pair
+  left: [UnitKind(28), UnitKind(20)]
+ right: [UnitKind(22), UnitKind(18)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank ... FAILED
+
+failures:
+
+failures:
+    ra8_russian_declared_opening_funds_real_siege_without_losing_its_tank
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 122 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

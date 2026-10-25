@@ -1,0 +1,30 @@
+{
+  "utc": "2026-10-20T23:24:30.826608+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--no-fail-fast",
+    "--test",
+    "ra1_commands",
+    "--test",
+    "ra5_shipped",
+    "--test",
+    "ra6_vehicles",
+    "--test",
+    "m1_map_subset",
+    "--test",
+    "m7_factions",
+    "--test",
+    "ra9_refinery_repair_liveness",
+    "ra9_",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 201.766,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual previously unrun AI-independent native/Prop command/bounds bodies and corrected refinery",
+  "input_mismatches": []
+}

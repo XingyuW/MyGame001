@@ -1,0 +1,89 @@
+{
+  "utc": "2026-10-19T04:38:10.557871+00:00",
+  "purpose": "Fresh byte-for-byte preservation proof BEFORE any ra8 label reuse. Covers every current failed gate file including wrapper/process metadata and liveness artifacts. Original archive/PRESERVED.json is unchanged.",
+  "files": [
+    {
+      "path": "docs/validation/ra2-parity/ra8/01-fmt.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/02-diff-check.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/03-clippy.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/03-clippy.log",
+      "bytes": 72,
+      "sha256": "92bec25ad54c650450560360480d5f94d3d8ad203f81a2c724e0c641b330bbfb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/04-test.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/04-test.log",
+      "bytes": 71592,
+      "sha256": "bd5e98e56efe17fa5a865c82e7fd1f86f67f48f4e0860d069edbdfd61ed56ea6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/gate-process-output.log",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/gate-process-output.log",
+      "bytes": 235,
+      "sha256": "d15344679231384324c1c53171c1c585e857e8056ceb64aebf8d9c7e6827dd15"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/gate-process.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/gate-process.json",
+      "bytes": 1834,
+      "sha256": "5de2976a13c9ff472f2b6f2d4b4d1c2f588dcc4320f5f334c7b35feb1f6a83b2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness1.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness1.json",
+      "bytes": 343,
+      "sha256": "f487d30b24682c3de2c54cf5db5dc60cd7b99b2d8259a2b04a28c0be623acc69"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness2.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness2.json",
+      "bytes": 664,
+      "sha256": "4057d3d73491aab06282400a98b9d3d4f3a034611afeedfd66d9ed9a2b344de0"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness3.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness3.json",
+      "bytes": 316,
+      "sha256": "abd692ed6fe97abfb76e6b15c77d75b2595c777ee067849146c7347e6f49e8d6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness4.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness4.json",
+      "bytes": 445,
+      "sha256": "7f732f0ac0fe64ccf7958110e1abb1c20930774abcfb82dbdcd589debe24f049"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness5.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness5.json",
+      "bytes": 448,
+      "sha256": "b834f93b726bda6db30b206b653f4ba7b93f95f67bad4acac274afae297ec4fb"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/production-liveness6.json",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/production-liveness6.json",
+      "bytes": 448,
+      "sha256": "8e080ae715a1e70f2c662c5db1a500b723716fec9de4c22b6c77adc2dd87392f"
+    },
+    {
+      "path": "docs/validation/ra2-parity/ra8/summary.txt",
+      "archive": "docs/validation/ra2-parity/ra8-attempt8/summary.txt",
+      "bytes": 235,
+      "sha256": "d15344679231384324c1c53171c1c585e857e8056ceb64aebf8d9c7e6827dd15"
+    }
+  ],
+  "count": 13,
+  "bytes": 76632,
+  "archive_preserved_json_sha256": "ef4635e961146fedb8131b854438b4dd3b9094abdece722f70405f4d3f94be92",
+  "all_current_and_archive_bytes_match": true,
+  "all_original_preservation_hashes_match": true
+}

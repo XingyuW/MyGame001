@@ -1,0 +1,13 @@
+{
+  "utc": "2026-10-22T23:17:08.530435+00:00",
+  "native_witnesses": [
+    "M6 non-Won seed0 liberty_bay: france (medium) against germany (medium): None ticks288000 limit288000"
+  ],
+  "raw_bytes_at_stop": 41128,
+  "raw_sha256_at_stop": "11a42ae9f5bf9ee738ab0cb192bf21d6832158baa89d1f297a9c1506f43b7565",
+  "verified_owned_validator_pid": 43684,
+  "verified_owned_pgid": 43684,
+  "verified_argv": "sh scripts/validate_ra2_parity.sh review-2",
+  "signal": "SIGTERM",
+  "scope": "Intentional early interruption after actual required native non-Won witness. Partial attempt is failed/interrupted, never complete or accepted; direct shell exit observed later by wrapper, native grandchild exit not inferred."
+}

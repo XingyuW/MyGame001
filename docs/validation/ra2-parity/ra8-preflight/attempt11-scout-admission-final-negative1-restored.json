@@ -1,0 +1,8 @@
+{
+  "separate_later_read_utc": "2026-10-19T13:22:12.099767+00:00",
+  "sha256": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa",
+    "crates/sim/tests/ra8_ai.rs": "2d4e17508f6406183719ff5f5090fd2e610c3ff9a759c19039bb3afa5888566c"
+  }
+}

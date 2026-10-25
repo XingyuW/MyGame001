@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.84s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 3 tests
+test command::ra8_intent_tests::ra8_strategic_erasure_cancels_only_a_certified_later_actor_change ... erasure lifecycle internal: certified=true rejected=false []
+erasure lifecycle public: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle already_erased: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle became_unready: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle became_spawned: certified=true rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle wrong_type: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("No strategic ability") }]
+erasure lifecycle wrong_form: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle outside: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: -1, y: -1 }, units: [] }, reason: AbilityUnavailable("Target is being erased") }]
+erasure lifecycle unit_arguments: certified=false rejected=true [CommandRejected { player: PlayerId(0), command: Superweapon { building: SimId(4), target: CellPos { x: 28, y: 28 }, units: [SimId(999999)] }, reason: AbilityUnavailable("Target is being erased") }]
+ok
+test command::ra8_intent_tests::ra8_strategic_visibility_certificate_is_value_hashed_and_never_certifies_hidden_cells ... ok
+test command::ra8_intent_tests::ra8_strategic_visible_cell_loss_cancels_only_fully_valid_internal_intents ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.11s
+

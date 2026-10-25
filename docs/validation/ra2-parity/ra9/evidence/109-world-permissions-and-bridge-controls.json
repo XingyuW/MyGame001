@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-21T02:10:38.177991+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra5_world",
+    "--no-fail-fast",
+    "--",
+    "ra9_false_assaulter_current_garrison_permissions",
+    "ra5_engineer_captures_each_tech",
+    "ra5_bridge_collapses_as_one_run",
+    "ra5_ai_repairs_the_only_land_route",
+    "ra5_outpost_repairs_one_vehicle",
+    "ra5_seaward_pier_hut",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "scope": "runtime/data/fixtures+selected ra5_world native scenario target/commonhelper; unselected audit/acceptance/doc metadata excluded; AIbridge neutral48x48seed23 unchanged72000bound explicitly leased",
+  "ended_utc": "2026-10-21T02:11:07.400206+00:00",
+  "exit_code": 0,
+  "seconds": 29.222,
+  "lease": "RA8 explicitly authorized serial neutral48x48seed23 bridge case72000 plus short world controls, jobs1, functional overlap only",
+  "input_mismatches": []
+}

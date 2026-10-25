@@ -1,0 +1,18 @@
+{
+  "utc": "2026-10-19T00:03:25.756368+00:00",
+  "session_id": 99237,
+  "owned_rust_pid": 26054,
+  "owned_cargo_pid": 26020,
+  "metadata_before_stop": {
+    "elapsed": "05:52",
+    "cpu": "6:00.57"
+  },
+  "status": "Intentionally interrupted owned sparse conservative diagnostic by SIGTERM; NOT an assertion/match outcome. No absence attribution.",
+  "raw_sha256": "ac678544ab002e4decf2a9bf98434b4bf368bbdee594fec14b72ee8acf201b2d",
+  "elapsed_seconds": 365.5405936250463,
+  "wrapper_cargo_exit": 101,
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  }
+}

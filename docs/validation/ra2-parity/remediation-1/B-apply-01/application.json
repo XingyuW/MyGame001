@@ -1,0 +1,716 @@
+{
+  "utc": "2026-10-22T04:26:06.394599+00:00",
+  "status": "CORRECTED_CHECKER_AND_COMMENT_PROSE_PATCHES_APPLIED_NOT_NATIVE_OR_REVIEW_PASS",
+  "before_actual": {
+    "process": "docs/validation/ra2-parity/remediation-1/A-audit-whole-before-02/process.json",
+    "raw_sha256": "452aa2576e4b8b44866adfe625e2612101359eaf5db1c4d42b0caef93215ab56",
+    "tests_failed": 4,
+    "intended_escaped_variants": 22,
+    "existing_rejected_variants": 6,
+    "whole_success_markers": 30,
+    "source_unchanged": true
+  },
+  "patches": [
+    {
+      "path": "remediate1-data-stageB-checker.patch",
+      "sha256": "20b36288268bbbf1685a9e6ba70014e218534d3acd3e69b3f69642a4375f2ae9"
+    },
+    {
+      "path": "p2-headless-props-prose.patch",
+      "sha256": "eceaa96505ad67075f0ab51369eed49deed33e6508d9bc157c03a3438bf600b8"
+    },
+    {
+      "path": "p2-headless-props-alias-assessments.patch",
+      "sha256": "51a0d0534393ca3a25e5e3cafab34498efa581606e0f1576f3b8eb15f6aff6f4"
+    },
+    {
+      "path": "p2-audit-status-comments.patch",
+      "sha256": "2204a04a841b83a8dbdef83e458e9cc191bd5a9f19b73a32b66c1c6525da651b"
+    },
+    {
+      "path": "p2-source-plans-status-header.patch",
+      "sha256": "2a3ff1ddc48100ff836f5153fc731791793dc0ede43b95749e296e95c304e2a9"
+    },
+    {
+      "path": "p2-game-status-comments.patch",
+      "sha256": "a238446fd22d3c2ce1314cfbc11e9cdbd2ee5cd1f9593b0ac67dc0b24781a733"
+    },
+    {
+      "path": "p2-additional-draft-status-comments.patch",
+      "sha256": "a521cb4dba7d6e0ac66918b33e5b74b843c1bd9215c93b25d4d3528b1e5c258f"
+    }
+  ],
+  "preimages": [
+    {
+      "path": "crates/game/src/minimap.rs",
+      "bytes": 90916,
+      "sha256": "a4d5e2209934b3cdb20090fb08092e63c5d3e6ccec12afb21f10417f35ecde2d"
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "bytes": 145842,
+      "sha256": "54a1b7b51617a21cbad05ada5ec75148afc0da543a326f1ed68fd43518d0e04f"
+    },
+    {
+      "path": "crates/game/src/sim_host.rs",
+      "bytes": 70757,
+      "sha256": "d450a433f047d81e24e3e7fca20b72a8922c5e8081bb3c02f1ebf602c91c3078"
+    },
+    {
+      "path": "crates/game/tests/m6_production_matches.rs",
+      "bytes": 32825,
+      "sha256": "e7f3b317c98e63368ae0e0dba733d7ae55274dd080c18e200d6998b776e4e97d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/actual.rs",
+      "bytes": 10507,
+      "sha256": "d87d351ffdf6c1e105596bace831b8fec7afc961a5c6e3191835de93b16963d5"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "bytes": 17718,
+      "sha256": "3a79202ccec618c04f50aef557135414e6b360727dc8abd9cf6da279c6d38e6a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-plans.rs",
+      "bytes": 45749,
+      "sha256": "6170f27cd9f2b4687dcde285b79f58f98738afeacdf6c26f57a1e0bf14bc19db"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/arrays.rs",
+      "bytes": 11609,
+      "sha256": "c03af1d54596e329b5465e6536c586df8102a572d2206484b4df5b8313e6806f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-admission.rs",
+      "bytes": 29262,
+      "sha256": "1547a6bb9ced4504acd2f0d632e7a192e91bb220b3adeba1c015ea1591778f67"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-admission.rs",
+      "bytes": 23147,
+      "sha256": "e754c9f4fb32562edbe1f4af7fd5ab93ebac5ff5b375caaf18f2ad0422190c5a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/combat.rs",
+      "bytes": 38030,
+      "sha256": "d89f4b80515ce8ea796524269afab34d179f6545df715bb1e6854badcc6ad105"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "bytes": 5748,
+      "sha256": "4059a56201fb6fca4214b1f4629c6cc9b2d2f8f2da3eb065b4e6015227f94cca"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "bytes": 32576,
+      "sha256": "b0c933fd4f0535ccb7ca236ddadb53344f5e8c79bfcdf689002b37d0da8397fc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/contracts.rs",
+      "bytes": 35087,
+      "sha256": "f81447419731ccbb496e7fbd21e235cd2c3f83885aad2d5fb62146929750ea46"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "bytes": 26699,
+      "sha256": "f16a4801c0f2fda09f2338bb786b588a8b50110bbcefde16d91010cc951e4c98"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-audit.rs",
+      "bytes": 12632,
+      "sha256": "a03f889a1285cfdb6a6c85aca863522c8c6ae703ff2b62cac5457335620bba4c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-keys.rs",
+      "bytes": 20618,
+      "sha256": "c0f2e53c234edbebf5c35a570c73ec2afc85ed50b325fb052a376513a4a12acc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-admission.rs",
+      "bytes": 25816,
+      "sha256": "818a55b668f40b31d72b39e4a15c61587650dcb88529948f2b8233bfa61fdb87"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-negatives.rs",
+      "bytes": 10523,
+      "sha256": "5d2676b84840763ef67125e4d8f924c1d27a297a27006d1cbd74e4529b138ca1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/items.rs",
+      "bytes": 51279,
+      "sha256": "52f8ce4374db9d97cd8473abb5612b8349f48bf037531d05508204a00d221ab3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-negatives.rs",
+      "bytes": 10393,
+      "sha256": "46d3b400c45ff8c2c10a8802a82d16fb292995f07554cce2bb598bc2b5ba4d5c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-policy.rs",
+      "bytes": 12255,
+      "sha256": "250b853e04bb435a1068d735329490f153e41c8757e082893339294efb11b71b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-negatives.rs",
+      "bytes": 6971,
+      "sha256": "12df49b70c861afd6a1d86c38b5ecc27d4e5484448c9ea7650cd27104511dcbe"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-policy.rs",
+      "bytes": 12350,
+      "sha256": "c4ff3a7e5125be450d39e79896a2bdde54dbb2e33ed74b1b356094b3b56210a2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "bytes": 1693,
+      "sha256": "7e2d2ee3032fbbbf89235bb57f3190e5dce9d877ab0f75674c1e17ae2f9c453c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-loaded.rs",
+      "bytes": 6997,
+      "sha256": "ba1bc97e03aee25a2e4e4532b6ed76fc34b6fed30b2a33b65da265baba465a03"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs",
+      "bytes": 1117,
+      "sha256": "2f7110228b5bdf6729ec5b2d636fa50829b07999259cecf2a9aa350fe6e7c382"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-support.rs",
+      "bytes": 17559,
+      "sha256": "1c86be98e98c46f1586f3ec23f12e0b44cc993eaf51efd9f821b22802adab005"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/masked-speed-admission.rs",
+      "bytes": 14115,
+      "sha256": "e3c5c90a32593c2732a16ac36162ed1cb9cf48d32f2b6bf960a1f0d385fc39f6"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/metadata-admission.rs",
+      "bytes": 76716,
+      "sha256": "4552cc0450e8f7caa1c0d30690d406cd919ef999e860480d49763181bf445237"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/mod.rs",
+      "bytes": 66953,
+      "sha256": "6a5d77e912ec36e38aa1318f40915129574c8ef83af18ad8c969dd36e2089f7b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "bytes": 25334,
+      "sha256": "00a0ce2f9de62d99205b068d5379cbacbc2dff65630f3f8c3561bbbfa569f8b7"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-loaded.rs",
+      "bytes": 5696,
+      "sha256": "cf0e034880f81ef3cca547e312cefc9e3e3e17501759017e7bbfd70b42d77ac2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/native.rs",
+      "bytes": 7444,
+      "sha256": "eb61204023ba73b42f5d796c99acaa8a03f937ab863d2a2a500b703f42713b2c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/negatives.rs",
+      "bytes": 13210,
+      "sha256": "ceac0d86594b7069138243307c2ba1ce69ee5299a57e9e7a57d2f0856e2da013"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-negatives.rs",
+      "bytes": 9590,
+      "sha256": "1bd9252077618a6a60584b28e641f1197ed75ca312347befc5b02a0cfec80818"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-plans.rs",
+      "bytes": 67402,
+      "sha256": "8386f5a5b57a2ef3ba008bcd88c83eab84a789568ddfb0f4d0c4d5e1ee1cd81d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/policy-admission.rs",
+      "bytes": 12927,
+      "sha256": "e4dfaba8bf2c99b8ff2fd0225fd7f1999f127a50c265d941375b06f9e3de1a8f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/raw.rs",
+      "bytes": 15899,
+      "sha256": "5d2427d74220c391cd1a1deacc8666595fbd8546bdc40051de42a148374a4a04"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-admission.rs",
+      "bytes": 17755,
+      "sha256": "c66c86ac7baa68f4b0365b24f48e07004e1533dc159186c9eda4f2bbfa06cc73"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/rules.rs",
+      "bytes": 43541,
+      "sha256": "402d2637ffcc1a88c0ea5d3cfbec98925e90e9b6e5aa187adee95be530f4fb35"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/schema10-adapters.rs",
+      "bytes": 2547,
+      "sha256": "caae2c58a4ac66363948560e17ffabc4f1989efc5fc7357ca6dfbc1cd4139dd4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "bytes": 9761,
+      "sha256": "f5ad1103bfb41077b5b96a822a13c29735daaafa59d91a4af9accc0d39af475b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "bytes": 64235,
+      "sha256": "32af88679c06bb9d158230777cf5bcd99bfb61f95d7486e2d7a44e8aea6a7765"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "bytes": 12086,
+      "sha256": "dd0ef86d2583b39fbb646f1e3e9902963c78cb5578381899a852d3a939c42682"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "bytes": 16430,
+      "sha256": "8c3c9fc00d17dae2a1ff004fa0b7001300460502f13d0335bdb02ca1ca05aedc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-source-admission.rs",
+      "bytes": 10028,
+      "sha256": "33718490e59f29cc7a1bb27235a4dab9408d6025f4bf5dacd3480ceaa21ec993"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/specialist.rs",
+      "bytes": 23438,
+      "sha256": "5c7733d621465927586797e67aed1d52e266bf6870b64e74360b0517713c7560"
+    },
+    {
+      "path": "crates/sim/tests/ra9_auto_defuse_geometry.rs",
+      "bytes": 9120,
+      "sha256": "4541fb107f122f6d6bfe81d987ea21de478178c283932d6547f932e70c8917b1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_crew.rs",
+      "bytes": 3578,
+      "sha256": "bedf72c53d0af6928a7e4d7551e12157a7bc15bd0c4d198e41cced8c8fafaa3e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_death_payload.rs",
+      "bytes": 3659,
+      "sha256": "56890ab01b5f82117f87a9142f0334ceeeb5af6b95198fffc6b697a6f0c1fd6c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_guard75_readiness.rs",
+      "bytes": 27725,
+      "sha256": "020594542a04015664a86b1e095c1ece23d6aad996a87457c6b4171a8b0fb2e0"
+    },
+    {
+      "path": "crates/sim/tests/ra9_harvester_liveness.rs",
+      "bytes": 3021,
+      "sha256": "7b14866c88bc79f3a8bdb2aed52ca00472fd34406f5163779a577c5c4da97161"
+    },
+    {
+      "path": "crates/sim/tests/ra9_legacy904_last_five.rs",
+      "bytes": 15987,
+      "sha256": "90e95c3f92a5061debb21e74fb0a0982db19a618a312e212a7a1ab0f9107cc81"
+    },
+    {
+      "path": "crates/sim/tests/ra9_legacy_model_boundaries.rs",
+      "bytes": 21709,
+      "sha256": "558513f1ac1a8bbb72b3cfbb06132b13d273eae44c4db340980114af831bb6bf"
+    },
+    {
+      "path": "crates/sim/tests/ra9_liveness.rs",
+      "bytes": 4850,
+      "sha256": "418003c8098e3f29854837057542fcde4aa2f4b2476b6f9a0457dba0914b5d82"
+    },
+    {
+      "path": "crates/sim/tests/ra9_liveness_movement.rs",
+      "bytes": 3334,
+      "sha256": "576a338f7f9d8b0d8fa7a02dd59d7feea39a70ce1673f0656e1f4efdf9ae63a3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_native_keys.rs",
+      "bytes": 53058,
+      "sha256": "adbfcd6376b5a7aa27bad1930542750f40761a876567f5bb24d6d05c43fc4443"
+    },
+    {
+      "path": "crates/sim/tests/ra9_parasite_origin.rs",
+      "bytes": 9297,
+      "sha256": "22f27d140b7e3f77ef4dbd511a4dfa1972ed4962d70bc9aecd926e6e25249026"
+    },
+    {
+      "path": "crates/sim/tests/ra9_prop_commands/mod.rs",
+      "bytes": 20426,
+      "sha256": "d49a1eaa14f9339d24c88262fb91aec7fd91002d1a2377156be78d9641f8a534"
+    },
+    {
+      "path": "crates/sim/tests/ra9_refinery_repair_liveness.rs",
+      "bytes": 9365,
+      "sha256": "246be150a29f3de0418bb139ac196c6d2345f90751212d4c3443cae6cb5e5154"
+    },
+    {
+      "path": "crates/sim/tests/ra9_remaining_common/mod.rs",
+      "bytes": 13307,
+      "sha256": "c1ee9ce425c1823cbe85a63b0108e2d45c40e785bf6a7afec7d378e9cef667a9"
+    },
+    {
+      "path": "crates/sim/tests/ra9_remaining_props.rs",
+      "bytes": 28940,
+      "sha256": "f43423e4d1f52b1aee06537f668db9aafc888c34a538131f1a52630e65e4352b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_runtime_liveness.rs",
+      "bytes": 7202,
+      "sha256": "5f95ade66eaf05494300dc90c78395ec2f7d506f98de76f3e6141850ad5f7336"
+    },
+    {
+      "path": "crates/sim/tests/ra9_scenery_connected.rs",
+      "bytes": 14473,
+      "sha256": "a460ad95cbad0161b199fb85a0e07e89c29505d3a27708c91fbbaf0eb6eb1328"
+    },
+    {
+      "path": "crates/sim/tests/ra9_soundness_common/mod.rs",
+      "bytes": 5768,
+      "sha256": "990ea0225435b3e77f31864cf5a21e767b72f0004da03b0af349fc78dcc01000"
+    },
+    {
+      "path": "crates/sim/tests/ra9_squid.rs",
+      "bytes": 2471,
+      "sha256": "37e2498a947f69aa0144d30e23635132d7c5c24b5c8ca733e7e039a7f8723b3d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport.rs",
+      "bytes": 6045,
+      "sha256": "9bd9a7c3e0ae3304af02308b490f0fec32e8a7af371ae6c62c20bd022d0eaee4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport_buildlimit.rs",
+      "bytes": 4071,
+      "sha256": "7b780c34c8ade20beb1d3e11998efcedf8e50242469e7125e6c11da6c7d2ba85"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport_lifecycle.rs",
+      "bytes": 6355,
+      "sha256": "201aaab247280c18a678604c5d7ad8b863222f7e585a10a1e757c58f52dc82ea"
+    },
+    {
+      "path": "crates/sim/tests/ra9_veterancy.rs",
+      "bytes": 4021,
+      "sha256": "ab0cac21a1b755c2b140e855a041af05c11258e3c2b6680a55fa006bdb593054"
+    },
+    {
+      "path": "crates/sim/tests/ra9_vhp_scan.rs",
+      "bytes": 10451,
+      "sha256": "2afeea6b772fbf4216f11c7f2c29057b5d6c89e08ccf529319515e216fc0ff4c"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "bytes": 244295,
+      "sha256": "702016ab476ae5f6d0be9f35f2f1145a7031f29b03c794e7c836a1c24e3e4c77"
+    },
+    {
+      "path": "docs/RA2_HISTORICAL_DEBT.tsv",
+      "bytes": 182550,
+      "sha256": "cc994253f9d6adb2284d32aaf6ea8ba52436bc5ac6e8a6de8fc0625fd36473b9"
+    }
+  ],
+  "after": [
+    {
+      "path": "crates/game/src/minimap.rs",
+      "sha256": "7da61129579df306260cb9ea243facfe9672ba50e660d6381d53afbe46813c4a"
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "sha256": "c4b55b36284ea4d05814ea31de796314709dcbb159eb51f6c08aa2b2ad594201"
+    },
+    {
+      "path": "crates/game/src/sim_host.rs",
+      "sha256": "2f20616e7016526ae3ce953f4b7a7f7b5b60f57c4513b0fe2a502ffedc3389ad"
+    },
+    {
+      "path": "crates/game/tests/m6_production_matches.rs",
+      "sha256": "a17505da2b12a125518614007e1ef902bc437d349277b14998cfb6b2f6a1aa23"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/actual.rs",
+      "sha256": "7ba9666b21d1c9f1e2ee575e4607d2a2d429f34d5a0db10d4fe7dd596864a8c8"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "sha256": "18340c20d212da307d9f2bbba4ac4f3d9b1170375c993774e8e5acc45b9ada33"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/array-plans.rs",
+      "sha256": "8b9d58e739741b663cb23ccb9e996c401267e2860a52921af6f7754eb2d5ff62"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/arrays.rs",
+      "sha256": "dc1a3a2c847282d43a15f57c7ef03a92d1c0b6f1d918955279725efb38f1f6a2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/behavior87-admission.rs",
+      "sha256": "ae24cf9f071f50d21a5479c0ce746c885dedba3824e38485324bd6512a6697c0"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/carry38-admission.rs",
+      "sha256": "b2f1b6b9aa4dd9a59805f9babfe0bf3de06e9df2d6bd4cda11c2ab518fcdc594"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/combat.rs",
+      "sha256": "47001751485e5afbbe0d9eb2f515e04268b12f6600052eccd34d0f71ae6a820b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/compositor-negatives.rs",
+      "sha256": "70afbffe1e76ab10d9623753904a8c7e05e3c042971629e3fd7189e1cca7e5b3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "sha256": "a155aa2475524be1d7ff85aae216dabc1ac0d4b77846fe95ff84018b1e3c916a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/contracts.rs",
+      "sha256": "e911d7b8bd67cf17d8ba41a19c9c20f816cc524c7d86173d04c8703c0ebceebf"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "sha256": "559dd0dc21aecc99a91afb8d91b13202d8fc40463cb8f6be073cd295d23b10d5"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-audit.rs",
+      "sha256": "6f2504a7f993cf527341e229dc7483eead66b917a80fe25f8f0c62e6daa107cd"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/fire-keys.rs",
+      "sha256": "81f2e5b431be9b2a3167d3553b2fa0c008f2c3549a3facd4a3e42c06546b85dc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-admission.rs",
+      "sha256": "c4bf88c6c53d72d622d4e50d683585132b12ec8fe0688a0c827b25c07cec8783"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-negatives.rs",
+      "sha256": "79ee7bb6255052a5e178d7b6583dcb3f1bdb4879b2d78bd0a42ef09ded50835a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/items.rs",
+      "sha256": "1212046a695c477f0646f1718c0c44a6f4385e14d0791a9ac984366a1364f10c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-negatives.rs",
+      "sha256": "420d22c4ab1bef025204d324612810f1c08e86fd7b6f66f58dcf2edee663fac1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-ai-policy.rs",
+      "sha256": "7a8e7d979613efb76341bb063394bba11dbb22e67f6170c97d4a5b32b4709e6e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-negatives.rs",
+      "sha256": "8a127d24304f92aa0dc151e175c34e21e3833bb3f2658791df1a09ea9fa6c0d9"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-model-policy.rs",
+      "sha256": "bc8f7e8d173ebc34e9e2fda08a0c0c80ab8f363f6a7e25e9263a1596e3914b49"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy-source-admission.rs",
+      "sha256": "1e8326dd7061a9bb30da5290b2977e26bde335d3eacb6f2e000f643c583c9a07"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-loaded.rs",
+      "sha256": "cf12beeef784314551e81b581790de1e61ca1de67215c90e2bde626d33d56e94"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-scope-negatives.rs",
+      "sha256": "495044ca847b1aab2f818728396b25bf336c5568dcb194f250ab05f998f90d22"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/legacy904-support.rs",
+      "sha256": "c007b7662e3bc7d4305409b16ae7e49c1be28764cd6a994f468580489523bebb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/masked-speed-admission.rs",
+      "sha256": "a8ac4d0d8b8a1b39e0ccc55712d67cbce0993ff254e8712da8e8c881af627273"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/metadata-admission.rs",
+      "sha256": "30232a2a87c070665eb78ea960a140ebe5001c66068b6def34a4d60920d6bd5a"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/mod.rs",
+      "sha256": "b83b34659c1d2154da4062e880f866991bf6788377ec36f5f762811e9268afe8"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "sha256": "0df1a2dadaaf45a248a3699bba4c828802e338e29944d5f4d30bbbf7a880eed9"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-loaded.rs",
+      "sha256": "797bf1c05cc86bc3e5eb7df036bbea15f10ae61b988fd84963550ff0a5a1ddfc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/native.rs",
+      "sha256": "1217acd3428777c5f3adee2b2621f771b58c9a57317e740f6df132a963a9e2eb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/negatives.rs",
+      "sha256": "3b855a91bd92f8475e1d2157f2e378aff0922f32b4b05be71a10875c8b13a49c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-negatives.rs",
+      "sha256": "58e771a2cf739b570f9175339b2a4f3a14b291fa3704dc7b12ea0091c7376fce"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/nested-plans.rs",
+      "sha256": "d12ba6b7da71ad24190d87337524dc771b1397bc55af6d3a4f0b5479365595c3"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/policy-admission.rs",
+      "sha256": "a94cbc1075d46aec3f5a8f752f1afb8dea3aedfec3a4fb62c649c411478dbf11"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/raw.rs",
+      "sha256": "abcb171d4e377695e72cc87137555ec5698a0951402c30c550cf09e6dd34614d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/residual-admission.rs",
+      "sha256": "c6358c422c0087d68c2fc0022d8c6a72a334240dfdb135e89ede1b22d5214cdb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/rules.rs",
+      "sha256": "65dea21f58d24cf83e45e2f06ef6c319cd3268dbd811bb14fe624c087db805f1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/schema10-adapters.rs",
+      "sha256": "2d57ff763f53331162198b31c96c961176cbb0c4ddb3dbb2d09e11cb9ffe2d6b"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/scope-inputs.rs",
+      "sha256": "cc7560fc31d11754f18eb7358e697dd34acf50bc381e9883b913821c2bf1a936"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "sha256": "6601316cf787f2b8fd14763bbf45eff69eead8d3385879532aa57d7321d3e638"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-plans.rs",
+      "sha256": "575666f47e93bb117710f27e340cca47b16e74a5c8c25341ac81da9c4d514a92"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-routes.rs",
+      "sha256": "046cc498133e35af96f732b7cdafdaa2206b98f70724e665a2b2256924bc138c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/special-source-admission.rs",
+      "sha256": "ec9a5a5a44eef8eeb6c51cb7c66a7abb634f693fd07deb7798c69d1a7fef335c"
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/specialist.rs",
+      "sha256": "2139c173b799403afe05ca37499420323316a3a8a716cafd3140e0b84ade5fbb"
+    },
+    {
+      "path": "crates/sim/tests/ra9_auto_defuse_geometry.rs",
+      "sha256": "46f99b7ad22b71d0ff28784e13850b8112299c873e07e2606e84729c451b6ba2"
+    },
+    {
+      "path": "crates/sim/tests/ra9_crew.rs",
+      "sha256": "1ac4ff894ca1c07879497f4d406ddfefe78e7a3bcc8dd9986c1a4a4152756f81"
+    },
+    {
+      "path": "crates/sim/tests/ra9_death_payload.rs",
+      "sha256": "daf1840cb2df8be79b28f3227f2f43a40a8e571ad12c1ebc1af2058a25e28839"
+    },
+    {
+      "path": "crates/sim/tests/ra9_guard75_readiness.rs",
+      "sha256": "8f274a727711f1a7b5df4fd26874f98616c7ced5ddd426a4ff2703209a5101dc"
+    },
+    {
+      "path": "crates/sim/tests/ra9_harvester_liveness.rs",
+      "sha256": "5371e908caeff0b04e7c67610bf254f68458c78e9ceff1a53eda3eb09094c165"
+    },
+    {
+      "path": "crates/sim/tests/ra9_legacy904_last_five.rs",
+      "sha256": "6690f90cba46367d5e432c6cd523fd1e91dd8d6bc661594ef7d7d0fa56770943"
+    },
+    {
+      "path": "crates/sim/tests/ra9_legacy_model_boundaries.rs",
+      "sha256": "af4a980cc6b6b4638b2cbb6de6ebfa87f54867a6d8b1bcd5ce4cbb998491da61"
+    },
+    {
+      "path": "crates/sim/tests/ra9_liveness.rs",
+      "sha256": "448f1f3a5cf0e4b0f73fc3e416e8501f89b2afcd19573388300bc1bc4d479fc1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_liveness_movement.rs",
+      "sha256": "80b919e46744b35cedd8e97df51dc9ecb4df483a313f35915bad128e319dc737"
+    },
+    {
+      "path": "crates/sim/tests/ra9_native_keys.rs",
+      "sha256": "fd599636ea372629f1fd908d98be62b580a50f71c5a3bbc74448ed3a4898f454"
+    },
+    {
+      "path": "crates/sim/tests/ra9_parasite_origin.rs",
+      "sha256": "cb5cabfcabee7b1344f791004fa78c258ed0862ad8d32759fabb90e4dd75cb5d"
+    },
+    {
+      "path": "crates/sim/tests/ra9_prop_commands/mod.rs",
+      "sha256": "d859347f569a9442af956e8cbc0735411ec9398148be3785d783f6a495543312"
+    },
+    {
+      "path": "crates/sim/tests/ra9_refinery_repair_liveness.rs",
+      "sha256": "ed639b521d744735be3dd2fe0e38fef54983020da8db22ea5cc09200d2a2684f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_remaining_common/mod.rs",
+      "sha256": "f75787aeb05a6a8b52e1d9364b7ed517380db9883796bb6b34d3b27725a54350"
+    },
+    {
+      "path": "crates/sim/tests/ra9_remaining_props.rs",
+      "sha256": "d708e73312d8586df91cad41dc723c4472ec17359e06f08e74149aa0f84aa30e"
+    },
+    {
+      "path": "crates/sim/tests/ra9_runtime_liveness.rs",
+      "sha256": "9b1be60af2427154a01ca1009d73383e763d8e8bc25056d965b20e23ed6be0b1"
+    },
+    {
+      "path": "crates/sim/tests/ra9_scenery_connected.rs",
+      "sha256": "9f20d54cd8cc4fb1e5105dbb419767937235c331b25013a9df6978c9b4425fd4"
+    },
+    {
+      "path": "crates/sim/tests/ra9_soundness_common/mod.rs",
+      "sha256": "f6bbcc701949a4da0770c5b92c9ac807995055d1b25e2c4996744657115a5a4f"
+    },
+    {
+      "path": "crates/sim/tests/ra9_squid.rs",
+      "sha256": "f19b18a622515d97f0c97099d06d90d862affd65541b920dbf4011b2b4f955f7"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport.rs",
+      "sha256": "a20696aeb1bf8e4db4e281a5c594582d7ce2f25b076bba5248b8e9e971b05f96"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport_buildlimit.rs",
+      "sha256": "d7dc83cba1a6ee6d94837467183e0ee8256235ab0c989070fdb30aca1bf0ea87"
+    },
+    {
+      "path": "crates/sim/tests/ra9_transport_lifecycle.rs",
+      "sha256": "fb7d1f2015b0330f166d257f53bcd2e6a6837935c46bfae92737139eeac86674"
+    },
+    {
+      "path": "crates/sim/tests/ra9_veterancy.rs",
+      "sha256": "dfd7a6192f254d12afc7ecb134e8372434921f28413809d9503d365b30022429"
+    },
+    {
+      "path": "crates/sim/tests/ra9_vhp_scan.rs",
+      "sha256": "6f75dfbf5f2fabab61cfb8bd27325fa2be081c88de5527eab2607e68da84cfa1"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "sha256": "f98841a84eb9b36009fc15cb154d4010cbc063087cc7465b01c8f9b049037450"
+    },
+    {
+      "path": "docs/RA2_HISTORICAL_DEBT.tsv",
+      "sha256": "d0c93c3a6cb828449a0fb859265e40b0987eb85de003688c279c1668987eecbe"
+    }
+  ],
+  "protected_authority_spans": 64,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "limits": "No source policy class/reason/route/decision/qualified receipt changed. Tests unchanged except historical comment status; missing admission predicates strengthened in source-plans. Native after results and full gates remain owed."
+}

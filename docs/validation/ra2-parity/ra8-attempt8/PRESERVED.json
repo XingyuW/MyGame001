@@ -1,0 +1,29 @@
+{
+  "preserved_utc": "2026-10-18T19:21:22.626507+00:00",
+  "frozen_commit": "618e9b4f2890a9cb5e95d920dcd94fedbca3955f",
+  "runtime_commit": "f431d122d1c147fdc948d21b55156aa0a7477cc1",
+  "failure_messages": [
+    "crossroads: great_britain (brutal) against america (brutal): None",
+    "liberty_bay: france (medium) against germany (medium): None",
+    "oasis_gulf: libya (brutal) against iraq (brutal): None",
+    "oasis_gulf: france (brutal) against russia (brutal): None",
+    "harvest_plains: france (easy) against germany (easy): None",
+    "a scoped thread panicked"
+  ],
+  "files_sha256": {
+    "01-fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-clippy.log": "92bec25ad54c650450560360480d5f94d3d8ad203f81a2c724e0c641b330bbfb",
+    "04-test.log": "bd5e98e56efe17fa5a865c82e7fd1f86f67f48f4e0860d069edbdfd61ed56ea6",
+    "gate-process-output.log": "d15344679231384324c1c53171c1c585e857e8056ceb64aebf8d9c7e6827dd15",
+    "gate-process.json": "5de2976a13c9ff472f2b6f2d4b4d1c2f588dcc4320f5f334c7b35feb1f6a83b2",
+    "production-liveness1.json": "f487d30b24682c3de2c54cf5db5dc60cd7b99b2d8259a2b04a28c0be623acc69",
+    "production-liveness2.json": "4057d3d73491aab06282400a98b9d3d4f3a034611afeedfd66d9ed9a2b344de0",
+    "production-liveness3.json": "abd692ed6fe97abfb76e6b15c77d75b2595c777ee067849146c7347e6f49e8d6",
+    "production-liveness4.json": "7f732f0ac0fe64ccf7958110e1abb1c20930774abcfb82dbdcd589debe24f049",
+    "production-liveness5.json": "b834f93b726bda6db30b206b653f4ba7b93f95f67bad4acac274afae297ec4fb",
+    "production-liveness6.json": "8e080ae715a1e70f2c662c5db1a500b723716fec9de4c22b6c77adc2dd87392f",
+    "summary.txt": "d15344679231384324c1c53171c1c585e857e8056ceb64aebf8d9c7e6827dd15"
+  },
+  "note": "Complete raw gate preserved after completed phase4 failure; wrapper stopped dependents. No table from this failed sweep is fresh successful evidence."
+}

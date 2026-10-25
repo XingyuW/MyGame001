@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-23T02:34:19.225364+00:00",
+  "hashes": {
+    "crates/sim/src/ai.rs": "32e2f224eb66136803ce40c27a886d7346b00026cda4b9f9c8c5aa02abdbd2f8",
+    "crates/sim/tests/ra8_ai.rs": "2472e56bff3ff4ee6b048132619cc71d848dc4a281012930b4417358f69f851b",
+    "crates/game/tests/m6_production_matches.rs": "f9d3de4abf4fa787c189b03a32ee7a4436fe7b4e7e6338cc424b8e6abdb84b7b"
+  },
+  "env": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "status": "COMPLETED_WITH_ACTUAL_EXITS_NOT_AUTOMATIC_PASS",
+  "start": "2026-10-22T19:48:48.511752+00:00",
+  "pid": 9933,
+  "head": "aafd1794a84f88b9919b7e31c78768e08f66d70d",
+  "plan": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261021/runtime2-after-01-plan.json",
+  "plan_sha256": "f6e35d114c5fade3dd5e9f50309f7cfd03b872ad16c2f700f6055c04d8b62274",
+  "runner_sha256": "ec077d80448573fc8a61072a6a84c3a4359d00e8cdd7e0bde2e8796f8170ee3f",
+  "snapshot_exclude": [],
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-10-22T19:48:48.628304+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/01-fmt-check.log",
+      "pid": 9949,
+      "pgid": 9949,
+      "exit": 0,
+      "end": "2026-10-22T19:48:53.643278+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-22T19:48:53.895177+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/02-diff-check.log",
+      "pid": 9968,
+      "pgid": 9968,
+      "exit": 0,
+      "end": "2026-10-22T19:48:58.916202+00:00",
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source_unchanged": true
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--no-fail-fast",
+        "--test",
+        "ra9_runtime_liveness",
+        "--test",
+        "ra9_crate_cargo_census",
+        "--test",
+        "ra9_guard_effective_targets",
+        "--test",
+        "ra9_specialist_firepower",
+        "--test",
+        "ra9_temporal_sources",
+        "--test",
+        "ra9_bay_current_state",
+        "--test",
+        "ra9_temporal_pending",
+        "--test",
+        "ra9_support_current",
+        "--",
+        "--nocapture"
+      ],
+      "start": "2026-10-22T19:48:59.171972+00:00",
+      "raw": "docs/validation/ra2-parity/remediation-2/C-runtime-after-01/03-runtime-eight-targets.log",
+      "pid": 9990,
+      "pgid": 9990,
+      "exit": 0,
+      "end": "2026-10-22T19:51:44.343187+00:00",
+      "raw_bytes": 6199,
+      "raw_sha256": "5af590f38f55666434221331c261aea918c289724acb4d51326be9c9e23a9ff2",
+      "source_unchanged": true
+    }
+  ],
+  "heartbeat": "2026-10-22T19:51:39.337083+00:00",
+  "end": "2026-10-22T19:51:44.470015+00:00",
+  "source_unchanged": true
+}

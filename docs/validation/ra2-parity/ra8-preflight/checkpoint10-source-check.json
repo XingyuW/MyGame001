@@ -1,0 +1,18 @@
+{
+  "verified_utc": "2026-10-19T06:19:48.664586+00:00",
+  "snapshots": [
+    {
+      "manifest": "attempt9-final1-runtime-manifest.json",
+      "sha256": "ccb5c922b8b2625813d6b442896c9d6ba9d2f408d1a407e0a873318b56cd4a52",
+      "files": 342,
+      "mismatches": []
+    },
+    {
+      "manifest": "attempt9-final1-test-example-manifest.json",
+      "sha256": "3e8a021515f1fb869d611cf404b2bedb2c2eaf8c47e78115bc0fddccdfc4e440",
+      "files": 101,
+      "mismatches": []
+    }
+  ],
+  "note": "The342 runtime set and101 additional integration/example set are separate recorded snapshots; no retrospective claim that older runtime sets included all integration files."
+}

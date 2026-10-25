@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.1056383340037428,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-fmt2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 1.0078565000148956,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-clippy2.log",
+    "sha256": "ba34a1bc97cc23abd04e18705b99982d7d50960cbac8bf903200ca6d3c5fb363"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--test",
+      "m2_movement",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "elapsed_seconds": 7.779344749986194,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-m2-after1.log",
+    "sha256": "a68a9caa390007a979f2eccb6fc1264ef8408f9d6bd4a78ee558fc8d260099e1"
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "sim",
+      "--tests",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 101,
+    "elapsed_seconds": 572.3265411659959,
+    "log": "docs/validation/ra2-parity/ra8-preflight/attempt6-sim-all2.log",
+    "sha256": "29811a90cbff026d2407285e4207bade1796140f857b4fb8b6b2b16bef9cff30"
+  }
+]

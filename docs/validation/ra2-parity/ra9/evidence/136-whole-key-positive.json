@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-21T03:20:11.422992+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_data_parity",
+    "--",
+    "every_physical_consumer_and_reference_atom_has_an_exact_successful_disposition",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "source_scope_sha256": "1c7e159bcd59af5a441669bf221f4646da5e222eefd3caf61ca4f2c620da7e1c",
+  "scope": "actualcomplete1737source+physical/dependency census withtypedindependentmembership;preliminaryexternallybound134,notcanonical/finalacceptance",
+  "ended_utc": "2026-10-21T03:23:47.776067+00:00",
+  "exit_code": 101,
+  "seconds": 216.351,
+  "input_mismatches": []
+}

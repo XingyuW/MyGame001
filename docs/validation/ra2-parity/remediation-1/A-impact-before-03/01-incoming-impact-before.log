@@ -1,0 +1,20 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 5.83s
+     Running tests/ra9_bay_current_state.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra9_bay_current_state-6886ee217ccfff6d)
+
+running 2 tests
+
+thread 'ra9_same_economy_incoming_missile_killed_spawner_cannot_launch' (16323244) panicked at crates/sim/tests/ra9_bay_current_state.rs:262:9:
+a same-stage missile-killed source cannot launch from stale Actor HP: [MissileDetonated { player: PlayerId(1), parent: SimId(1), unit: SimId(5), at: SubPos { x: 3712, y: 2688 } }, Impact { warhead: WarheadKind(15), at: SubPos { x: 3712, y: 2688 }, air: false }, UnitLaunched { player: PlayerId(0), parent: SimId(0), unit: SimId(8) }, AttackEnded { unit: SimId(1), target: SimId(0), reason: TargetGone }, UnitDestroyed { player: PlayerId(0), unit: SimId(0) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_same_economy_one_hp_surviving_spawner_launches_positive ... ok
+test ra9_same_economy_incoming_missile_killed_spawner_cannot_launch ... FAILED
+
+failures:
+
+failures:
+    ra9_same_economy_incoming_missile_killed_spawner_cannot_launch
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `-p sim --test ra9_bay_current_state`

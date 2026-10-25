@@ -1,0 +1,58 @@
+{
+  "utc": "2026-10-21T03:06:57.497684+00:00",
+  "authorization": "Root factual external128check:650source+213provenancesnapshots+63authoritysections+67receipt/logpairs+13staticobservations+95producer0mismatch; preliminaryimplementation/scopedfacts only",
+  "input_binding": "a706429c38f15d4b1d51ed84130f261bb464dff7b95db4f2401469af96de019f",
+  "static_evidence_sha256": "9addcc1359ea1a12286e73e0093ab8946b914ba07d9ed44c68c56d36dba54928",
+  "files": [
+    {
+      "path": "crates/sim/tests/ra9_audit/root-policy-input-binding.txt",
+      "before_sha256": "4064a3209b6ddbec2f5796ceed142e839fb26d866b823abf091dacf05450b4b1",
+      "after_sha256": "abebba5e8ac2c74dd7485643408910d3cbb9f62ed852bf05b7b7fa48d5dd46dc",
+      "old_binding_replacements": 1
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-policy-acceptance.tsv",
+      "before_sha256": "6ec9bba49e4237f28a0d4e3f39d18feaad53d603b6ef552694302826247bd2b3",
+      "after_sha256": "36ca8eae098ba89c3828c6225374af996b0b7d1380e930f85926d7013acc1b78",
+      "old_binding_replacements": 1313
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/guard75-acceptance.tsv",
+      "before_sha256": "ffcf25c25204a47edab821d4466102fff7d8941bfe94edc6ff8c50c1704380eb",
+      "after_sha256": "645ccaf1a2a87ff5e4e95ed695ce2bbed8bf66704477df7850a975c55c454e9f",
+      "old_binding_replacements": 75
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/own-policy-acceptance.tsv",
+      "before_sha256": "80d3650eb207df6ac2173d81ebe84e6f38e4cbe6d9eb3f24882975607a2fc080",
+      "after_sha256": "50e37ed208e5f2359046a8df8500dc16d3216d849bc3c603f9d8b8fad3bcfbe9",
+      "old_binding_replacements": 80
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_legacy_range_resolution.tsv",
+      "before_sha256": "f6f452ba24063f858a055e9fdc53221c76f156d201dccd372ca5c6f179810c7a",
+      "after_sha256": "de82f43325d2b4f7404396aa576d3f42a134a33913cfb63529d28880199481ad",
+      "old_binding_replacements": 1
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_return_fire_policy.tsv",
+      "before_sha256": "89568f7e5ec3bbfa1e9d20eef99cdd1cafc5d08a6bbe2481e86b054f3e8158b3",
+      "after_sha256": "d1a3429f836366a9f81defbf301ede4bd61a382c51343a83ca6f5a8358ef25dd",
+      "old_binding_replacements": 1
+    },
+    {
+      "path": "crates/sim/tests/reference/ra9_scope_approval.tsv",
+      "before_sha256": "a13c8b341679122bf84545646d73b29f442ca8c714f54a6cd500b0ec7ddfe132",
+      "after_sha256": "29e2a1ba9e24411643419b9cc6721c71a0fa383eb0d7770764bd85163ae1cbfa",
+      "old_binding_replacements": 1
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/ra9-approved-static-evidence-sha256.txt",
+      "before_sha256": "e8d70687f88f32646f9c014389119ed3e9b3d3ccc109084933455caf58a75f83",
+      "after_sha256": "3475f51bb44e9b31e7c5e5255edb3168bcd2920db12a7fb1f5a3645e53bb7c89",
+      "old_binding_replacements": 0
+    }
+  ],
+  "B_owned_acceptances": "Not touched until B stops all writes",
+  "execution": "wholepositive/validbaseline negatives pending"
+}

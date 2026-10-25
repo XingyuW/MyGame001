@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unseen_enemy_water_building_cannot_change_naval_planning",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "purpose": "Final Guard/Move fixture: remove ONLY honest unknown-water occupancy guard; repeat negative on exact final staging. Restore in finally before dependent work.",
+  "start_utc": "2026-10-18T20:13:37.747623+00:00",
+  "elapsed_seconds": 26.735972916008905,
+  "exit": 101,
+  "source_before": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a",
+  "source_mutated": "d02bcc577721a23f2b24b6235440acc64bd30c9649cd6af1595a05f2a857bb2c",
+  "source_restored": "fd659a2ae11818aa67c9f0dbf1a037ee0a6245c1c1603838280743dce2b6d06a",
+  "log_sha256": "ef75eb122926614b820a6fd3658c254d772f239b7a4a75be32b5e79ca34f3969"
+}

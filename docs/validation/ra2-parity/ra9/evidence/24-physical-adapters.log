@@ -1,0 +1,16 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 38s
+     Running tests/ra9_data_parity.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_data_parity-f191adb6678c35d5)
+
+running 1 test
+Error: "specialist native/own field policies: parasite role metadata fallback not shadowed by actual parasite WH\nremaining typed nested arrays/tuples: root has not bound the actual final source/input/native receipt scope"
+test ra9_audit::every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission ... FAILED
+
+failures:
+
+failures:
+    ra9_audit::every_loaded_physical_adapter_reports_exact_failures_before_source_policy_admission
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 169 filtered out; finished in 0.30s
+
+error: test failed, to rerun pass `-p sim --test ra9_data_parity`

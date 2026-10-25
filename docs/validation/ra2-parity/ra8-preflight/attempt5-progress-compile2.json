@@ -1,0 +1,14 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--no-run"
+  ],
+  "exit": 0,
+  "elapsed_seconds": 24.238500249979552
+}

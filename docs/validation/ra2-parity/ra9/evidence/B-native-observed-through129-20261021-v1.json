@@ -1,0 +1,64 @@
+{
+  "status": "FACTUAL_LOG_IMPLEMENTATION_ONLY_NO_NATIVE_RUN_OR_ACCEPTANCE",
+  "old245": {
+    "raw_results_reproduced": true,
+    "identities_retained": true,
+    "immutable11_fields_unchanged": true,
+    "old245_preimages_kept": true,
+    "old117_provenance": {
+      "old_rows": 117,
+      "all117_raw_results_reproduced": true,
+      "all117_identities_retained": true,
+      "immutable11_facts_unchanged": true,
+      "old_facts_preimage_preserved": true
+    }
+  },
+  "cutoff": 129,
+  "latest_pairs": 324,
+  "phases": {
+    "EDITED_PRELIMINARY_COPY": {
+      "distinct_target_test_pairs": 311,
+      "latest_observed_ok": 311,
+      "latest_observed_failed": 0,
+      "latest_observed_ignored": 0
+    },
+    "IMMUTABLE_BEFORE_SNAPSHOT": {
+      "distinct_target_test_pairs": 11,
+      "latest_observed_ok": 7,
+      "latest_observed_failed": 4,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_LATE_PRODUCTION_OBSERVER_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    },
+    "INTENDED_CAUSAL_RNG_MUTANT": {
+      "distinct_target_test_pairs": 1,
+      "latest_observed_ok": 0,
+      "latest_observed_failed": 1,
+      "latest_observed_ignored": 0
+    }
+  },
+  "receipts": 60,
+  "per_receipt_unique_observations": 405,
+  "harness_summaries_verified": 116,
+  "collapsed_child_duplicate_lines": 9,
+  "scenario_observations": 6,
+  "outputs": [
+    {
+      "path": "native-observed-results.tsv",
+      "bytes": 189084,
+      "sha256": "3002814fa456e56cef5a7603be4c8d7ca76007eb69be4d43c7daa3ceb6d6e165"
+    },
+    {
+      "path": "native-observed-results.json",
+      "bytes": 495058,
+      "sha256": "56cf96831dfece8a98659ad89897c38f63ca219308df65218d547044e8b59da0"
+    }
+  ],
+  "scope": "RulesNone/fixture/loaded/client/shipped scopes separated; intended causal failures in separate phases; oldfailures/rawlogs retained; no combinedfinalsuite, originalflag/render/performance/canonicalacceptance claim.",
+  "source_writes": false,
+  "new_directories": 0
+}

@@ -1,0 +1,17 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+warning: `game` (bin "game") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.28s
+     Running tests/m8_team_paint.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/m8_team_paint-edd2dde68a4adc75)
+
+running 4 tests
+test presentation::tests::team_paint_preserves_materials_alpha_and_shading ... ok
+test presentation::tests::palette_restarts_repaint_from_source_and_preserve_neutral_materials ... ok
+test every_shipped_unit_facing_has_visible_material_preserving_team_paint ... ok
+test every_hd_unit_facing_and_building_has_team_accents ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.91s
+

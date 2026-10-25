@@ -1,0 +1,102 @@
+{
+  "checkpoint": 11,
+  "utc": "2026-10-19T09:18:55.466164+00:00",
+  "status": "validated scoped preflight; mandatory complete full13 and both fresh756-winner R29 distributions pending root release; not independent review",
+  "source_commit": "313e96b3ef0e37af3b834c32f02d23fcc19cc17c",
+  "preflight_working_tree_base": "d82617645047338fa9270e67c5850299ec8731cf",
+  "runtime": {
+    "crates/sim/src/ai.rs": "9d47fb7efae4ed984a1f4fd6052ffc463bc023386144c5de580a0648bf31c367",
+    "crates/sim/src/ai/strategy.rs": "e689d137e343eafcaa8345fc2d3bf4f2a8e641b413a97dd8ff2a7021a079b7b1",
+    "assets/data/ai.ron": "42cf650956788f04f4520e7f5be1d617c416b83e6e2f555e8b7a417b4a1a5b2a",
+    "scripts/generate_ra2_data.py": "6a0477b0720c54971bd8b11ed5b8ba7fda00b23101516f349477dbca209057d9"
+  },
+  "main": "8230a955b251e9341d349f99eaeb86f7f8253664",
+  "branch": "ra2-parity",
+  "static_tests": 1327,
+  "baseline_static_tests": 1124,
+  "added": 203,
+  "removed_or_renamed": 0,
+  "ignored": 0,
+  "preflight": {
+    "commands": 18,
+    "test_target_invocations": 12,
+    "passed": 151,
+    "failed": 0,
+    "ignored": 0,
+    "wall_seconds": 1755.0095551660052,
+    "command_seconds_sum": 1755.0033729579882,
+    "all_exits_zero": true,
+    "summary_sha256": "50b5facb45bd2af5250427c1f8fb06f95a58dfffc3e082700ffa1bcfc0591e00"
+  },
+  "m13": {
+    "count": 21,
+    "winners": 21,
+    "ten_builders": 21,
+    "unchanged_outer_limit": 400000,
+    "mean_budget_ms": 5,
+    "end_tick_median": 77405,
+    "end_tick_p90_nearest_rank": 96994,
+    "end_tick_max": 114793,
+    "worst_mean_map": "coral_archipelago",
+    "worst_mean_ms": 1.422,
+    "measured_seconds_sum": 1176.603,
+    "elapsed_seconds_sum": 1176.745,
+    "raw_sha256": "7e8fde2ef4807fab0bb7d894607e1610afcd76ab3d2098c4ce92b1e602afb359"
+  },
+  "fixed256_means_ms": {
+    "liberty_bay": 0.785201,
+    "continental_divide": 0.808316,
+    "pacific_atoll": 0.846548
+  },
+  "references": [
+    "checkpoint11-metrics.json",
+    "checkpoint11-inventory.json",
+    "checkpoint11-source-check.json",
+    "checkpoint11-source-staged-check.json",
+    "checkpoint11-storage.json",
+    "checkpoint11-attempt10-preservation.json",
+    "checkpoint11-r29-baseline.json",
+    "attempt10-final2-runtime-manifest.json",
+    "attempt10-final2-test-example-manifest.json",
+    "attempt10-repair-evidence-index.json",
+    "attempt10-unfundable-evidence-index.json"
+  ],
+  "source_staged_hygiene_exit": 0,
+  "evidence_staged_hygiene": {
+    "exit": 2,
+    "passed": false,
+    "raw_artifact_diagnostic_count": 39,
+    "raw_log_diagnostic_count": 31,
+    "raw_patch_context_count": 1,
+    "counts": {
+      "new blank line at EOF": 25,
+      "trailing whitespace": 14
+    },
+    "source_data_test_prose_errors": 0,
+    "stdout_sha256": "08afd69f68ad9dfe72a5eb25e56f7576637ab564a77edca9eec5a72416680f62",
+    "classification": "checkpoint11-staged-hygiene.json",
+    "raw": "checkpoint11-staged-hygiene-second.json",
+    "identical_final_staged_recheck_required": true,
+    "diagnostic_count": 39,
+    "raw_hygiene_stdout_count": 7,
+    "initial_classification": "checkpoint11-staged-hygiene-initial-classification.json",
+    "initial_raw": "checkpoint11-staged-hygiene-raw.json"
+  },
+  "assumptions_and_migrations": "DECISIONS R159\u2013R160; retaining R88\u2013R158. No existing expectation/limit migration. New constrained-income and post-combat remnant fixtures explicitly isolate their policy/state and preserve native prices,production,repair,damage and public command paths. Paid unit work takes current-wallet priority; surviving unit production must have native financing or the existing eligible sale/refund recovery. The all-army prerequisite sale policy is not physical unrecoverability.",
+  "ra9_carryforward": [
+    "M6 review2 P2 terrain-only gathering-point own-yard partition debt",
+    "R83 Size/SizeLimit loaded boarding and actual attached-Squid-host WeaponFired",
+    "R96 actorless occupied-Prop C4/Ivan/Temporal ability resolution",
+    "R99 unproven bombable/capability lead",
+    "R160 Demo RussiaEasy/LibyaEasy70234/72000 near-limit watch; existing all-army prerequisite sale-policy tradeoff",
+    "R97 lifecycle debt closed by R103, not remaining"
+  ],
+  "verification_pending": [
+    "one complete unchanged full13 all0",
+    "both fresh756-winner R29 distributions/before-after ratios",
+    "RA9 soundness/audit",
+    "independent final review",
+    "user visual/audio/play-feel verification"
+  ],
+  "new_substantial_external_directories_since_checkpoint10": []
+}

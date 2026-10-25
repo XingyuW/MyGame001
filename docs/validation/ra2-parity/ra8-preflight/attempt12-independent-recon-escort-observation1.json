@@ -1,0 +1,35 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_a_detector_escort_keeps_real_strike_sorties_and_its_own_wave_mission",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T21:32:28.614757+00:00",
+  "elapsed_seconds": 15.333707957994193,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/tests/ra8_ai.rs": "4de8e563e2e399d0a18bfefce513f8107823f17d9b84b034de1b1786296e0ed2"
+  },
+  "source_diagnostic": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/tests/ra8_ai.rs": "07393ab0c5dbc2c23d743a825fa25312db008e23264b9e1d3973f6e03db44ebd"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "fcf15641832e881f8e848fda0ed2b85ba6c47fc6976a810694055b0ecbb339b0",
+    "crates/sim/src/ai/strategy.rs": "cc4d09d5f9d68bc67105bc03dc939ae0644e7d6c3385eadd2719471c9dafa288",
+    "crates/sim/tests/ra8_ai.rs": "4de8e563e2e399d0a18bfefce513f8107823f17d9b84b034de1b1786296e0ed2"
+  },
+  "finally_restored_utc": "2026-10-19T21:32:43.949362+00:00",
+  "log_sha256": "d34f3ea3b677c0b19a6b0b58c04cdcf6c11a3bedfd4ca3de828406ea32f24a03"
+}

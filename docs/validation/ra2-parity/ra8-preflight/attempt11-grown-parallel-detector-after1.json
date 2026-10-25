@@ -1,0 +1,28 @@
+{
+  "label": "attempt11-grown-parallel-detector-after1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "game",
+    "--test",
+    "m13_grown_maps",
+    "a_ten_player_match_on_the_smallest_map_is_played_to_its_end",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T13:22:20.648067+00:00",
+  "elapsed_seconds": 48.12940070795594,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "640e8f960f9f8b06544f4dd676d23a8557662a636a91f770646308ca347a388c",
+    "crates/sim/src/ai/strategy.rs": "952827fe16b30aaa0e48b7b360872686a2891aab8c53b05abbe1aa88efa6bafa"
+  },
+  "log_sha256": "0fde525633504a76427fc27311e84a511d798fbe1be9dca5cf9de836c128c121"
+}

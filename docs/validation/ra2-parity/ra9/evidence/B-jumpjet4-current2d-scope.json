@@ -1,0 +1,212 @@
+{
+  "status": "EXACT_CURRENT_2D_MODEL_SCOPE_WITH_REAL_SHARED_MOVEMENT_OBSERVATIONS_NOT_ORIGINAL_JUMPJET_PHYSICS",
+  "source_atoms": [
+    {
+      "file": "rules",
+      "section": "JumpjetControls",
+      "key": "Acceleration",
+      "exact_value": "2",
+      "classification": "GAMEPLAY_KINEMATICS_AND_GENERATED_BOB",
+      "specific_reason": "Exact [JumpjetControls] Acceleration=2:  Current implementation model: Matching locomotors use per-type JumpjetSpeed for constant integer horizontal motion. No global acceleration/climb/turn/height/wobble integration. Active scope: All actual mapped matching locomotors must have explicit JumpjetSpeed; global Speed14 is a masked fallback only under that exact census. Other globals are kinematic omissions, not all cosmetic.",
+      "model_guard_id": "model162:jumpjet-defaults:JumpjetControls.Acceleration",
+      "required_evidence_routes": "native/jumpjet-defaults/JumpjetControls.Acceleration"
+    },
+    {
+      "file": "rules",
+      "section": "JumpjetControls",
+      "key": "Climb",
+      "exact_value": "5",
+      "classification": "GAMEPLAY_KINEMATICS_AND_GENERATED_BOB",
+      "specific_reason": "Exact [JumpjetControls] Climb=5:  Current implementation model: Matching locomotors use per-type JumpjetSpeed for constant integer horizontal motion. No global acceleration/climb/turn/height/wobble integration. Active scope: All actual mapped matching locomotors must have explicit JumpjetSpeed; global Speed14 is a masked fallback only under that exact census. Other globals are kinematic omissions, not all cosmetic.",
+      "model_guard_id": "model162:jumpjet-defaults:JumpjetControls.Climb",
+      "required_evidence_routes": "native/jumpjet-defaults/JumpjetControls.Climb"
+    },
+    {
+      "file": "rules",
+      "section": "JumpjetControls",
+      "key": "Speed",
+      "exact_value": "14",
+      "classification": "EXPLICIT_UNIT_SPEED_MASKED_GLOBAL_FALLBACK",
+      "specific_reason": "Exact [JumpjetControls] Speed=14: Only while every actual mapped matching Jumpjet locomotor has explicit per-type JumpjetSpeed. A new applicable missing override is a hard blocker, not a default14 comparison. Current implementation model: Matching locomotors use per-type JumpjetSpeed for constant integer horizontal motion. No global acceleration/climb/turn/height/wobble integration. Active scope: All actual mapped matching locomotors must have explicit JumpjetSpeed; global Speed14 is a masked fallback only under that exact census. Other globals are kinematic omissions, not all cosmetic.",
+      "model_guard_id": "model162:jumpjet-defaults:JumpjetControls.Speed",
+      "required_evidence_routes": "static/jumpjet-override-census;native/jumpjet-constant-speed"
+    },
+    {
+      "file": "rules",
+      "section": "JumpjetControls",
+      "key": "TurnRate",
+      "exact_value": "4",
+      "classification": "GAMEPLAY_KINEMATICS_AND_GENERATED_BOB",
+      "specific_reason": "Exact [JumpjetControls] TurnRate=4:  Current implementation model: Matching locomotors use per-type JumpjetSpeed for constant integer horizontal motion. No global acceleration/climb/turn/height/wobble integration. Active scope: All actual mapped matching locomotors must have explicit JumpjetSpeed; global Speed14 is a masked fallback only under that exact census. Other globals are kinematic omissions, not all cosmetic.",
+      "model_guard_id": "model162:jumpjet-defaults:JumpjetControls.TurnRate",
+      "required_evidence_routes": "native/jumpjet-defaults/JumpjetControls.TurnRate"
+    }
+  ],
+  "source_pins": [
+    {
+      "path": "scripts/generate_ra2_data.py",
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+      "line": 621,
+      "anchor": "def speed(section, infantry):"
+    },
+    {
+      "path": "scripts/generate_ra2_data.py",
+      "sha256": "7ad36719acf71c12aaeac6fd28894018be60fd78912c1f89a3757724da167163",
+      "line": 627,
+      "anchor": "key, leptons = \"JumpjetSpeed\", int(section[\"JumpjetSpeed\"])"
+    },
+    {
+      "path": "crates/sim/src/unit.rs",
+      "sha256": "050290ed178d4440b512a97769994d5c588ce7fc5e89d96d21631b46624dd9cb",
+      "line": 131,
+      "anchor": "pub struct Mobile {"
+    },
+    {
+      "path": "crates/sim/src/unit.rs",
+      "sha256": "050290ed178d4440b512a97769994d5c588ce7fc5e89d96d21631b46624dd9cb",
+      "line": 121,
+      "anchor": "pub struct Step {"
+    },
+    {
+      "path": "crates/sim/src/unit.rs",
+      "sha256": "050290ed178d4440b512a97769994d5c588ce7fc5e89d96d21631b46624dd9cb",
+      "line": 116,
+      "anchor": "pub struct Facing(pub Direction);"
+    },
+    {
+      "path": "crates/sim/src/map.rs",
+      "sha256": "4f017c7549b04a05792ca378bc1c278d84b9d3beb04ccb325451577629958895",
+      "line": 73,
+      "anchor": "pub struct SubPos {"
+    },
+    {
+      "path": "crates/sim/src/movement.rs",
+      "sha256": "8e8c97ed9354954b8ab2af31f0adf07433a671b4413d3ab2c198ad150b28bab3",
+      "line": 236,
+      "anchor": "pub(crate) fn move_units("
+    },
+    {
+      "path": "crates/sim/src/movement.rs",
+      "sha256": "8e8c97ed9354954b8ab2af31f0adf07433a671b4413d3ab2c198ad150b28bab3",
+      "line": 287,
+      "anchor": "u32::from(mobile.speed).saturating_mul(players.unit_speed_percent(owner.0)) / 100;"
+    },
+    {
+      "path": "crates/sim/src/movement.rs",
+      "sha256": "8e8c97ed9354954b8ab2af31f0adf07433a671b4413d3ab2c198ad150b28bab3",
+      "line": 387,
+      "anchor": "facing.0 = direction;"
+    },
+    {
+      "path": "crates/game/src/units.rs",
+      "sha256": "4d312c858a2e501d37b221c8fa12ce9c14063d3e4c9b1619eab09e9a17ae3c7b",
+      "line": 126,
+      "anchor": "const CLIMB_RATE: f32 = 48.0;"
+    },
+    {
+      "path": "crates/sim/tests/ra9_airdock_retry.rs",
+      "sha256": "ccb6ca902a54f2e91f3b8b12a6a33a09c35eb6678f143ff074b841ce04441c24",
+      "line": 69,
+      "anchor": "let blocker = put(&mut app, P0, \"rocketeer\", 8, 10);"
+    },
+    {
+      "path": "crates/sim/tests/ra6_vehicles.rs",
+      "sha256": "4622602a91a13ff4b65981ac97ce3fb836c5b9ca61605b2e15be003ace617718",
+      "line": 1531,
+      "anchor": "fn ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination()"
+    },
+    {
+      "path": "crates/game/src/selection.rs",
+      "sha256": "dcc1973933d78b5afca9bdcb5220a09b9a58707b0aee3829ad71ef782871e8d9",
+      "line": 3282,
+      "anchor": "fn ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink()"
+    }
+  ],
+  "quoted_original_control_read_search": {
+    "bounded_paths": "scripts/generate_ra2_data.py and actual crates/sim/src/**/*.rs",
+    "exact_quoted_key_occurrences": {
+      "Acceleration": [],
+      "Climb": [],
+      "TurnRate": []
+    },
+    "scope": "Corroboration only; actual complete Mobile/Step/SubPos/Facing declarations and movement consumer determine current model absence. No assertion of original engine nonuse."
+  },
+  "independent_masked_speed_census": {
+    "premises_path": "crates/sim/tests/ra9_audit/model162-jumpjet-premises.tsv",
+    "sha256": "de8ca7bcc8773d953ae7e7dcae4c18e2decf9b3a50ab4f62986605d0fc9bbccf",
+    "exact_source_reference_values": [
+      [
+        "ZEP",
+        "JumpjetSpeed",
+        "5"
+      ],
+      [
+        "SHAD",
+        "JumpjetSpeed",
+        "30"
+      ],
+      [
+        "JUMPJET",
+        "JumpjetSpeed",
+        "30"
+      ]
+    ],
+    "conversion": "round_half_away_from_zero(explicit unit JumpjetSpeed *3/4), minimum1 =>kirov4,nighthawk23,rocketeer23; generator requires the explicit section key, no JumpjetControls.Speed14 fallback here",
+    "scope": "Complete admitted3exactJumpjet-locomotor aliases; a new/missing explicit value/locomotor/mapped type invalidates this qualified masking scope."
+  },
+  "current_runtime": "All Mobile state is scalar speed +2Dcell+step. move_units deterministically advances integer budget from Mobile.speed/current owner speed option; it may be blocked/repath/disabled/damaged and is NOT universally a constant full-speed trajectory. A step chooses its discrete Facing directly; no original turn-rate delay. SubPos x/y only; no sim z/vertical velocity/climb or acceleration integrator. Client CLIMB_RATE48 is visual float state only, not sourceClimb5/native flight physics.",
+  "actual_evidence": [
+    {
+      "path": "ra9-preliminary-logs/62-airdock-schema-controls.json",
+      "sha256": "ea0682abfed497eacfd920bccc0d3733b1b70d2e1cd28620bfcfc163402544e3"
+    },
+    {
+      "path": "ra9-preliminary-logs/62-airdock-schema-controls.log",
+      "sha256": "6aa8b954b0717fe7979b47fdb32d5921f7c31199f209f0d3ffe3eb07730813fe"
+    },
+    {
+      "path": "ra9-preliminary-logs/42-three-fixture-controls.json",
+      "sha256": "8d9edb392b24aee6e472741a8727c73f50e4f325f850c615edd12a17a070a113"
+    },
+    {
+      "path": "ra9-preliminary-logs/42-three-fixture-controls.log",
+      "sha256": "7cf2698f7742d16def13429a72a0640462622db83587b7f17e0148a5343f2a35"
+    },
+    {
+      "path": "ra9-preliminary-logs/76-game-all40-empty-context.json",
+      "sha256": "0c969fba8f1dff6fb5908d89dfb45314d7158731f245005185a0f7d7a9417085"
+    },
+    {
+      "path": "ra9-preliminary-logs/76-game-all40-empty-context.log",
+      "sha256": "03290b3e221eb4282cdb9b0b403cd835322e67bbe3d1bf74ed9379f733dc8486"
+    },
+    {
+      "path": "ra9-preliminary-logs/78-policy-guards-and-fire.json",
+      "sha256": "e31d4d654b3f372555c4ee6b3512c65b46cd670459507c07fdda1d3c794dfc81"
+    },
+    {
+      "path": "ra9-preliminary-logs/78-policy-guards-and-fire.log",
+      "sha256": "93bc8d3b991b6fcc25063e1023a3cd539149a0640b8bc4c679d413026a86ef54"
+    }
+  ],
+  "qualified_actual_bodies": [
+    {
+      "body": "ra9_airdock_retry::ra9_airdock_occupied_cell_public_release_allows_native_return_and_rearm",
+      "actual_receipt": "62-airdock-schema-controls.json",
+      "scope": "Real stock Rocketeer public Move to assigned pad aircell, actual arrival/room wait, public Move release, live ownership/HP/I6 eachtick. Harrier normal ammo return/landing/rearm. Does not assert original acceleration/turn/climb values or an exact Rocketeer uniform-rate trajectory."
+    },
+    {
+      "body": "ra6_vehicles::ra9_behavior87_coordinate_move_admits_genuine_unexplored_destination",
+      "actual_receipt": "42-three-fixture-controls.json",
+      "scope": "Real stock Kirov/NightHawk amongst8types, initially unexplored coordinate publicMove, actual destination arrival within unchanged1000 bound; source loaded speed used for independent reachability bound. Current2Dmovement only."
+    },
+    {
+      "body": "game::bin::selection::tests::ra9_b87_all40_stock_aliases_use_real_group_cycle_type_combat_preview_and_sink",
+      "actual_receipt": "76-game-all40-empty-context.json",
+      "scope": "Actual JUMPJET/SHAD/ZEP host actors and current public input\u2192Sink\u2192run_tick; UnitView/HoveredCell/Time controlled only for input. Does not itself prove arrival/kinematics; paired above with real per-locomotor movement and78loaded census."
+    }
+  ],
+  "remaining_limits": "No sourceTrue capability, original3Dphysics, original values2/5/4 compliance, native sourceflag getter, individual trajectory timing or visualquality claim. These4choices can be bound as original controls absent/masked plus current generic2Dconsumer/native movement under root-approved scope; any claim of original-rate fidelity or an exposed current 3D feature would remain unsupported. No contract/acceptance modified by this artifact.",
+  "execution": "Static source/reference/receipt-hash checks only; no Cargo/native",
+  "new_directories": []
+}

@@ -1,0 +1,28 @@
+{
+  "label": "attempt9-powered-support-repair-before1",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_powered_support_remnants_without_a_force_do_not_renew_paid_repairs",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T05:11:15.232827+00:00",
+  "elapsed_seconds": 6.700088917044923,
+  "exit": 101,
+  "source_before": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "a833cde5228648119044b248d7fcd577a6461215e83b0c89e937aac5dd16b174",
+    "crates/sim/src/ai/strategy.rs": "894fc9a66081c2690d4ed48f399d7ddf51ac09409cee18b617c15464ffcb764f"
+  },
+  "log_sha256": "ff38487be277fcee1c70122f2f6afe6c4979629aa0b84be88860341ac55538a1"
+}

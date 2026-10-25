@@ -1,0 +1,311 @@
+{
+  "created_utc": "2026-10-19T18:25:42.741978+00:00",
+  "head": "ab4a17606fcd013a4d8cc6452aa8435fcd24e987",
+  "completed_commands": 12,
+  "rust_passed": 203,
+  "rust_failed": 1,
+  "rust_ignored": 0,
+  "completed_retained_test_functions": 37,
+  "retained_explicit_winners": 36,
+  "retained_winner_rows": [
+    [
+      "demo",
+      "0",
+      "[\"russia\", \"libya\"]",
+      "[\"easy\", \"easy\"]",
+      "1",
+      "68863"
+    ],
+    [
+      "frozen_sound",
+      "0",
+      "[\"russia\", \"libya\"]",
+      "[\"easy\", \"easy\"]",
+      "0",
+      "37282"
+    ],
+    [
+      "riverlands",
+      "0",
+      "[\"iraq\", \"cuba\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "25641"
+    ],
+    [
+      "demo",
+      "0",
+      "[\"russia\", \"libya\"]",
+      "[\"easy\", \"easy\"]",
+      "1",
+      "68863"
+    ],
+    [
+      "jungle_delta",
+      "0",
+      "[\"cuba\", \"russia\"]",
+      "[\"easy\", \"easy\"]",
+      "1",
+      "50317"
+    ],
+    [
+      "thousand_lakes",
+      "0",
+      "[\"russia\", \"libya\"]",
+      "[\"medium\", \"brutal\"]",
+      "1",
+      "35150"
+    ],
+    [
+      "coral_archipelago",
+      "0",
+      "[\"iraq\", \"cuba\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "89118"
+    ],
+    [
+      "riverlands",
+      "0",
+      "[\"iraq\", \"cuba\"]",
+      "[\"easy\", \"easy\"]",
+      "1",
+      "49417"
+    ],
+    [
+      "oasis_gulf",
+      "0",
+      "[\"russia\", \"france\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "80629"
+    ],
+    [
+      "crossroads",
+      "0",
+      "[\"great_britain\", \"america\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "36907"
+    ],
+    [
+      "thousand_lakes",
+      "0",
+      "[\"cuba\", \"russia\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "102411"
+    ],
+    [
+      "harvest_plains",
+      "0",
+      "[\"france\", \"germany\"]",
+      "[\"easy\", \"easy\"]",
+      "1",
+      "119790"
+    ],
+    [
+      "oasis_gulf",
+      "0",
+      "[\"france\", \"russia\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "69633"
+    ],
+    [
+      "liberty_bay",
+      "0",
+      "[\"france\", \"germany\"]",
+      "[\"medium\", \"medium\"]",
+      "1",
+      "110533"
+    ],
+    [
+      "oasis_gulf",
+      "0",
+      "[\"libya\", \"iraq\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "47242"
+    ],
+    [
+      "pacific_atoll",
+      "0",
+      "[\"cuba\", \"great_britain\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "98305"
+    ],
+    [
+      "continental_divide",
+      "0",
+      "[\"france\", \"cuba\"]",
+      "[\"easy\", \"medium\"]",
+      "1",
+      "30996"
+    ],
+    [
+      "demo",
+      "0",
+      "[\"france\", \"cuba\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "28088"
+    ],
+    [
+      "demo",
+      "0",
+      "[\"germany\", \"great_britain\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "27249"
+    ],
+    [
+      "ember_caldera",
+      "0",
+      "[\"libya\", \"korea\"]",
+      "[\"brutal\", \"medium\"]",
+      "0",
+      "28656"
+    ],
+    [
+      "continental_divide",
+      "0",
+      "[\"iraq\", \"great_britain\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "42172"
+    ],
+    [
+      "black_water",
+      "0",
+      "[\"libya\", \"america\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "86273"
+    ],
+    [
+      "black_water",
+      "0",
+      "[\"korea\", \"france\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "136700"
+    ],
+    [
+      "harvest_plains",
+      "0",
+      "[\"america\", \"korea\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "64067"
+    ],
+    [
+      "liberty_bay",
+      "0",
+      "[\"iraq\", \"america\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "82842"
+    ],
+    [
+      "glacier_pass",
+      "0",
+      "[\"korea\", \"russia\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "81140"
+    ],
+    [
+      "liberty_bay",
+      "0",
+      "[\"iraq\", \"korea\"]",
+      "[\"medium\", \"medium\"]",
+      "0",
+      "51268"
+    ],
+    [
+      "red_canyon",
+      "0",
+      "[\"france\", \"russia\"]",
+      "[\"medium\", \"easy\"]",
+      "0",
+      "21246"
+    ],
+    [
+      "frozen_sound",
+      "0",
+      "[\"cuba\", \"germany\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "104040"
+    ],
+    [
+      "steel_harbor",
+      "0",
+      "[\"france\", \"germany\"]",
+      "[\"medium\", \"medium\"]",
+      "1",
+      "108526"
+    ],
+    [
+      "steel_harbor",
+      "0",
+      "[\"america\", \"cuba\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "101493"
+    ],
+    [
+      "thousand_lakes",
+      "0",
+      "[\"france\", \"germany\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "81388"
+    ],
+    [
+      "thousand_lakes",
+      "0",
+      "[\"great_britain\", \"america\"]",
+      "[\"easy\", \"easy\"]",
+      "0",
+      "110849"
+    ],
+    [
+      "steel_harbor",
+      "0",
+      "[\"cuba\", \"america\"]",
+      "[\"brutal\", \"brutal\"]",
+      "0",
+      "122210"
+    ],
+    [
+      "wheel_of_worlds",
+      "0",
+      "[\"germany\", \"great_britain\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "97381"
+    ],
+    [
+      "wheel_of_worlds",
+      "0",
+      "[\"cuba\", \"france\"]",
+      "[\"brutal\", \"brutal\"]",
+      "1",
+      "166729"
+    ]
+  ],
+  "failed_test": "ra8_gate_oasis_germany_great_britain_brutal_seed_zero_finishes",
+  "failed_case": "oasis_gulf Germany/GreatBritain Brutal seed0 None252000",
+  "source_mismatches": [],
+  "remaining_unrun": [
+    "m13-all",
+    "m13-256",
+    "example-guard-m13_ten_players",
+    "example-guard-m14_duels",
+    "example-guard-m7_soak"
+  ],
+  "note": "A completed failed target,not acceptance. All21,fixed256,threeexampleguards unrun. Individual native property proofs and Coral/Frostline wins remain separate."
+}

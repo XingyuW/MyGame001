@@ -1,0 +1,65 @@
+{
+  "utc": "2026-10-20T13:00:55.327499+00:00",
+  "attempt": 16,
+  "head": "26ad1e384ff17aff2a0075a08f39d510f28d0067",
+  "wrapper_pid": 84658,
+  "script_pid": 84687,
+  "owned_pgid": 84687,
+  "completed_phase_count": 3,
+  "latest_reported_progress": "M6 production progress completed252/756 non_Won0",
+  "owned_descendants": [
+    {
+      "pid": 84658,
+      "ppid": 7720,
+      "pgid": 84658,
+      "elapsed": "28:48",
+      "cpu_time": "0:00.64",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/Resources/Python.app/Contents/MacOS/Python"
+    },
+    {
+      "pid": 84687,
+      "ppid": 84658,
+      "pgid": 84687,
+      "elapsed": "28:48",
+      "cpu_time": "0:00.01",
+      "cpu_percent": "0.0",
+      "state": "Ss",
+      "command": "sh"
+    },
+    {
+      "pid": 84692,
+      "ppid": 84687,
+      "pgid": 84687,
+      "elapsed": "28:48",
+      "cpu_time": "0:00.01",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "caffeinate"
+    },
+    {
+      "pid": 84735,
+      "ppid": 84687,
+      "pgid": 84687,
+      "elapsed": "28:46",
+      "cpu_time": "0:00.46",
+      "cpu_percent": "0.0",
+      "state": "S",
+      "command": "/Users/xingyuwang/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/cargo"
+    },
+    {
+      "pid": 86944,
+      "ppid": 84735,
+      "pgid": 84687,
+      "elapsed": "24:09",
+      "cpu_time": "233:06.80",
+      "cpu_percent": "928.9",
+      "state": "R",
+      "command": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-fff13bc99bc7e9e6"
+    }
+  ],
+  "source_files_verified": 495,
+  "source_mismatches": [],
+  "note": "Read-only bounded activity snapshot, no profiler/signal. CPU is activity only; pending cases may not be inferred successful."
+}

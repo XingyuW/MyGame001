@@ -1,0 +1,19 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_attrition_tests::ra8_an_expired_aa_job_cannot_starve_a_fresh_observed_barrier",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 16.65924362500664,
+  "runtime_sha": "81f72a6bfdb8d198635ca3eab7bae09f595fb0680fc5f6347bf2bfc117b1dd45",
+  "log_sha": "c0fae974a5701cddce9e084ffd55bb53377f0c5adff31c6adf241d37e9959545"
+}

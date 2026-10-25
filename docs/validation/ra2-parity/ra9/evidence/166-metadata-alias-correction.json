@@ -1,0 +1,74 @@
+{
+  "utc": "2026-10-21T05:08:07.716074+00:00",
+  "cause": "Correct shallow-record alias in metadata before descriptors only; immutable156 provides exact old five source records. No source/authority/acceptance/Cargo change.",
+  "old_input_sha256": "8ef2e63b92d05952d45846ff1fcc6930cd3a3ec4c05b919332f436fe451fe9a4",
+  "new_input_sha256": "035f1cf6fa664f7a79f78012d4fbfb4e1eb7d73b29821fc7b397476adac8b875",
+  "proposal_sha256": "413e316342a707ad881d5a3ac4f12ad76428d07f18ac1915447b74b233827a71",
+  "five_before_after": [
+    {
+      "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+      "before": {
+        "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+        "bytes": 17648,
+        "sha256": "b160488120ca006a53e27b316934524c49ee2ebbd040eef7d9c547bfc0bed31e"
+      },
+      "after": {
+        "path": "crates/sim/tests/ra9_audit/array-negatives.rs",
+        "bytes": 17718,
+        "sha256": "3a79202ccec618c04f50aef557135414e6b360727dc8abd9cf6da279c6d38e6a"
+      }
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+      "before": {
+        "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+        "bytes": 32431,
+        "sha256": "c0bf712072667fc207d5e0db536bc6c6606302eff8542c9a78dfdecae8be1ab8"
+      },
+      "after": {
+        "path": "crates/sim/tests/ra9_audit/consumer62-admission.rs",
+        "bytes": 32576,
+        "sha256": "b0c933fd4f0535ccb7ca236ddadb53344f5e8c79bfcdf689002b37d0da8397fc"
+      }
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+      "before": {
+        "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+        "bytes": 26424,
+        "sha256": "aaa74d5332b21ba5c4fec7a600321a8c420cbf9e8a3f07e7e3c4d764f5a4599b"
+      },
+      "after": {
+        "path": "crates/sim/tests/ra9_audit/country-rosters.rs",
+        "bytes": 26699,
+        "sha256": "f16a4801c0f2fda09f2338bb786b588a8b50110bbcefde16d91010cc951e4c98"
+      }
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+      "before": {
+        "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+        "bytes": 25201,
+        "sha256": "c8732fcf0e380a3ac01f4513781bd3af87deccef2d37888621c09ad70b51ba21"
+      },
+      "after": {
+        "path": "crates/sim/tests/ra9_audit/model162-admission.rs",
+        "bytes": 25334,
+        "sha256": "00a0ce2f9de62d99205b068d5379cbacbc2dff65630f3f8c3561bbbfa569f8b7"
+      }
+    },
+    {
+      "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+      "before": {
+        "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+        "bytes": 64051,
+        "sha256": "09123c1c0701400ff532613436ddceceeafc9ba973dbefad8f1e5a6250c03581"
+      },
+      "after": {
+        "path": "crates/sim/tests/ra9_audit/source-disposition.rs",
+        "bytes": 64235,
+        "sha256": "32af88679c06bb9d158230777cf5bcd99bfb61f95d7486e2d7a44e8aea6a7765"
+      }
+    }
+  ]
+}

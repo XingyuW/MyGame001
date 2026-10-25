@@ -1,0 +1,11 @@
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_full_tree_builds_and_fires_strategic_weapons_and_off_keeps_american_paradrop ... great_britain, SW=true: {"airforce_command": 1, "barracks": 1, "chronosphere": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "pillbox": 9, "power_plant": 10, "prism_tower": 10, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2, "weather_control": 1}, major=true, para=false
+iraq, SW=true: {"cloning_vats": 1, "iron_curtain": 1, "nuclear_reactor": 1, "nuclear_silo": 1, "psychic_sensor": 1, "radar_tower": 1, "sentry_gun": 10, "soviet_barracks": 1, "soviet_battle_lab": 1, "soviet_construction_yard": 1, "soviet_refinery": 2, "soviet_service_depot": 1, "soviet_war_factory": 2, "tesla_coil": 10, "tesla_reactor": 3}, major=true, para=false
+america, SW=false: {"american_airforce_command": 1, "barracks": 1, "construction_yard": 1, "gap_generator": 1, "ore_purifier": 1, "pillbox": 6, "power_plant": 5, "prism_tower": 3, "refinery": 2, "service_depot": 1, "spy_satellite": 1, "tech_center": 1, "war_factory": 2}, major=false, para=true
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 56 filtered out; finished in 19.50s
+

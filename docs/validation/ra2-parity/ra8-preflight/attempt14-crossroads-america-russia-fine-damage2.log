@@ -1,0 +1,24 @@
+   Compiling game v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/game)
+    Finished `release` profile [optimized] target(s) in 3.33s
+     Running tests/ra8_gate_matches.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_gate_matches-556affa51f6ab831)
+
+running 1 test
+
+thread 'ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes' (10883608) panicked at /Users/xingyuwang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bevy_ecs-0.19.1/src/schedule/schedule.rs:566:13:
+Error when initializing schedule SimSchedule: 2 pairs of systems with conflicting data access have indeterminate execution order. Consider adding `before`, `after`, or `ambiguous_with` relationships between these:
+ -- <Enable the debug feature to see the name> (in set Economy) and <Enable the debug feature to see the name> (in set Economy)
+    conflict on: bevy_ecs::world::World
+ -- <Enable the debug feature to see the name> (in set Economy) and <Enable the debug feature to see the name> (in set Economy)
+    conflict on: bevy_ecs::world::World
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes ... FAILED
+
+failures:
+
+failures:
+    ra8_gate14_crossroads_america_russia_easy_seed_zero_finishes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 39 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p game --test ra8_gate_matches`

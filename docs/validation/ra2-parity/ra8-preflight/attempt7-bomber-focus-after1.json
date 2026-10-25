@@ -1,0 +1,19 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_unlimited_bomber",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 18.869810250005685,
+  "runtime_sha": "81f72a6bfdb8d198635ca3eab7bae09f595fb0680fc5f6347bf2bfc117b1dd45",
+  "log_sha": "96580f7185b53f0e76f5c08a248f55dfbd5c5e6f73d3078c8a4c33dcb4adecc4"
+}

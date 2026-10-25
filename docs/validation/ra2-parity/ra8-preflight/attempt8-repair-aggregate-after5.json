@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-repair-aggregate-after5",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "purpose": "Complete recovery controls; real neutral Oil Derrick Engineer capture initializes actual periodic grants, surplus/multiple repairs and fully-financed source GI plus real building fire. No-income cases retain strict no-extra-refund assertion.",
+  "start_utc": "2026-10-18T22:07:29.034108+00:00",
+  "elapsed_seconds": 20.06713049998507,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "872c91082778ccc57da43e7f1caba4c2a0d0f45aa5d14284bf9b09765b4d4ccd",
+    "crates/sim/src/ai/strategy.rs": "97bf9859f160d5f4d6e8a54f0b10a948f6c974ffb3ba3e83a8b9e88e9fa055e3"
+  },
+  "log_sha256": "42cf0f81f63b563e4caa2dbf4ebdac9eb026adc67fce717e504125cf8bfc351c"
+}

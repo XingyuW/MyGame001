@@ -1,0 +1,19 @@
+{
+  "cmd": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--lib",
+    "ai::ra8_recovery_tests::ra8_unfundable_construction_cannot_reserve_out_the_first_reachable_finisher_forever",
+    "--",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 101,
+  "seconds": 32.64146620800602,
+  "ai_source_sha": "d8ca0631e0eac6ad37d936cbd4540260d0fbcc1ea33b61d69aba025216a3b6be",
+  "log_sha": "813bd355aad93d167a610b58752250cc0aec196eb9ceb72f35dfda0ea7590ef9"
+}

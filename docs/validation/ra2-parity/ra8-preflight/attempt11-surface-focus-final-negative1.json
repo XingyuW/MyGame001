@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "ra8_surface_building_focus_responds_to_a_new_real_local_defender",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "start_utc": "2026-10-19T12:24:26.526973+00:00",
+  "source_before": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c",
+  "removed_block": "            // A previously installed building focus must not ignore newly arrived\n            // local defenders. Switch once to normal en-route acquisition; an\n            // already healthy AttackMove keeps its path and weapon history.\n            let mut responses: BTreeMap<CellPos, Vec<SimId>> = BTreeMap::new();\n            for unit in ground_wave.iter().filter(|unit| {\n                view.fights(unit)\n                    && matches!(\n                        view.definitions.domain(unit.kind),\n                        Domain::Land | Domain::Amphibious\n                    )\n                    && range(view.definitions, unit.kind)\n                        < view.ai.policy.artillery_min_range * crate::SUBCELLS_PER_CELL as u32\n                    && matching_attack(unit)\n                    && incoming_wave_threat(view, unit)\n            }) {\n                let cell = surface_response_cell(view, unit, target.1.footprint);\n                responses.entry(cell).or_default().push(unit.id);\n            }\n            for (target, units) in responses {\n                commands.push(Command::AttackMove { units, target });\n            }\n",
+  "mutated_source": "eda43c15bea3322bf9617678fdb1d6126a2b8a4fd0d6f06126822cd2d49f078f",
+  "exit": 101,
+  "restored_source": "b0df5e184134726456cea67079c2621a6395aadb75c1c5b971c8c341787e5c8c",
+  "elapsed_seconds": 20.704398875008337,
+  "log_sha256": "ca8641808e8bab911d76a19b753ee6d9917651a4ee8674b9ef448b15b5105d1b"
+}

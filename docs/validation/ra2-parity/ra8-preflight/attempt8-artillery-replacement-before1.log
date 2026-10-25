@@ -1,0 +1,21 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.43s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra8_ai-281c94436fee249f)
+
+running 1 test
+
+thread 'ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home' (8095090) panicked at crates/sim/tests/ra8_ai.rs:1403:13:
+assertion `left == right` failed
+  left: CellPos { x: 8, y: 7 }
+ right: CellPos { x: 8, y: 8 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home ... FAILED
+
+failures:
+
+failures:
+    ra8_a_remote_replacement_tank_does_not_pull_advancing_artillery_back_home
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 77 filtered out; finished in 0.82s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

@@ -1,0 +1,11 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.97s
+     Running tests/ra4_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra4_ai-4dcc50c27d5fddc2)
+
+running 2 tests
+test computer_players_finish_their_matches_with_veterans_and_survivors ... ok
+test two_players_who_have_spent_each_other_make_their_last_stand_and_the_match_ends ... RA4 fog-on last stand: Played { outcome: Some(Won { winner: PlayerId(1), tick: 8211 }), ticks: 8212, hash: 11379481105989577302, unexplained: [], promotions: 7, survivors: 10 }
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.87s
+

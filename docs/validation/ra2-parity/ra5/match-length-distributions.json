@@ -1,0 +1,52 @@
+{
+  "production": {
+    "winners": 756,
+    "total_ticks": 27606823,
+    "median": 0.13232291666666668,
+    "p90": 0.31869444444444445,
+    "max": 0.7095694444444445,
+    "counts_above_half_seven_eight_nine": [
+      20,
+      1,
+      0,
+      0
+    ],
+    "max_case": [
+      0.7095694444444445,
+      "riverlands: france (easy) against germany (easy)",
+      51089,
+      72000
+    ],
+    "longest_case": [
+      0.6807881944444445,
+      "coral_archipelago: libya (brutal) against germany (brutal)",
+      196067,
+      288000
+    ]
+  },
+  "duels": {
+    "winners": 756,
+    "total_ticks": 28159459,
+    "median": 0.13909375000000002,
+    "p90": 0.3121031746031746,
+    "max": 0.8229027777777778,
+    "counts_above_half_seven_eight_nine": [
+      18,
+      5,
+      1,
+      0
+    ],
+    "max_case": [
+      0.8229027777777778,
+      "demo: america (easy) against korea (easy)",
+      59249,
+      72000
+    ],
+    "longest_case": [
+      0.7681284722222222,
+      "ember_caldera: france (medium) against libya (easy)",
+      221221,
+      288000
+    ]
+  }
+}

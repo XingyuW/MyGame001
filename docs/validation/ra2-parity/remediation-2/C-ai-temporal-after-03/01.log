@@ -1,0 +1,27 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 24.48s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-b27027efb5a77317)
+
+running 5 tests
+
+thread 'ra9_temporal_building_sale_waits_for_real_release' (18345018) panicked at crates/sim/tests/ra8_ai.rs:13956:5:
+the genuine original building must resume ordinary sale after public native release
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_temporal_building_sale_waits_for_real_release ... FAILED
+
+thread 'ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes' (18345017) panicked at crates/sim/tests/ra8_ai.rs:13956:5:
+the genuine original building must resume ordinary sale after public native release
+test ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes ... FAILED
+test ra9_temporal_garrison_waits_for_real_release_then_recovers_its_original_infantry ... ok
+test ra9_temporal_garrison_does_not_starve_a_current_unblocked_recovery_host ... ok
+test ra9_temporal_garrison_current_cargo_interrupts_an_existing_last_stand ... ok
+
+failures:
+
+failures:
+    ra9_temporal_building_sale_uses_an_unblocked_alternative_then_resumes
+    ra9_temporal_building_sale_waits_for_real_release
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 141 filtered out; finished in 0.13s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

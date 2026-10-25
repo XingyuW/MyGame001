@@ -1,0 +1,23 @@
+{
+  "status": "EXACT_EXECUTED_CLOSURE_UNCHANGED_WITH_BENCHMARK_ONLY_SOURCE_DELTA",
+  "utc": "2026-10-22T21:07:29.282147+00:00",
+  "old_packet_sha256": "6d3f277549aaf0321dfc161a1c9ad9b15f823ac61b1c330e88c65c7f43f088e2",
+  "new_packet_sha256": "43f4ae4d10f61996ff36aaf3c70e93362f1605a514cc2a2ffa3a787b918858d0",
+  "source_file_count": 674,
+  "sole_code_delta": [
+    "crates/sim/examples/m7_benchmark.rs"
+  ],
+  "all_other_source_files_byte_identical": true,
+  "all105_production_and_test_source_core_files_identical": true,
+  "model_census_identical": true,
+  "actual_restored_m6_executable": {
+    "path": "/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/m6_production_matches-cf20e94e4f55d858",
+    "bytes": 60513280,
+    "sha256": "19fa607900583140d73cfbe12ff78c0949e3336dc48d1b5140aaa7c80f163d13"
+  },
+  "actual_dependency_file_sha256": "78cc5936fb45693a54e6e7b17d50653452239fa6f3518aed384b854cdd8a489d",
+  "benchmark_not_in_m6_depinfo": true,
+  "snapshot_sha256": "c71dcef3f21d63d090e219afeab5c3a2899887393a800c7ab65b37c212ce42fa",
+  "new_factual_output_readback_sha256": "9fd5b5f027d48aa09fe8d7ca8b602a5c588f122f18e0a0027b17604f2a96b833",
+  "limits": "C1 audit/late/causal logs keep original global-source scope. Late/causal executed production, data, configuration, helpers, M6 test and actual executable are identical; benchmark-only source is unexecuted there. No new whole-current audit pass is inferred from old pins; C-current-audit-01 verifies C2. No prior full13 or performance acceptance is transferred; final full13 runs every command on current frozen source."
+}

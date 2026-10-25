@@ -1,0 +1,13 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 17.69s
+     Running unittests src/lib.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/sim-1e941bb2a2132385)
+
+running 5 tests
+test command::ra8_intent_tests::ra8_pending_intent_origin_witness_payload_and_order_are_value_hashed ... ok
+test command::ra8_intent_tests::ra8_internal_and_public_commands_keep_fifo_across_ordinary_and_ability_boundaries ... ok
+test command::ra8_intent_tests::ra8_intrinsically_invalid_internal_intents_still_reject_with_original_public_reasons ... ok
+test command::ra8_intent_tests::ra8_internal_targets_cancel_after_death_capture_or_real_detector_loss_but_public_stays_strict ... ok
+test command::ra8_intent_tests::ra8_internal_mixed_and_fully_stale_selections_prune_only_witnessed_lifecycle_changes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 52 filtered out; finished in 0.06s
+

@@ -1,0 +1,85 @@
+--- a/crates/sim/tests/ra9_audit/array-negatives.rs
++++ b/crates/sim/tests/ra9_audit/array-negatives.rs
+@@ -238,6 +238,9 @@
+         std::fs::write(path, output).map_err(|e| e.to_string())?;
+         Ok(owned)
+     }
++    pub(super) fn data_dir(&self) -> &Path {
++        &self.path
++    }
+     pub(super) fn loaded(&self) -> AuditResult<(Inputs, Definitions)> {
+         let input = Inputs::load(&self.path, &super::super::reference_dir())?;
+         let definitions = sim::load_ruleset(&self.path)
+--- a/crates/sim/tests/ra9_audit/country-rosters.rs
++++ b/crates/sim/tests/ra9_audit/country-rosters.rs
+@@ -726,8 +726,11 @@
+             "roster_units: []",
+             "roster_units: [\"grizzly\"]",
+         )?;
+-        let (input, d) = copy.loaded()?;
+-        let e = sim::load_skirmish(input.data_dir.join("skirmish.ron"), &d)
++        // Prove native schema rejection rather than the earlier audit raw-list guard.
++        // Only skirmish.ron changed; the unchanged copied native ruleset must load first.
++        let d = sim::load_ruleset(copy.data_dir())
++            .map_err(|e| format!("unchanged copied native ruleset must load: {e}"))?;
++        let e = sim::load_skirmish(copy.data_dir().join("skirmish.ron"), &d)
+             .err()
+             .ok_or("native country raw roster unexpectedly accepted")?
+             .to_string();
+--- a/crates/sim/tests/ra9_audit/consumer62-admission.rs
++++ b/crates/sim/tests/ra9_audit/consumer62-admission.rs
+@@ -800,7 +800,10 @@
+         let error = super::super::items::docks(&mut a, &input.reference, &d, row, &input.mappings)
+             .err()
+             .ok_or("nonfirst actual pad mutation escaped source adapter")?;
+-        assert!(error.contains("arsenal.docks"), "{error}");
++        assert_eq!(
++            error,
++            r#"unexplained WitnessId { consumer: "american_airforce_command@rules:AMRADR", field: "arsenal.ron.entries.docks" }: actual "3", expected "4""#
++        );
+         Ok(())
+     }
+     #[test]
+--- a/crates/sim/tests/ra9_audit/model162-admission.rs
++++ b/crates/sim/tests/ra9_audit/model162-admission.rs
+@@ -594,9 +594,9 @@
+             .map_err(|e| e.to_string())?;
+         let mut a = super::super::load_audit(&input, &d)?;
+         let errors = super::super::run_adapters(&mut a, &input, &d, &sk);
+-        assert!(
+-            errors.iter().any(|e| e.contains("arsenal.radius")),
+-            "{errors:?}"
++        assert_eq!(
++            errors,
++            vec![r#"specialist native/own field policies: unexplained WitnessId { consumer: "gap_generator@rules:GAGAP", field: "arsenal.ron.entries.radius" }: actual "9", expected "10""#.to_owned()]
+         );
+         assert!(live_group(&input, &d, "gap-boost").is_err());
+         Ok(())
+--- a/crates/sim/tests/ra9_audit/source-disposition.rs
++++ b/crates/sim/tests/ra9_audit/source-disposition.rs
+@@ -1895,15 +1895,16 @@
+             .into_iter()
+             .find(|s| s.section == "M60" && s.key == "Speed")
+             .ok_or("missing exact M60 policy")?;
+-        let row = Unused {
+-            atom: Atom {
+-                key: SourceKey::new(s.file, s.section, s.key),
+-                portion: Portion::Whole,
+-            },
+-            exact_value: s.exact.into(),
+-            reason: "Exact instant inactive branch test".into(),
+-            code_evidence: "Actual loaded M60 adapter first succeeds".into(),
+-        };
++        let classified = super::super::source_routes::load_typed(
++            &super::super::super::reference_dir().join("ra9_source_dispositions.tsv"),
++        )?
++        .into_iter()
++        .find(|r| r.row.atom.key == SourceKey::new(s.file, s.section, s.key))
++        .ok_or("actual installed M60 Speed disposition missing")?;
++        assert_eq!(classified.route, super::super::source_routes::Route::Static116);
++        let row = classified.row;
++        assert_eq!(row.atom.portion, Portion::Whole);
++        assert_eq!(row.exact_value, s.exact);
+         require(&a, &input, &d, &row, Some(&final_approval(&row)?))?;
+         Ok((input, d, a, row))
+     }

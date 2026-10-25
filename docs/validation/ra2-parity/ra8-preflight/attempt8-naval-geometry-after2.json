@@ -1,0 +1,28 @@
+{
+  "label": "attempt8-naval-geometry-after2",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "-p",
+    "sim",
+    "--test",
+    "ra8_ai",
+    "--",
+    "--test-threads=1"
+  ],
+  "env": {},
+  "purpose": "Validate shared source subcell minimum/maximum and separate honest sight geometry against all 81 RA8 scheduled AI controls including real edge fire, paid recruitment, minimum-range last stand, Gap, hidden occupancy and escorts.",
+  "start_utc": "2026-10-18T22:33:02.997076+00:00",
+  "elapsed_seconds": 76.30635212501511,
+  "exit": 0,
+  "source_before": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "source_after": {
+    "crates/sim/src/ai.rs": "3aed244c85f50ea633c2481662a6cf9050ec2b3edc9c3ecb108c3972b2ade366",
+    "crates/sim/src/ai/strategy.rs": "65a00aa3fa4636b49354f51792970c41424ee4ce1893dfeca112b67294220337"
+  },
+  "log_sha256": "e7acf931dc831d5fe9a830fd614c716852284eafa0dd6a9c575816b14f5d2dad"
+}

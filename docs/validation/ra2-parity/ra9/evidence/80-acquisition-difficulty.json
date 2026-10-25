@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-21T01:04:19.753500+00:00",
+  "ended_utc": "2026-10-21T01:05:56.819731+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "sim",
+    "--test",
+    "ra9_policy_acquisition",
+    "--test",
+    "ra8_ai",
+    "--no-fail-fast",
+    "--",
+    "ra9_c38_",
+    "ra9_difficulty_neutral_cost_ground_and_air_motion",
+    "ra8_difficulty_start_credit_build_and_reload",
+    "ra8_special_weapon_rof_scales",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 97.065,
+  "lease": "RA8 revocable functional phase jobs1; selected shipped acquisition/Spy and short difficulty cases, preliminary copy only",
+  "input_mismatches": [
+    "crates/sim/tests/ra9_audit/legacy904-family-contracts.tsv"
+  ]
+}

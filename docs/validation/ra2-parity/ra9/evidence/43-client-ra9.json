@@ -1,0 +1,19 @@
+{
+  "utc": "2026-10-20T23:27:44.850257+00:00",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "game",
+    "--lib",
+    "--no-fail-fast",
+    "ra9_",
+    "--",
+    "--test-threads=1"
+  ],
+  "exit_code": 101,
+  "seconds": 0.547,
+  "lease": "RA8revocable functional phase jobs1",
+  "status": "actual preliminary client compilation and RA9 unit/native-backed controls, not user visual verification",
+  "input_mismatches": []
+}

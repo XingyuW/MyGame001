@@ -1,0 +1,19 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra9-integration-validation/crates/sim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.02s
+     Running tests/ra9_squid_punch.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/debug/deps/ra9_squid_punch-171c010dd96ea689)
+
+running 1 test
+
+thread 'ra9_stock_squid_punch_keeps_organic_targets_movement_and_has_no_legacy_stun' (13210985) panicked at crates/sim/tests/ra9_squid_punch.rs:42:5:
+ordinary non-Parasite Punch must not leak the old role-only100-tick stun
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ra9_stock_squid_punch_keeps_organic_targets_movement_and_has_no_legacy_stun ... FAILED
+
+failures:
+
+failures:
+    ra9_stock_squid_punch_keeps_organic_targets_movement_and_has_no_legacy_stun
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `-p sim --test ra9_squid_punch`

@@ -1,0 +1,23 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 4.44s
+     Running tests/ra8_ai.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/deps/ra8_ai-fe272913e06cf281)
+
+running 1 test
+test ra8_unseen_enemy_water_building_cannot_change_naval_planning ... hidden-water diagnostic twin0 first visible at SimTick(230)
+hidden-water diagnostic twin1 first visible at SimTick(230)
+hidden-water diagnostic actual mobiles[(UnitKind(38), Mobile { speed: 8, cell: CellPos { x: 18, y: 17 }, step: None }), (UnitKind(43), Mobile { speed: 23, cell: CellPos { x: 18, y: 17 }, step: Some(Step { to: CellPos { x: 18, y: 18 }, progress: 138, length: 256 }) }), (UnitKind(2), Mobile { speed: 11, cell: CellPos { x: 38, y: 34 }, step: None })]
+hidden-water diagnostic control mobiles[(UnitKind(38), Mobile { speed: 8, cell: CellPos { x: 18, y: 22 }, step: None }), (UnitKind(43), Mobile { speed: 23, cell: CellPos { x: 31, y: 34 }, step: Some(Step { to: CellPos { x: 32, y: 35 }, progress: 239, length: 362 }) }), (UnitKind(43), Mobile { speed: 23, cell: CellPos { x: 29, y: 33 }, step: Some(Step { to: CellPos { x: 30, y: 34 }, progress: 342, length: 362 }) }), (UnitKind(43), Mobile { speed: 23, cell: CellPos { x: 27, y: 31 }, step: Some(Step { to: CellPos { x: 28, y: 32 }, progress: 345, length: 362 }) }), (UnitKind(2), Mobile { speed: 11, cell: CellPos { x: 38, y: 34 }, step: None })]
+
+thread 'ra8_unseen_enemy_water_building_cannot_change_naval_planning' (8030982) panicked at crates/sim/tests/ra8_ai.rs:3756:9:
+the interposed water building must remain unseen in both twins
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    ra8_unseen_enemy_water_building_cannot_change_naval_planning
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `-p sim --test ra8_ai`

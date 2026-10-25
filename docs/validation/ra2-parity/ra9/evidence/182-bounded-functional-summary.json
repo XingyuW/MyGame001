@@ -1,0 +1,64 @@
+{
+  "end_utc": "2026-10-21T11:09:17.978905+00:00",
+  "results": [
+    {
+      "utc": "2026-10-21T11:07:23.346230+00:00",
+      "end_utc": "2026-10-21T11:09:11.776001+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra9_start_setup",
+        "ra9_shipped_yard_starts_for_all_maps_two_to_ten_players_have_legal_occupancy_and_public_exits",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 101,
+      "seconds": 108.429,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/182-00-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/182-00.log",
+        "bytes": 1066,
+        "sha256": "3db39a9665e6427cb743ff417cd1cbc89ced69e1509c59a838c51dca661b0a7c"
+      }
+    },
+    {
+      "utc": "2026-10-21T11:09:11.845364+00:00",
+      "end_utc": "2026-10-21T11:09:17.978312+00:00",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "-p",
+        "sim",
+        "--test",
+        "ra7_orders",
+        "ra9_attack_move_combat_at_destination_emits_only_one_completion_for_one_order",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "seconds": 6.133,
+      "scope": "COPY_ONLY_FUNCTIONAL_OVERLAP_NO_PERFORMANCE_NO_CANONICAL_ACCEPTANCE",
+      "phase04_ended_cancellation": false,
+      "source_before": "ra9-preliminary-logs/182-01-start.json",
+      "source_drift": [],
+      "raw": {
+        "path": "ra9-preliminary-logs/182-01.log",
+        "bytes": 514,
+        "sha256": "7a2505a05d13bd3961b471f7e4aaa8040a72e9b5c8de4a2c921f0b1837e04ed0"
+      }
+    }
+  ],
+  "owned_child_processes": "ALL_WAITED_AND_EXITED",
+  "phase04_done": false,
+  "source_before_after_drift": []
+}

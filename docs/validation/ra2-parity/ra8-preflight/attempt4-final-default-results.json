@@ -1,0 +1,41 @@
+[
+  {
+    "name": "ten-player-all-end6",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "to-the-end",
+      "all"
+    ],
+    "runtime_commit": "bbb09feab392b31e6d627d0060586c73b100e6db",
+    "exit": 0,
+    "elapsed_seconds": 918.2419499160023,
+    "stopped_on_concrete_failure": null
+  },
+  {
+    "name": "ten-player256-benchmark6",
+    "command": [
+      "cargo",
+      "run",
+      "--release",
+      "-p",
+      "sim",
+      "--example",
+      "m13_ten_players",
+      "--",
+      "liberty_bay",
+      "continental_divide",
+      "pacific_atoll"
+    ],
+    "runtime_commit": "bbb09feab392b31e6d627d0060586c73b100e6db",
+    "exit": 0,
+    "elapsed_seconds": 54.54953058299725,
+    "stopped_on_concrete_failure": null
+  }
+]
