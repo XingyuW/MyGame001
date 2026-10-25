@@ -1,5 +1,30 @@
 <!-- RA9_CURRENT_EVIDENCE_BEGIN -->
 
+<!-- RA2_FINAL_REVIEW2_BEGIN -->
+## RA2 parity programme closed by independent review 2
+
+The binding independent lead reviewed the complete cumulative range
+`8230a955b251e9341d349f99eaeb86f7f8253664..f6fdac5a5add10e62285141a2a4ccb3328234e2f`
+and decided **GO WITH DOCUMENTED NON-BLOCKING DEBT**: **0 P0, 0 P1, 3 P2**. The five fresh
+slice reports, lead report, dispatch and 183-row individual debt adjudication are preserved in
+[`docs/validation/ra2-parity/review-2-final/`](../validation/ra2-parity/review-2-final/) and the
+binding report is [`docs/reviews/RA2-parity-review-2.md`](RA2-parity-review-2.md).
+
+The complete frozen-source 13-command gate and isolated five checks pass. The retained P2s are:
+(1) exact lost-Hornet 800-tick regeneration-boundary assertions; (2) the client same-frame notice
+cap with deferred despawn; and (3) PNG metadata-before-open pathname replacement/FIFO handling.
+They have no demonstrated simulation-authority, numerical-integrity, victory, compatibility or
+mandatory-gate blocker. All **51** hands-on visual, audio, pacing, human victory/defeat, packaged
+launch and distribution checks remain **PENDING — requires user verification**. No user approval
+tag is created by the independent decision.
+
+R4 map growth remains optional and default-off. R7 retains the 15-frame-to-20-tick conversion.
+R6/I6-prime remains one vehicle or ship, up to three infantry spots, and one separate aircraft
+occupant per corresponding cell. Original caps remain unchanged. The fixed-duration soak is not
+an all-to-Won claim, overall simulation means are not rendered-smoothness approval, and local
+arm64 packaging is not signing, notarization, universal output or other-machine verification.
+<!-- RA2_FINAL_REVIEW2_END -->
+
 <!-- RA9_REMEDIATION1_CURRENT_BEGIN -->
 ## Current corrected-source native acceptance — independent decision pending
 

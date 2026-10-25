@@ -12509,3 +12509,24 @@ remain binding. All five revised reports and lead must ingest these actual resul
 self-approval, GO, merge/tag or user-quality approval is supplied by this factual update.
 
 Preserved exact manifest SHA256 17d992857c80567e6d8377a8b98c4a1b254454ce13ff9e58104b811c52d5d64d; final summary SHA256 83030b60fa3530169c9868eb98adea664c61bf583c6aa05df0572ca7aaabbb41. All183 ledger bytes remain exact; independent adjudication is still required.
+
+
+### R210. Accept independent review 2 and preserve three non-blocking P2 findings
+
+The fresh independent lead reviewed the complete cumulative range
+`8230a955b251e9341d349f99eaeb86f7f8253664..f6fdac5a5add10e62285141a2a4ccb3328234e2f`,
+all five final slice reports, every final raw gate receipt, and all 183 stable historical debt
+IDs with byte-exact aliases. The binding decision is **GO WITH DOCUMENTED NON-BLOCKING DEBT**:
+0 P0, 0 P1 and 3 unique P2. Preserve the exact lost-Hornet regeneration-boundary assertion gap,
+the same-frame notice-cap/deferred-despawn edge case, and the PNG metadata-before-open
+pathname/FIFO race as non-blocking debt. Do not relabel the 51 hands-on checks: every one remains
+PENDING and user-only. The report corrects a nonbinding isolated-summary hash transcription in
+the TESTS slice; the actual file and all other evidence use
+`718eccd049ec89f2e97bb0aa2ea5311cf456aba6e05b8e18a437caa93aeda0f0`.
+
+R194's single shared complete 13-command run, the isolated five, and corrected asset acceptance
+satisfy the automated RA9/final gates on the frozen C9 source. Failed/interrupted attempts remain
+preserved without pass credit. This independent GO WITH DEBT authorizes the already user-approved
+local merge of `ra2-parity` into `main` and annotated tag `ra2-parity-reviewed`; it does not
+authorize a user approval tag or claim signing, notarization, universal/other-machine launch,
+render smoothness, subjective quality or completion of the 51 user checks.
