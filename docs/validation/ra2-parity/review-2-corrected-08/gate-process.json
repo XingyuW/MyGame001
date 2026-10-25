@@ -1,0 +1,314 @@
+{
+  "start_utc": "2026-10-25T01:31:42.443671+00:00",
+  "pid": 42147,
+  "controller_pgid": 42147,
+  "source_commit": "525636dac32eb8bae4919a6dccdde1c0dbe815eb",
+  "label": "review-2-corrected-08",
+  "runner": "/Users/xingyuwang/Library/Caches/Codex/reviews/MyGame001/ra2-final-review-20261023/run-frozen-candidate-c9-v1.py",
+  "runner_sha256": "7bc28a77162dcc1945f899f007880c71c22fa2a690f0f7c33bbb8b77761b1af8",
+  "frozen_manifest": {
+    "path": "/Users/xingyuwang/GameProjects/MyGame001/docs/validation/ra2-parity/remediation-2/C-corrected-09/frozen-validation-inputs.json",
+    "bytes": 148657,
+    "sha256": "17d992857c80567e6d8377a8b98c4a1b254454ce13ff9e58104b811c52d5d64d"
+  },
+  "status": "PASSED",
+  "source_before": {
+    "files": 689,
+    "authority_spans": 64,
+    "mismatches": [],
+    "tracked_diff_empty": true
+  },
+  "commands": [
+    {
+      "line": "01 exit 0  1 s  cargo fmt --all -- --check",
+      "number": 1,
+      "exit": 0,
+      "observed_utc": "2026-10-25T01:31:47.459642+00:00",
+      "elapsed_seconds": 5.012991791001696,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "02 exit 0  0 s  git diff --check",
+      "number": 2,
+      "exit": 0,
+      "observed_utc": "2026-10-25T01:31:47.578954+00:00",
+      "elapsed_seconds": 5.132299916003831,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "03 exit 0  5 s  cargo clippy --workspace --all-targets -- -D warnings",
+      "number": 3,
+      "exit": 0,
+      "observed_utc": "2026-10-25T01:31:52.711821+00:00",
+      "elapsed_seconds": 10.265143040996918,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "04 exit 0  10178 s  cargo test --workspace --release  [1844 passed, 0 failed, 0 ignored]",
+      "number": 4,
+      "exit": 0,
+      "observed_utc": "2026-10-25T04:21:31.158984+00:00",
+      "elapsed_seconds": 10188.656114999998,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      },
+      "actual_production_length_table": {
+        "repository_path": "docs/validation/ra2-parity/review-2-corrected-08/production-lengths.tsv",
+        "bytes": 49787,
+        "sha256": "dbffc84bd3bc262951ada6184ced4e4bf74142c0ddbad3294041181a1ba90385",
+        "cache_mtime_ns": 1792899038199776466,
+        "mtime_changed_since_launch": true
+      }
+    },
+    {
+      "line": "05 exit 0  0 s  cargo build --release -p game",
+      "number": 5,
+      "exit": 0,
+      "observed_utc": "2026-10-25T04:21:31.329067+00:00",
+      "elapsed_seconds": 10188.826172791,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "06 exit 0  16 s  cargo run --release -p game -- --smoke-test 600",
+      "number": 6,
+      "exit": 0,
+      "observed_utc": "2026-10-25T04:21:51.502548+00:00",
+      "elapsed_seconds": 10208.999562541001,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "07 exit 0  154 s  cargo run -p game -- --smoke-test 600",
+      "number": 7,
+      "exit": 0,
+      "observed_utc": "2026-10-25T04:24:27.104201+00:00",
+      "elapsed_seconds": 10364.600329,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "08 exit 0  5 s  cargo run --release -p sim --example m7_benchmark",
+      "number": 8,
+      "exit": 0,
+      "observed_utc": "2026-10-25T04:24:37.260429+00:00",
+      "elapsed_seconds": 10374.756507541002,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "09 exit 0  5917 s  cargo run --release -p sim --example m7_soak",
+      "number": 9,
+      "exit": 0,
+      "observed_utc": "2026-10-25T06:03:10.689450+00:00",
+      "elapsed_seconds": 16288.150110832998,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "10 exit 0  6052 s  cargo run --release -p sim --example m14_duels -- full",
+      "number": 10,
+      "exit": 0,
+      "observed_utc": "2026-10-25T07:44:04.902342+00:00",
+      "elapsed_seconds": 22342.328713625007,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "11 exit 0  21 s  sh scripts/package_macos.sh",
+      "number": 11,
+      "exit": 0,
+      "observed_utc": "2026-10-25T07:44:30.151394+00:00",
+      "elapsed_seconds": 22367.577618207994,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "12 exit 0  0 s  python3 scripts/generate_ra2_data.py --check",
+      "number": 12,
+      "exit": 0,
+      "observed_utc": "2026-10-25T07:44:30.301949+00:00",
+      "elapsed_seconds": 22367.728152125004,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    },
+    {
+      "line": "13 exit 0  0 s  python3 scripts/ra2_reference.py --check",
+      "number": 13,
+      "exit": 0,
+      "observed_utc": "2026-10-25T07:44:30.410476+00:00",
+      "elapsed_seconds": 22367.836679041,
+      "source_after": {
+        "files": 689,
+        "authority_spans": 64,
+        "mismatches": [],
+        "tracked_diff_empty": true
+      }
+    }
+  ],
+  "scope": "Actual full13 execution only; no independent review or user quality approval. First failed command stops this failed attempt, preserving all completed raw results; only a new all13 successful attempt can pass.",
+  "diagnostics": "RUST_TEST_NOCAPTURE=1 changes output only. CARGO_BUILD_JOBS=2 controls compilation concurrency only (no configured build-job value was present); original commands, native test/match workers, scenarios, caps and acceptance unchanged. Both projects keep running; no priority changes.",
+  "configured_environment": {
+    "CARGO_TARGET_DIR": "/Users/xingyuwang/Library/Caches/Codex/cargo-target",
+    "UV_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/uv-cache",
+    "PIP_CACHE_DIR": "/Users/xingyuwang/Library/Caches/Codex/pip-cache",
+    "TMPDIR": "/Users/xingyuwang/Library/Caches/Codex/tmp",
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_TEST_NOCAPTURE": "1"
+  },
+  "production_cache_before": {
+    "bytes": 49787,
+    "sha256": "dbffc84bd3bc262951ada6184ced4e4bf74142c0ddbad3294041181a1ba90385",
+    "mtime_ns": 1792887766854044144
+  },
+  "command": [
+    "sh",
+    "scripts/validate_ra2_parity.sh",
+    "review-2-corrected-08"
+  ],
+  "last_heartbeat_utc": "2026-10-25T07:44:30.669652+00:00",
+  "child_pid": 42152,
+  "child_pgid": 42152,
+  "owned_group_after_direct_exit": {
+    "pgid": 42152,
+    "empty": true,
+    "observations": [
+      {
+        "utc": "2026-10-25T07:44:30.550278+00:00",
+        "remaining": []
+      }
+    ]
+  },
+  "exit": 0,
+  "terminal_result_observed": true,
+  "source_after": {
+    "files": 689,
+    "authority_spans": 64,
+    "mismatches": [],
+    "tracked_diff_empty": true
+  },
+  "end_utc": "2026-10-25T07:44:30.658432+00:00",
+  "seconds": 22368.084650375,
+  "raw_logs": [
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/01-fmt.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/02-diff-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/03-clippy.log",
+      "bytes": 230,
+      "sha256": "7f7b61448abaf627f4b3932b843297443789fa492fb6eb45f296354f900857e9"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/04-test.log",
+      "bytes": 13138458,
+      "sha256": "7d3f274aabaf33d8d38463810d2d7e0a0f94d7a11506f2b658524c0d2ef25b7b"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/05-build-release.log",
+      "bytes": 62,
+      "sha256": "a40c1884a95654da1e9ce0b9042cc3b906a7c879f74bfc6527def185ef03cdb2"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/06-smoke-release.log",
+      "bytes": 287,
+      "sha256": "2c3308be638069bbe5143d0e8870141fe1308b28732a48736f1fb51580019464"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/07-smoke-debug.log",
+      "bytes": 576,
+      "sha256": "4aad623d6c9ffea6c2585f90f33178bb08baf2e5d6e12da235db5fa8e9aaefd1"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/08-benchmark.log",
+      "bytes": 907,
+      "sha256": "c5489ee4c50153a5c0ae5d7692421d444b952170b7c1e2f677f7993820c73660"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/09-soak.log",
+      "bytes": 55785,
+      "sha256": "7aff0f06d2b88fbcf10eb436c13b215f3aaf60e17c9776cd6abee958c0362950"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/10-duels.log",
+      "bytes": 103745,
+      "sha256": "3656ba662afe0e828d44f24a3690a13b6343f748e63479a82d1d6282e5d0eca6"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/11-package.log",
+      "bytes": 362,
+      "sha256": "64afdf6b61e29cf1d2bebbda446ee987f07168d7c00775d550896ba2fa7578c5"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/12-data-generated.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/validation/ra2-parity/review-2-corrected-08/13-reference-table.log",
+      "bytes": 69,
+      "sha256": "049b7392cd329aff67646187d48320f1ac79b1430aba17f0dcea7345d442cda5"
+    }
+  ],
+  "summary": {
+    "path": "docs/validation/ra2-parity/review-2-corrected-08/summary.txt",
+    "bytes": 810,
+    "sha256": "f21cbde559982627fe2fb2c8a70f90272b83dde10f1fab37e941fd8a6f09cdf1"
+  }
+}
