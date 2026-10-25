@@ -1,43 +1,59 @@
 # Remaining differences from vanilla Red Alert 2
 
 <!-- RA9_REMEDIATION1_CURRENT_BEGIN -->
-## Current corrected round2 candidate — 2026-10-23T03:02:12.803613+00:00
+## Current corrected-source native acceptance — independent decision pending
 
-This current checkpoint supersedes the dated execution headlines below. R201 and R203 preserve the
-actual failed/interrupted review-2 and review-2-corrected-01 attempts; neither is final acceptance.
-R204 records the subsequent observed-cause correction and exact bounded regression evidence.
+This section supersedes earlier copy/pending execution wording below. Dated execution passages
+remain historical evidence; their retained model boundaries and user-only checks still apply.
 
-R201 and R203 preserve two actual failed/interrupted full13 attempts. Neither is a passed RA9/final gate. R203's current-state admission defect was reproduced on the exact same Crossroads Korea Brutal/Iraq Easy seed0 tuple: Deploy at13002 named an erased occupied Prop. A garrison-only correction then exposed an erased-building SellBuilding at14594; that genuine failed AFTER attempt is retained too.
+The corrected cumulative candidate is bound by the exact frozen input manifest recorded below.
+The single complete shared RA9/final validation launched at 525636dac32eb8bae4919a6dccdde1c0dbe815eb; all 13
+unchanged commands exited 0 with terminal PASSED. R194 authorizes sharing this one full run.
+Exact raw counts and scope are in [final validation](validation/ra2-parity/review-2-corrected-08/final-validation-summary.json).
+Workspace: 1835 primary unfiltered passes, zero failures/ignores/filters;
+selected child probes are accounted separately in that report. The whole RA9 audit passed
+185/0/0/0 together. File/declaration counts are not test executions.
 
-The final production correction adds only a decision-local set of currently erased owned BuildingSnaps. It preserves all owned-building/kind, living-owned, nested-cargo and recoverable-garrison capability lists. Garrison command selection tries the first nonerased host across the whole ordered list, waits when all are paused, and precedes liquidation even during an existing last stand. Each of the three sale selectors excludes erased candidates before ranking/refund/financing projection. No persistent state, new timer, roster, data/schema, command validation bypass or tick-limit change is introduced.
+Production: 756 Won, median/p90/max ticks 29448.0/70403/286896.
+Duels: 756 Won, median/p90/max ticks 29056.0/73899/263681.
+Original map-scaled production caps, 300000 duel cap and base MATCH_TICK_LIMIT=72000 remain.
+Isolated all21 each reached Won before the unchanged400000 cap; median/p90/max
+86306/108805/245510.
+All three fixed256x256 windows and three example refusal guards passed. All overall means stayed below5ms.
+Across those measured map runs the largest busy1000 mean was 4.897ms,
+largest p99 24.65ms and maximum tick
+299.238ms. The m13 gate is overall mean;
+these observed tails are retained limits and do not establish rendered smoothness.
 
-Independent SIM2 and TESTS source inspections map the actual distinction: SellBuilding and active Deploy/Undeploy reject erased actors; owner RepairBuilding and SetRallyPoint remain admitted, and Queue/Cancel/Place administration, living frozen prerequisites and Interact target policy retain their existing semantics. Ordinary unit sources and strategic sources already have erasure admission checks. External repair under beam and paused production/pending jobs stay distinct from active forbidden operations. These source inspections are not final native acceptance or original-engine proof.
+Soak: 260 configurations ×2×36000=18720000 deterministic ticks;
+peak concurrent heap 247.2 MiB against 1024 MiB. Final sampled
+Running worlds (260 per repeat) are fixed-duration windows,
+not Won claims; actual completed outcomes and the independent all-to-Won workloads retain scope.
+Both benchmark200-original-unit workloads passed movement/combat, original5ms mean/busy and50ms
+maximum/heap guards. Release/debug600-frame smokes and actual macOS package smoke passed.
+Actual release and packaged missing-image processes exited1 with the path, then restored-image
+processes each completed600 frames with map created:true; canonical assets remain unchanged.
+Package/executable/archive and the actual phase11 README snapshot hashes are preserved; later
+closing prose was not retroactively packaged. Signing/notarization/universal and other-machine
+launch, notice completeness and subjective quality are not established by these processes.
 
-Five final public-schedule controls genuinely fail together on the original AI (0pass/5fail/141filtered, actual101), then pass on the final correction (5pass/0fail/141filtered, actual0). They cover native Temporal garrison pause/release/original-infantry fire, a later unblocked host, pre-existing last_stand state, a paused sale's actual release/sale, and an unblocked cheaper alternative. The complete current AI target passes146/0fail/0ignore/0filter together (26.37s). The exact failed tuple now passes the unchanged Won/I6/rejection predicates, reporting15139 schedules of72000; the raw does not print a winner ID or MatchOutcome.tick, so none is invented here.
+All689 source/factual inputs and64 authority spans remain exact. Both original cached INI hashes,
+all51 HOWTOSEE bytes, original assertions and zero ignore attributes remain. The actual catalogue
+is54units/46buildings/116weapons/61warheads/11armours/9countries/21maps/11plans/3difficulties.
+16211 physical facts reconcile as13419Compared+2792GameOwned;7108 pairs succeed.
+5022 source atoms are3111Compared+1911 specific dispositions:759CURRENT_MODEL_NONREAD and
+1152INTENTIONAL_DIFFERENCE, zeroORIGINAL_ENGINE_UNUSED. Seventy-five numeric differences remain
+explicit in ra2_differences.tsv; declarations do not establish original-engine consumption.
 
-All141 pre-existing AI test bytes (462426) and all8 prior M6 test bytes (37217) remain exact prefixes; five AI tests and one M6 tuple wrapper are appended. Every genuine failure, after/setup failure, diagnostic, original/final source and restoration is retained. New fixture corrections preserve all bounds/assertions: move only the new house/source to the existing home-defense region because the initial released actor was outside gather range before Easy's unchanged first wave; replace only the new sale fixture's release Guard with public Move beyond range because the actual beam reacquired before the unchanged256-tick sale slot. No old test/fixture is changed or skipped.
-
-The new root producer, independent factual verification and separate postpropagation readback refresh13of15 factual outputs/3290cells/71branch families/72local acceptance rows. Every class, reason, route, guard, decision, original literal and qualified receipt remains unchanged. All689 frozen inputs and64 authority spans remain binding, with51 HOWTOSEE bytes and183 debt IDs/aliases retained. The prior C3 all21 wins/fixed windows/guards are real historical C3 evidence; they are not promoted to this changed Sim source. Fresh current-source isolated5, one complete unchanged13 underR194, actualasset4, all five whole-cumulative source/evidence followups and fresh lead remain required. No GO, final merge/tag or user quality approval exists.
-
-Fresh corrected-source preflight completes fmt/diff/all-targetClippy0 and full physical reconciliation1pass/184filtered (not all185 together), reporting16211physical/7108successful pairs/5022source atoms/1911dispositions/75differences. Fresh late twins actually reach P0Won42056/72000,42057schedules, late330WeaponFired/3ProductionComplete/7positiveOreDelivered, final991a7990712f9fe8/trajectorycf968dbee1b99dd4. Existing native36001 extra-RNG fails exactlyat36001; observer-only omission reaches the identical winner/world/trajectory then fails missinglateProduction330/0/7; exactrestoredsourcepassesagain1/0/8filtered. Expectednegative101/101/restored0 and immediate/separate-later restoration reads are preserved. These are current-source scoped proofs, never the still-required completefull13/185/756/all21. Frozen689-input manifestSHA9df40e2ce6a42fdb0dadd8d20f1295842de69940429bea78e7b975ee854aec26/64spans/51HOWTOSEE remainexact.
-
-The exact new source manifest is `docs/validation/ra2-parity/remediation-2/C-corrected-04/frozen-validation-inputs.json`,
-SHA256 9df40e2ce6a42fdb0dadd8d20f1295842de69940429bea78e7b975ee854aec26: 689 inputs (674 source plus15 factual
-outputs),64 protected authority spans and all51 HOWTOSEE bytes. Factual source/hash propagation
-changes no class, reason, route, guard, decision, source literal or qualified native receipt.
-The source census is 65 sim/40 game Rust files;
-49 audit Rust/67 TSV/4 TXT siblings and36 top-level RA9 sim targets.
-Literal test attributes:1833, zero ignore attributes; original modified-file test names
-remain. File/declaration counts are preservation observations, never native executions.
-
-The previous corrected C-source all21 wins/fixed3/guards remain historical scoped evidence.
-This revised source still requires actual all21-to-Won/fixed3/guards, ONE successful unchanged
-full13 shared under R194, release/package missing-image failure/restoration, all five full
-cumulative revised independent slices and a fresh binding lead. Every original scenario,
-native worker, cap, deterministic/heap/performance and winning predicate remains binding.
-All183 debt IDs/aliases and51 user-only quality checks remain; no GO, merge/tag or quality
-approval exists. Both projects keep running; no unrelated process is changed. R172/R199 govern
-3+2 slice batches and whole revised cumulative inspection. Earlier snapshots remain historical.
+All183 historical debt IDs/aliases are preserved, with exact per-row scopes in the ledger and
+independent reports. Native passage supplies execution within each assertion's actual scope;
+it does not blanket-close retained model limitations or user-only items. All51 visual, audio,
+readability, animation, pacing/feel, human victory/defeat and platform checks remain pending.
+R4 map growth remains optional/default-off; R7 uses15-frame-to20-tick speed conversion;
+R6/I6prime retains onevehicle/threeinfantry/oneaircraft per corresponding cell rules.
+R172 two-batch full panel, R199 whole revised cumulative inspection and a fresh independent lead
+remain binding. All five revised reports and lead must ingest these actual results; no root
+self-approval, GO, merge/tag or user-quality approval is supplied by this factual update.
 <!-- RA9_REMEDIATION1_CURRENT_END -->
 
 ### Temporal building model retained in R195

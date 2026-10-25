@@ -1,0 +1,9 @@
+   Compiling sim v0.1.0 (/Users/xingyuwang/GameProjects/MyGame001/crates/sim)
+    Finished `release` profile [optimized] target(s) in 0.24s
+     Running unittests examples/m7_soak.rs (/Users/xingyuwang/Library/Caches/Codex/cargo-target/release/examples/m7_soak-0c5041a213a236e6)
+
+running 1 test
+test ra8_completed_soak_matches_require_winners_while_duration_stays_fixed ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

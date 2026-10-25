@@ -1,0 +1,62 @@
+{
+  "status": "FACTUAL_NATIVE_GATES_COMPLETE_INDEPENDENT_DECISION_PENDING",
+  "utc": "2026-10-25T08:18:32.492356+00:00",
+  "native_summary_sha256": "83030b60fa3530169c9868eb98adea664c61bf583c6aa05df0572ca7aaabbb41",
+  "source_count": 689,
+  "authority_spans": 64,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "ledger_sha256": "d0c93c3a6cb828449a0fb859265e40b0987eb85de003688c279c1668987eecbe",
+  "ledger_ids": 183,
+  "changes": [
+    {
+      "path": "README.md",
+      "before_sha256": "d9358aea3b16d3175a1bf07e25ade2cabf45888923db02b568fb30993ec09e89",
+      "after_sha256": "8df952c5047f375e147f32ca39e6ff8ad61d7655a96866728eba08fafb55e609"
+    },
+    {
+      "path": "docs/HANDOFF.md",
+      "before_sha256": "6b10e033304cedb48367bce07426d61b32ceae8d79e10f3ebc66785865cd8b18",
+      "after_sha256": "9c11f24f35d7599db1e8c1513b5de7fbc8d3990fc68872ce2b3428dcf52bd159"
+    },
+    {
+      "path": "docs/RA2_GAP_ANALYSIS.md",
+      "before_sha256": "dad42c3ac144f522658375c7665c277fca95e7125c553f356684528a85adb343",
+      "after_sha256": "9b5aee5eb73cc8802eea223db2f2f176e149cbb912f5be39fa3f5b1966f95d2c"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-review-requirements.md",
+      "before_sha256": "6070049976be0552dad25ea0b73e235293a1dad3125a4b26e367c002e3109b0e",
+      "after_sha256": "84a167fa089f63ee4a2d92c3e3eb274debc4ab9a0801412d8b6ed0400e7304f2"
+    },
+    {
+      "path": "docs/reviews/RA2-parity-reviews-outstanding.md",
+      "before_sha256": "c1a68e60dd491531d2ae435a1f53f80dd075fc00d15534058872675547a06663",
+      "after_sha256": "e2924695fdaa502c745743585ed6fafbbb601a3db570361b4d9bd7bea8dcbcad"
+    },
+    {
+      "path": "docs/RA9_INTEGRATION_CHECKLIST.md",
+      "before_sha256": "b3944189938fb3dcd687ee249bb6047085dd07e3ed7e42835be2c86daca1c115",
+      "after_sha256": "7bf17c84c9739072c07e6c49bdb8f702509f94449852a2531bbef11d954a5a3c"
+    },
+    {
+      "path": "docs/RA9_LOADED_CATALOGUE.md",
+      "before_sha256": "df31f26a9294e8af1e63d68881cc5cca02807ec2df5fca5b4b61587116c02dd1",
+      "after_sha256": "bb41458058c4efa0f3186ed511a185faf91d8b67f60d2ddfe06c6962fcb2e7d2"
+    },
+    {
+      "path": "docs/CONSTRUCTION_SYSTEM.md",
+      "before_sha256": "18035854e69fe4c807f523c78aefeba822848cfd721580a467fc6b90cd034665",
+      "after_sha256": "6cfd3f9f300621e0fa3f7770a3b8bbee001d6eda975df910861aa17f8e375c16"
+    },
+    {
+      "path": "docs/STATUS.md",
+      "before_sha256": "a0443237f2b99fe6a3286e415f1a2a79c8cfb1a21e8b20d7739f38ec06829b32",
+      "after_sha256": "126fe3ad4c49f962c3d19dfe718c8edab8c3b9a65b42193a7f9bc40fbbd9a432"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "before_sha256": "01b8bd85126c2bf26dd53f7f2b7f9c923757a0118a1bbc16cd458d4b9d9e2ecf",
+      "after_sha256": "8f74ac7b6a63087121e855ac80fa6736c405db7308f967b917c9d94eac937bb7"
+    }
+  ]
+}
