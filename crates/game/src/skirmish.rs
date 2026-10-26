@@ -792,6 +792,10 @@ pub enum Row {
 /// The unit speeds the Super Me player may choose, in percent of every unit type's speed.
 pub const UNIT_SPEEDS: [u16; 5] = [100, 150, 200, 300, 400];
 
+/// Index into [`UNIT_SPEEDS`] of the lobby's default: Super Me alone already moves the human
+/// player's units three times as fast (docs/DECISIONS.md R211).
+pub const DEFAULT_UNIT_SPEED: usize = 3;
+
 impl Row {
     /// The rows of the menu's first column: the match.
     pub const MATCH: [Row; 8] = [
@@ -942,7 +946,7 @@ impl Default for MenuSelection {
             map_growth: false,
             super_me: false,
             unlock_all: false,
-            unit_speed: 0,
+            unit_speed: DEFAULT_UNIT_SPEED,
         }
     }
 }
@@ -1472,12 +1476,13 @@ pub fn row_text(row: Row, selection: MenuSelection, catalogue: &Catalogue) -> St
         }
         .to_owned(),
         Row::McvRepacks => switch(selection.mcv_repacks),
-        Row::SuperMe => if selection.super_me {
-            "ON / 10x / $1"
-        } else {
-            "OFF"
+        Row::SuperMe => {
+            if selection.super_me {
+                format!("ON / {}x / $1", sim::SUPER_ME_PRODUCTION_FACTOR)
+            } else {
+                "OFF".to_owned()
+            }
         }
-        .to_owned(),
         Row::UnitSpeed => {
             let Some(&percent) = UNIT_SPEEDS.get(selection.unit_speed) else {
                 return "-".to_owned();
@@ -3553,7 +3558,8 @@ pub(crate) mod tests {
         assert_eq!(text(Row::TeamMode), "ALLIED AI");
         assert_eq!(text(Row::MapGrowth), "OFF");
         assert_eq!(text(Row::SuperMe), "OFF");
-        assert_eq!(text(Row::UnitSpeed), "1x - SUPER ME OFF");
+        // The extension's default speed, in effect only once Super Me is on (R211).
+        assert_eq!(text(Row::UnitSpeed), "3x - SUPER ME OFF");
         assert_eq!(text(Row::UnlockAll), "STANDARD");
         assert_eq!(
             text(Row::Enemies),
@@ -3822,7 +3828,7 @@ pub(crate) mod tests {
         }
         // The extensions of this game: off at first, and the human player's alone.
         for (row, at_first, changed) in [
-            (Row::SuperMe, "OFF", "ON / 10x / $1"),
+            (Row::SuperMe, "OFF", "ON / 30x / $1"),
             (Row::UnlockAll, "STANDARD", "ALL UNLOCKED"),
         ] {
             assert_eq!(row_text(row, initial, &catalogue), at_first);
@@ -3840,18 +3846,28 @@ pub(crate) mod tests {
                     (Vec::new(), vec![HUMAN])
                 }
             );
+            // Super Me brings the lobby's unit speed into effect (3x at first, R211).
             assert_eq!(
                 sim::MatchOptions {
                     super_players: Vec::new(),
                     unlock_players: Vec::new(),
                     ..options
                 },
-                defaults
+                sim::MatchOptions {
+                    unit_speed_percent: if row == Row::SuperMe {
+                        UNIT_SPEEDS[DEFAULT_UNIT_SPEED]
+                    } else {
+                        defaults.unit_speed_percent
+                    },
+                    ..defaults.clone()
+                }
             );
         }
-        // The unit speed row: every speed, in effect with Super Me only.
+        // The unit speed row: 3x at first, every speed, in effect with Super Me only.
+        assert_eq!(UNIT_SPEEDS[initial.unit_speed], 300);
         let mut selection = MenuSelection {
             super_me: true,
+            unit_speed: 0,
             ..initial
         };
         let mut speeds = Vec::new();

@@ -38,7 +38,7 @@ HIP, KNEE, SHO = .93, .5, 1.44
 # the pelvis rides at whatever height puts the lower foot on the ground, which gives the bob of a
 # real walk for free. Everything above the hips leans into the walk and turns against the legs.
 POSE = None
-WALK_FRAMES = 6
+WALK_FRAMES = 8
 RUNNERS = ('tanya', 'terrorist', 'attack_dog')   # units of speed 20 and over (assets/data/units.ron) run
 UNRIGGED = ('rocketeer',)                        # flies: it has no walk cycle
 _RUN = False
@@ -50,8 +50,10 @@ def phase():
 def gait(f):
     """Hip and knee angle in degrees at fraction f of one leg's cycle (0: heel strike, .5: toe-off)."""
     f %= 1.0
-    swing, fold, brace = (37, 92, 18) if _RUN else (27, 62, 9)
-    hip = swing * cos(2 * pi * f) + (9 if _RUN else 2)
+    # A figure is a couple of dozen pixels tall on screen, so the stride is a little longer and
+    # the knee lifts a little higher than a real infantryman's, or the legs would barely part.
+    swing, fold, brace = (44, 108, 20) if _RUN else (33, 72, 11)
+    hip = swing * cos(2 * pi * f) + (10 if _RUN else 3)
     knee = 6 + (brace * sin(2 * pi * f) if f < .5 else fold * sin(2 * pi * (f - .5)))
     return hip, knee
 
@@ -79,20 +81,20 @@ def swinging(k, s, amp=1.0):
     """A free arm on side s, and whatever its hand carries, swings against the leg below it."""
     if POSE is None:
         yield; return
-    a = -(40 if _RUN else 22) * amp * cos(2 * pi * (phase() + (0 if s > 0 else .5)))
+    a = -(52 if _RUN else 34) * amp * cos(2 * pi * (phase() + (0 if s > 0 else .5)))
     with k.at(0, s * .225, SHO - .03, pitch=a):
         with k.at(0, -s * .225, -(SHO - .03)): yield
 
 def limb(k, a, b, r0, r1, c):
-    k.tube(a, b, r0, c, r2=r1, n=8)
-    k.ball(a[0], a[1], a[2], r0 * 1.02, c, n=8, k=4)
+    k.tube(a, b, r0, c, r2=r1, n=12)
+    k.ball(a[0], a[1], a[2], r0 * 1.02, c, n=12, k=6)
 
 def boot_shape(k, boot):
     boot = remat(boot, 'leather')   # worn leather: unlike a tyre, it is not caked in dust
     k.stack(.05, 0, [(0, .3, .13, .05), (.1, .3, .13, .05), (.2, .16, .12, .05, -.06)], boot, k=2)
     k.box(-.1, -.068, -.012, .31, .136, .03, tint(boot, .6))  # sole
 
-def legs(k, c, boot=BOOT, stride=.07, spread=.11, kneel=False, r=.085, pads=False):
+def legs(k, c, boot=BOOT, stride=.07, spread=.11, kneel=False, r=.092, pads=False):
     """Two legs with boots; returns nothing. kneel: right knee on the ground."""
     if POSE is not None:
         hz, body = pelvis(), k.T
@@ -145,12 +147,12 @@ def helmet(k, kind, c, zc, x=.01, band=True):
     if kind == 'pasgt':  # modern combat helmet: deep shell, brow rim, ear cut
         k.ball(x - .01, 0, zc + .02, r * 1.2, c, rz=r * 1.15, n=12, k=5, lo=-.25, hi=1.0)
         k.box(x + .09, -.1, zc + .0, .06, .2, .025, tint(c, .85))
-        if band: k.rev((x - .01, 0, zc + .035), 'z', [(0, r * 1.22), (.055, r * 1.19)], TEAM, n=12)
+        if band: k.rev((x - .01, 0, zc + .04), 'z', [(0, r * 1.215), (.032, r * 1.2)], TEAM, n=14)
         k.box(x + .075, -.07, zc + .09, .05, .14, .05, GLASS_DARK)  # goggles pushed up
     elif kind == 'ssh':  # Soviet steel helmet: rounder, flared rim
         k.ball(x, 0, zc + .02, r * 1.18, c, rz=r * 1.2, n=12, k=5, lo=-.12, hi=1.0)
         k.rev((x, 0, zc - .005), 'z', [(0, r * 1.26), (.02, r * 1.2)], c, n=12)
-        if band: k.rev((x, 0, zc + .04), 'z', [(0, r * 1.2), (.055, r * 1.165)], TEAM, n=12)
+        if band: k.rev((x, 0, zc + .045), 'z', [(0, r * 1.195), (.032, r * 1.18)], TEAM, n=14)
     elif kind == 'ushanka':  # fur cap with tied-up flaps
         k.rev((x, 0, zc + .0), 'z', [(0, r * 1.22), (.1, r * 1.24), (.16, r * 1.0), (.17, .02)], c, n=12)
         for s in (-1, 1): k.box(x - .07, s * r * 1.2 - .02, zc - .02, .14, .04, .12, tint(c, .9))
@@ -158,6 +160,7 @@ def helmet(k, kind, c, zc, x=.01, band=True):
     elif kind == 'hardhat':
         k.ball(x, 0, zc + .03, r * 1.18, c, rz=r * 1.05, n=12, k=5, lo=0.0, hi=1.0)
         k.rev((x + .03, 0, zc + .02), 'z', [(0, r * 1.4), (.015, r * 1.4)], c, n=12)
+        if band: k.rev((x, 0, zc + .045), 'z', [(0, r * 1.19), (.035, r * 1.16)], TEAM, n=14)  # reflective band
     elif kind == 'beret':
         k.ball(x - .02, .02, zc + .09, r * 1.12, c, rz=r * .5, n=12, k=4)
     elif kind == 'fedora':
@@ -185,7 +188,7 @@ def arm(k, s, elbow, hand, c, skin=SKIN, r=.062, bare=False):
 
 def brassards(k, z0=0.0, r=.082):
     """The owner's colour on both upper arms."""
-    for s in (-1, 1): k.rev((0, s * .245, SHO - .2 + z0), 'z', [(0, r), (.15, r)], TEAM, n=8)
+    for s in (-1, 1): k.rev((0, s * .245, SHO - .19 + z0), 'z', [(0, r * .96), (.1, r * .96)], TEAM, n=10)
 
 def pack(k, c, x=-.2, z=1.08, w=.18, d=.3, h=.36, panel=True):
     k.stack(x, 0, [(z, w, d, .05), (z + h * .8, w, d, .06), (z + h, w * .7, d * .8, .05)], c, k=2)
@@ -490,30 +493,35 @@ def rocketeer(k):
         k.box(-.38, -.12, 1.16, .02, .24, .26, TEAM)
 
 def attack_dog(k):
-    # German shepherd in a working harness, mid-stride.
-    tan = rgb(150, 108, 62, 'cloth'); black = rgb(46, 38, 32, 'cloth')
+    # German shepherd in a working harness, mid-stride: a deep chest, a long back sloping to the
+    # hips, and legs no longer than the body is deep (about 0.62 m at the withers).
+    tan = rgb(132, 90, 50, 'cloth'); black = rgb(40, 33, 28, 'cloth')
     f = phase()
-    with k.at(0, 0, 0 if f is None else .03 * abs(sin(2 * pi * f)), s=1.5):
-        k.body([(-.42, 0, .5, .09, .1), (-.2, 0, .52, .12, .13), (.1, 0, .54, .13, .15), (.3, 0, .56, .11, .13), (.4, 0, .6, .08, .09)], tan, n=10)
-        k.body([(-.4, 0, .58, .08, .05), (-.1, 0, .62, .1, .06), (.28, 0, .65, .09, .05)], black, n=8)  # saddle
-        k.body([(.34, 0, .62, .08, .09), (.44, 0, .72, .075, .085), (.52, 0, .78, .08, .085), (.6, 0, .76, .055, .055), (.74, 0, .72, .035, .035)], tan, n=10)
-        k.ball(.75, 0, .725, .025, BLACK, n=6, k=3)
+    with k.at(0, 0, -.06 if f is None else -.06 + .025 * abs(sin(2 * pi * f)), s=1.35):
+        k.body([(-.44, 0, .5, .12, .13), (-.22, 0, .51, .15, .16), (.06, 0, .52, .17, .21), (.26, 0, .54, .16, .21), (.38, 0, .58, .12, .14)], tan, n=14)
+        # The black saddle covers the back and runs down the flanks.
+        k.body([(-.46, 0, .56, .125, .09), (-.16, 0, .59, .155, .1), (.16, 0, .63, .165, .09), (.32, 0, .66, .13, .06)], black, n=12)
+        # A thick neck carried forward, the head held level, not raised like a deer's.
+        k.body([(.32, 0, .6, .12, .14), (.42, 0, .67, .11, .12), (.5, 0, .72, .1, .1), (.6, 0, .71, .07, .07), (.72, 0, .68, .042, .042)], tan, n=14)
+        k.body([(.4, 0, .74, .08, .05), (.5, 0, .79, .07, .04)], black, n=10)  # dark crown and nape
+        k.ball(.735, 0, .685, .03, BLACK, n=6, k=3)
         for s in (-1, 1):
-            k.plate([(.46, s * .05, .84), (.5, s * .07, .97), (.54, s * .045, .85)], black)
-            for x0, fwd, hz, lead in ((.28, .08, .5, 0), (-.34, -.1, .48, .5)):
+            k.plate([(.47, s * .055, .79), (.51, s * .075, .9), (.56, s * .05, .8)], black)
+            for x0, fwd, hz, lead in ((.28, .07, .5, 0), (-.36, -.09, .48, .5)):
                 if f is None:
-                    joint = (x0 + fwd, .26); paw = (x0 + fwd * .4 + .02, .03)
+                    joint = (x0 + fwd, .24); paw = (x0 + fwd * .4 + .02, .07)
                 else:
                     # Diagonal pairs strike together; a paw is lifted while it reaches forward.
                     g_ = (f + lead + (0 if s > 0 else .5)) % 1.0
-                    reach = .2 * cos(2 * pi * g_); lift = .1 * max(0.0, sin(2 * pi * (g_ - .5)))
-                    paw = (x0 + reach + (.04 if x0 > 0 else -.02), .03 + lift)
-                    joint = (x0 + reach * .45 + fwd, .27 + lift * .7)
-                k.tube((x0, s * .08, hz), (joint[0], s * .085, joint[1]), .045, tan, r2=.032, n=6); k.tube((joint[0], s * .085, joint[1]), (paw[0], s * .085, paw[1]), .03, tan, r2=.024, n=6)
-                k.ball(paw[0] + .02, s * .085, paw[1], .035, tan, n=6, k=3)
-        k.tube((-.42, 0, .54), (-.62, 0, .4), .035, tan, r2=.018, n=6); k.tube((-.62, 0, .4), (-.72, 0, .44), .018, black, r2=.008, n=5)
-        k.rev((.02, 0, .54), 'x', [(0, .155), (.2, .16)], TEAM, n=10)  # harness
-        k.rev((.36, 0, .62), (1, 0, .6), [(0, .09), (.03, .09)], BLACK, n=8)
+                    reach = .22 * cos(2 * pi * g_); lift = .1 * max(0.0, sin(2 * pi * (g_ - .5)))
+                    paw = (x0 + reach + (.04 if x0 > 0 else -.02), .07 + lift)
+                    joint = (x0 + reach * .45 + fwd, .25 + lift * .7)
+                k.tube((x0, s * .1, hz), (joint[0], s * .105, joint[1]), .075, tan, r2=.045, n=10); k.tube((joint[0], s * .105, joint[1]), (paw[0], s * .105, paw[1]), .04, tan, r2=.032, n=8)
+                k.ball(paw[0] + .02, s * .105, paw[1], .045, tan, n=8, k=4)
+        # A bushy tail hanging low in a gentle curve.
+        k.tube((-.46, 0, .54), (-.62, 0, .4), .06, black, r2=.05, n=10); k.tube((-.62, 0, .4), (-.7, 0, .26), .05, tan, r2=.03, n=10)
+        k.rev((.06, 0, .52), 'x', [(0, .225), (.1, .23)], TEAM, n=14)  # harness
+        k.rev((.38, 0, .62), (1, 0, .6), [(0, .125), (.03, .125)], BLACK, n=10)
 
 MODELS = {f.__name__: f for f in [rifleman, gi, conscript, grenadier, rocket_soldier, engineer, spy, tanya, sniper,
                                   flak_trooper, tesla_trooper, chrono_legionnaire, crazy_ivan, yuri, desolator,
@@ -528,6 +536,8 @@ def build(m, ident):
     if POSE is None or ident in UNRIGGED or ident == 'attack_dog':
         MODELS[ident](k); return
     f = phase()
-    turn = -(10 if _RUN else 6) * cos(2 * pi * f)   # shoulders against the hips
-    with k.at(0, 0, pelvis(), yaw=turn, pitch=-(12 if _RUN else 3)):
+    turn = -(14 if _RUN else 9) * cos(2 * pi * f)   # shoulders against the hips
+    # The weight goes over the planted foot: the body rolls towards it twice a cycle.
+    roll = (4 if _RUN else 3) * sin(2 * pi * f)
+    with k.at(0, 0, pelvis(), yaw=turn, pitch=-(13 if _RUN else 5), roll=roll):
         with k.at(0, 0, -HIP): MODELS[ident](k)

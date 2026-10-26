@@ -138,9 +138,11 @@ fn the_rates_are_those_of_the_plan() {
     assert_eq!(power_rate_pm(&rules, 100, 150), 666);
     assert_eq!(power_rate_pm(&rules, 100, 200), 500, "half short");
     assert_eq!(power_rate_pm(&rules, 0, 10), 500, "no power at all");
-    // The product, rounded down, and ten times with Super Me.
+    // The product, rounded down; with Super Me the factory rate times the Super Me factor,
+    // whatever the power.
     assert_eq!(production_rate_pm(&rules, 2, 100, 150, false), 832);
-    assert_eq!(production_rate_pm(&rules, 2, 100, 150, true), 8320);
+    assert_eq!(production_rate_pm(&rules, 2, 100, 150, true), 1250 * 30);
+    assert_eq!(production_rate_pm(&rules, 1, 0, 10, true), 1000 * 30);
 }
 
 #[test]

@@ -94,7 +94,8 @@ pub use definitions::{
 pub use economy::{
     Lane, MAX_COUNTED_FACTORIES, MAX_PRODUCTION_RATE_PM, MAX_QUEUE_LENGTH, PlayerSetupError,
     PlayerState, Players, QueueItem, QueueKey, REPAIR_COST_DIVISOR, REPAIR_INTERVAL, REPAIR_STEPS,
-    factory_rate_pm, power_rate_pm, production_rate_pm, repair_cost, repair_step_cost,
+    SUPER_ME_PRODUCTION_FACTOR, factory_rate_pm, power_rate_pm, production_rate_pm, repair_cost,
+    repair_step_cost,
 };
 pub use economy_commands::{
     SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, extends_base,

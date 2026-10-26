@@ -139,6 +139,9 @@ def setup_scene():
     prefs = bpy.context.preferences.addons['cycles'].preferences
     try:
         prefs.compute_device_type = 'METAL'
+        # No specialised kernels compiled in the background: saving their binary archive can
+        # crash Blender mid-run (seen 2026-10-25 with several processes at once).
+        if hasattr(prefs, 'kernel_optimization_level'): prefs.kernel_optimization_level = 'OFF'
         prefs.get_devices()
         for d in prefs.devices: d.use = True
         sc.cycles.device = 'GPU'
@@ -634,7 +637,8 @@ def main():
         render_unit(sc, cam, catcher, mats, mask, ident, out / 'units' / ident, ident not in air, facings)
     # Walk cycles (w:ident): every infantry unit that goes on foot.
     for ident in g.walkers():
-        if ident not in units or (only and f'w:{ident}' not in only): continue
+        # A walker the roster no longer names (the legacy fixtures' art) renders when asked for.
+        if (ident not in units and f'w:{ident}' not in only) or (only and f'w:{ident}' not in only): continue
         if done(out / 'walk' / f'{ident}_{g.WALK_FRAMES - 1}_7_mask.png'): continue
         render_walk(sc, cam, catcher, mats, mask, ident, out / 'walk' / ident, facings)
     field_light(sc, False)
