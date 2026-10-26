@@ -163,7 +163,7 @@ fn every_item_executes_queue_cost_completion_and_placement_or_spawn() {
     verify_catalogue(false);
 }
 #[test]
-fn super_me_every_item_costs_one_and_finishes_in_tenth_time() {
+fn super_me_every_item_costs_one_and_finishes_in_a_fraction_of_the_time() {
     verify_catalogue(true);
 }
 fn verify_catalogue(super_me: bool) {
@@ -212,7 +212,11 @@ fn verify_catalogue(super_me: bool) {
         let before = credits(&a);
         cmd(&mut a, Command::QueueProduction { item: i });
         assert!(!rejected(&a), "queue {i:?}");
-        let duration = terms.build_time.div_ceil(if super_me { 10 } else { 1 });
+        let duration = terms.build_time.div_ceil(if super_me {
+            sim::SUPER_ME_PRODUCTION_FACTOR
+        } else {
+            1
+        });
         if duration > 1 {
             tick(&mut a, duration - 2);
             assert!(

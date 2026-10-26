@@ -2843,7 +2843,8 @@ mod tests {
             sim::MatchOptions {
                 super_players: vec![HUMAN],
                 unlock_players: vec![HUMAN],
-                unit_speed_percent: crate::skirmish::UNIT_SPEEDS[1],
+                unit_speed_percent: crate::skirmish::UNIT_SPEEDS
+                    [crate::skirmish::DEFAULT_UNIT_SPEED + 1],
                 free_for_all: true,
                 // The first two computer players have a country; the others are drawn.
                 random_countries: vec![sim::PlayerId(3), sim::PlayerId(4)],
