@@ -3,8 +3,8 @@
   uv run --with pillow --with numpy python scripts/finish_hd_art.py [RENDER_DIR [OUT_DIR]]
 
 Only units with all eight facings in RENDER_DIR are written, so a partial test render (f0 f3)
-never replaces a shipped sheet with a broken one; likewise a walk cycle (walk/<ident>.png: six
-rows of eight 256-texel frames) needs all of its 48 frames.
+never replaces a shipped sheet with a broken one; likewise a walk cycle (walk/<ident>.png: eight
+rows of eight 256-texel frames) needs all of its 64 frames.
 
 Team paint: presentation.rs recolours pixels on the authored blue ramp
 (b > r+60 and g > r+35, brightness carried by r - 42) and, for the human colour pass,
@@ -82,7 +82,7 @@ def main():
         sheet.save(OUT / 'units' / f'{ident}.png')
         n_u += 1
     # Walk cycles: one row of eight facings per frame of the cycle (WALK_FRAMES rows).
-    poses = 6
+    poses = 8
     for ident in sorted({p.name.rsplit('_', 3)[0] for p in (src / 'walk').glob('*_0_0_color.png')}):
         names = [(src / 'walk' / f'{ident}_{p}_{f}') for p in range(poses) for f in range(8)]
         if not all(Path(f'{n}_{k}.png').exists() for n in names for k in ('color', 'mask')): continue

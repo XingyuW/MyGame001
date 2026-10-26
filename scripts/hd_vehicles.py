@@ -166,7 +166,9 @@ def turret_cast(k, x, z, c, rx=1.3, ry=1.25, h=.78):
     k.ball(x, 0, z, rx, c, ry=ry, rz=h, n=20, k=6, lo=0.0, hi=1.0)
 
 def roof_panel(k, x, y, z, w, d):
-    k.cbox(x, y, z, w, d, .03, TEAM)
+    # A real air-recognition panel is a small marker, not a painted roof: at game zoom a large
+    # one turns the whole vehicle into a block of team colour.
+    k.cbox(x, y, z, w * .62, d * .62, .03, TEAM)
 
 # --- Battle tanks ------------------------------------------------------------------------------
 def grizzly(k):
@@ -190,7 +192,7 @@ def grizzly(k):
     roof_panel(k, x - 1.25, 0, z + .82, .9, 1.5)
     for s in (-1, 1):
         smoke_launchers(k, x + .4, s * 1.48, z + .35, s)
-        k.box(x - 1.95, s * 1.42 - .02, z + .32, 1.3, .04, .26, TEAM)
+        k.box(x - 1.95, s * 1.42 - .02, z + .32 + 0.052, 1.3, .04, 0.156, TEAM)
         k.box(x - 1.6, s * 1.48 - .15, z + .2, .9, .3, .32, tint(c, .9))  # stowage bins
     stowage(k, x - 2.12, 0, z + .08, .75, 2.5, c)
     antenna(k, x - 1.9, 1.2, z + .82); antenna(k, x - 1.9, -1.2, z + .82, 1.8, False)
@@ -211,7 +213,7 @@ def light_tank(k):
     roof_panel(k, x - .85, 0, z + .68, .7, 1.5)
     for s in (-1, 1):
         smoke_launchers(k, x + .3, s * 1.05, z + .3, s, n=3)
-        k.box(x - 1.3, s * 1.0 - .02, z + .1, 1.0, .04, .45, TEAM)
+        k.box(x - 1.3, s * 1.0 - .02, z + .1 + 0.09, 1.0, .04, 0.27, TEAM)
     stowage(k, x - 1.36, 0, z + .1, .5, 1.8, c)
     antenna(k, x - 1.1, .85, z + .68, 2.0)
 
@@ -241,7 +243,7 @@ def rhino(k):
     roof_panel(k, x - .55, 0, z + .735, .8, .7)
     for s in (-1, 1):
         smoke_launchers(k, x + .55, s * 1.1, z + .28, s, n=4)
-        k.box(x - 1.25, s * .92 - .02, z + .22, .6, .04, .3, TEAM)
+        k.box(x - 1.25, s * .92 - .02, z + .22 + 0.06, .6, .04, 0.18, TEAM)
     k.tube((x - 1.25, -.8, z + .3), (x - 1.25, .8, z + .3), .12, tint(c, .9), n=10)  # snorkel
     k.cbox(x - 1.05, 0, z + .08, .5, 1.2, .3, tint(c, .86))
     antenna(k, x - .7, .95, z + .5, 2.4)
@@ -271,7 +273,7 @@ def heavy_tank(k):
     hatch(k, x - .4, .6, z + .78, .3, c)
     roof_panel(k, x - .1, 0, z + .925, .8, .9)
     for s in (-1, 1):
-        k.box(x - 1.5, s * 1.0 - .02, z + .2, .7, .04, .34, TEAM)
+        k.box(x - 1.5, s * 1.0 - .02, z + .2 + 0.068, .7, .04, 0.204, TEAM)
         k.pipe([(x - 1.2, s * 1.22, z + .2), (x - 1.2, s * 1.32, z + .38), (x + .4, s * 1.46, z + .38), (x + .4, s * 1.36, z + .2)], .02, c, n=4)  # hand rails
     k.cbox(x - 1.45, 0, z + .08, .45, 1.4, .34, tint(c, .86))
     antenna(k, x - .9, .95, z + .6, 2.4)
@@ -304,7 +306,7 @@ def apocalypse(k):
             k.cbox(0, 0, 0, 1.5, .5, .5, tint(c, .92))
             for i in range(2):
                 for j in range(2): k.rev((.75, -.12 + i * .24, .13 + j * .24), 'x', [(0, .09), (.03, .09)], BLACK, n=8)
-        k.box(x - 2.3, s * 1.82 - .02, z + .1, 1.4, .04, .42, TEAM)
+        k.box(x - 2.3, s * 1.82 - .02, z + .1 + 0.084, 1.4, .04, 0.252, TEAM)
         era(k, x + 1.2, s * 1.2, z + .2, .9, tint(c, .9), 10 if s > 0 else -80, 80 if s > 0 else -10, 5)
     cupola(k, x - .5, -.8, z + 1.15, c, .38); mg(k, x - .5, -.8, z + 1.38, yaw=170, length=1.5)
     hatch(k, x - .5, .8, z + 1.15, .32, c)
@@ -326,7 +328,7 @@ def tank_destroyer(k):
     for s in (-1, 1):
         y0 = min(s * (W / 2 - .5), s * W / 2)
         k.box(L / 2 - .5, y0, .955, .45, .5, .05, TEAM); k.box(-L / 2 - .02, y0, .55, .04, .5, .4, RUBBER)
-        k.box(-.9, s * (W / 2 - .42) - .02, 1.3, 1.5, .04, .4, TEAM)
+        k.box(-.9, s * (W / 2 - .42) - .02, 1.3 + 0.08, 1.5, .04, 0.24, TEAM)
         smoke_launchers(k, -.2, s * 1.2, 1.7, s, n=4)
     with k.at(1.7, .25, 1.4): k.ball(0, 0, 0, .42, tint(c, .88), ry=.5, rz=.42, n=12, k=6)  # ball mantlet
     gun(k, 1.8, 1.4, 4.4, .075, y=.25, brake='single', evac=.55)
@@ -350,7 +352,7 @@ def artillery(k):
     cupola(k, x + .3, -.9, z + 1.3, c, .36); mg(k, x + .3, -.9, z + 1.52, yaw=10)
     hatch(k, x + .3, .8, z + 1.3, .32, c); roof_panel(k, x - .8, 0, z + 1.3, 1.1, 2.0)
     for s in (-1, 1):
-        k.box(x - 1.9, s * 1.54 - .02, z + .2, 1.5, .04, .5, TEAM)
+        k.box(x - 1.9, s * 1.54 - .02, z + .2 + 0.1, 1.5, .04, 0.3, TEAM)
         k.box(x - 1.2, s * 1.58 - .2, z + .1, 1.6, .4, .5, tint(c, .92))  # side stowage baskets
         k.box(x - 2.3, s * 1.0 - .3, .5, .5, .6, .9, DARK)  # recoil spades
     k.cbox(x - 2.1, 0, z + .1, .4, 2.2, .8, tint(c, .9))
@@ -391,7 +393,7 @@ def mirage_tank(k):
         pz = 1.5 + rnd.uniform(0, .5)
         k.tube((px, py, 1.2), (px + rnd.uniform(-.2, .2), py + rnd.uniform(-.2, .2), pz), .03, TIMBER, n=4)
         k.ball(px, py, pz + .2, rnd.uniform(.3, .5), LEAF if i % 2 else LEAF2, rz=.3, n=8, k=4)
-    for s in (-1, 1): k.box(x - .9, s * .92 - .02, z + .12, .9, .04, .3, TEAM)
+    for s in (-1, 1): k.box(x - .9, s * .92 - .02, z + .12 + 0.06, .9, .04, 0.18, TEAM)
     antenna(k, x - .9, .7, z + .6, 2.0)
 
 def prism_tank(k):
@@ -409,7 +411,7 @@ def prism_tank(k):
         k.rev((x - .05, s_ * .9, z + 1.25), (0, s_, 0), [(0, .2), (.06, .2), (.06, .1), (.1, .1)], IRON, n=10)   # trunnion cap
         k.box(x - 2.35, s_ * .72 - .32, z - .02, 1.05, .64, .62, tint(c, .9))         # capacitor bank
         for i in range(6): k.box(x - 2.3 + i * .18, s_ * .72 - .34, z + .6, .05, .68, .14, STEEL)   # cooling fins
-        k.box(x - 1.1, s_ * .96 - .0, z + .2, .9, .03, .34, TEAM)
+        k.box(x - 1.1, s_ * .96 - .0, z + .2 + 0.068, .9, .03, 0.204, TEAM)
     # The director: a stepped optical tube, gold-coated primary mirror, and the prism itself, a
     # faceted crystal held in a cage of four struts in front of the aperture.
     with k.at(x - .05, 0, z + 1.25, pitch=5):
@@ -422,7 +424,7 @@ def prism_tank(k):
             k.tube((.9, .6 * cos(a_), .6 * sin(a_)), (1.5, .3 * cos(a_), .3 * sin(a_)), .03, STEEL, n=5)
         k.rev((1.2, 0, 0), 'x', [(0, .02), (.3, .34), (.42, .34), (.74, .02)], PLASMA, n=6, smooth=False)   # the prism
         k.rev((1.5, 0, 0), 'x', [(0, .36), (.12, .36)], STEEL, n=6, smooth=False)                           # its collar
-        k.cbox(-.2, 0, .5, 1.1, .46, .05, TEAM)                                           # recognition panel
+        k.cbox(-.2, 0, .5, .7, .3, .05, TEAM)                                           # recognition panel
         for s_ in (-1, 1): k.box(-.9, s_ * .5 - .05, -.2, .5, .1, .4, DARK)             # elevation jacks
     for s_ in (-1, 1):
         k.pipe([(x - 1.5, s_ * .45, z + .6), (x - 1.25, s_ * .4, z + .95), (x - .9, s_ * .3, z + 1.2)], .055, RUBBER, n=6)
@@ -445,7 +447,7 @@ def tesla_tank(k):
     for i in range(5): k.cbox(x - 1.38 + i * .19, 0, z + 1.15, .05, 1.3, .08, DARK)
     roof_panel(k, x + .2, 0, z + .8, .7, .9)
     for s in (-1, 1):
-        k.box(x - 1.2, s * 1.02 - .02, z + .15, 1.3, .04, .4, TEAM)
+        k.box(x - 1.2, s * 1.02 - .02, z + .15 + 0.08, 1.3, .04, 0.24, TEAM)
         with k.at(x + .8, s * .62, z + .8, pitch=-26, s=1.18):
             k.cyl(0, 0, 0, .26, .2, DARK, n=10)
             k.rev((0, 0, .2), 'z', [(0, .19), (.5, .17)], rgb(150, 96, 66, 'copper'), n=12)   # primary winding
@@ -469,7 +471,7 @@ def cab(k, x0, x1, W, z0, h, c, slope=.35, roof=None):
     for s in (-1, 1):
         y = s * (W / 2 + e)
         k.plate([(x0 + .25, y - s * .02, z0 + h * .55), (x1 - .1, y - s * .02, z0 + h * .55), (x1 - slope, y - s * .1, z0 + h * .93), (x0 + .3, y - s * .1, z0 + h * .93)], GLASS)
-    if roof: k.cbox((x0 + x1 - slope) / 2, 0, z0 + h, (x1 - slope - x0) * .8, W * .7, .03, roof)
+    if roof: k.cbox((x0 + x1 - slope) / 2, 0, z0 + h, (x1 - slope - x0) * .5, W * .45, .03, roof)
 
 def bonnet(k, x0, x1, W, z0, h, c):
     """Engine bonnet ahead of a cab: tapering hood, grille, bumper, headlights."""
@@ -510,7 +512,7 @@ def scout(k):
     for s in (-1, 1):
         y = s * (W / 2 + e)
         k.plate([(-.85, y - s * .03, 1.42), (.85, y - s * .03, 1.42), (.5, y - s * .11, 1.84), (-.8, y - s * .11, 1.84)], GLASS)
-        k.box(-2.1, s * (W / 2) - .02, 1.02, 1.1, .04, .3, TEAM)
+        k.box(-2.1, s * (W / 2) - .02, 1.02 + 0.06, 1.1, .04, 0.18, TEAM)
         k.cbox(2.33, s * .72, 1.02, .04, .22, .2, LAMP)
     k.cbox(2.36, 0, .7, .14, W, .2, DARK); k.cbox(2.34, 0, 1.0, .03, .9, .22, DARK)
     k.cbox(1.6, 0, 1.3, 1.2, 1.5, .03, tint(c, .9))  # bonnet louvres
@@ -534,7 +536,7 @@ def raider(k):
     mudguards(k, xs, W, r, c, .38)
     for s in (-1, 1):
         k.plate([(1.55, s * .2 - .16, 1.62), (1.55, s * .2 + .16, 1.62), (1.38, s * .2 + .16, 1.84), (1.38, s * .2 - .16, 1.84)], GLASS_DARK)
-        k.box(-2.5, s * (W / 2) - .02, 1.2, 1.3, .04, .26, TEAM)
+        k.box(-2.5, s * (W / 2) - .02, 1.2 + 0.052, 1.3, .04, 0.156, TEAM)
         k.cbox(2.55, s * .75, 1.2, .1, .2, .18, LAMP)
     engine_deck(k, -2.0, W * .7, 1.95, c, 1, 1.0)
     k.cyl(-.2, 0, 1.95, .62, .12, DARK, n=16)
@@ -555,7 +557,7 @@ def ifv(k):
     k.loft([[(-3.4, -W / 2, 1.12), (2.6, -W / 2, 1.12), (3.45, -.8, 1.15), (3.45, .8, 1.15), (2.6, W / 2, 1.12), (-3.4, W / 2, 1.12)],
             [(-3.4, -W / 2 + .2, 1.85), (1.9, -W / 2 + .2, 1.85), (2.1, -.7, 1.8), (2.1, .7, 1.8), (1.9, W / 2 - .2, 1.85), (-3.4, W / 2 - .2, 1.85)]], c, smooth=False)
     for s in (-1, 1):
-        k.box(-3.2, s * (W / 2) - .02, 1.2, 1.8, .04, .3, TEAM)
+        k.box(-3.2, s * (W / 2) - .02, 1.2 + 0.06, 1.8, .04, 0.18, TEAM)
         k.cbox(3.0, s * .95, 1.3, .1, .2, .18, LAMP)
         k.box(-1.0, s * (W / 2 - .12) - .12, 1.5, 1.6, .24, .28, tint(c, .92))  # stowage
     k.cbox(2.2, -.6, 1.82, .9, .8, .05, DARK); hatch(k, 2.2, .6, 1.84, .28, c)
@@ -591,7 +593,7 @@ def flak_track(k):
     k.box(-3.15, -W / 2, 1.0, 3.4, W, .12, c)
     for s in (-1, 1):
         y0 = s * W / 2 - (.06 if s > 0 else 0)
-        k.box(-3.15, y0, 1.12, 3.4, .06, .62, c); k.box(-3.0, s * (W / 2 + .01) - .02, 1.25, 1.6, .04, .28, TEAM)
+        k.box(-3.15, y0, 1.12, 3.4, .06, .62, c); k.box(-3.0, s * (W / 2 + .01) - .02, 1.25 + 0.056, 1.6, .04, 0.168, TEAM)
     k.box(-3.15, -W / 2, 1.12, .06, W, .62, c)
     # The gun: rotating base, twin barrels with flash hiders, ammunition boxes, gunner's seat, shield.
     k.cyl(-1.5, 0, 1.12, .7, .15, DARK, n=16)
@@ -629,7 +631,7 @@ def rocket_launcher(k):
     truck(k, c, bed=False)
     roof_panel(k, .8, 0, 2.7, .8, 1.5)
     k.box(-3.65, -W / 2 + .1, 1.3, 3.7, W - .2, .15, c)
-    for s in (-1, 1): k.box(-3.3, s * (W / 2 - .1) - .02, 1.32, 2.6, .04, .12, TEAM)
+    for s in (-1, 1): k.box(-3.3, s * (W / 2 - .1) - .02, 1.32 + 0.024, 2.6, .04, 0.072, TEAM)
     k.cyl(-1.9, 0, 1.45, .8, .3, DARK, n=16)
     for s in (-1, 1): k.box(-2.3, s * .85 - .08, 1.75, .9, .16, .6, tint(c, .9))  # cradle cheeks
     with k.at(-1.9, 0, 2.3, pitch=22):
@@ -640,7 +642,7 @@ def rocket_launcher(k):
                 k.rev((1.7, y, z), 'x', [(0, .075), (.06, .075)], GUN, n=8)
                 k.rev((1.76, y, z), 'x', [(0, .055), (.01, .055)], BLACK, n=6)
         for xb in (-.9, .3, 1.3): k.cbox(xb, 0, -.34, .08, 2.16, .76, DARK)
-        k.cbox(.2, 0, .385, 1.8, 1.4, .03, TEAM)
+        k.cbox(.2, 0, .385, 1.1, .85, .03, TEAM)
     antenna(k, .35, 1.0, 2.7, 2.2)
 
 def demolition_truck(k):
@@ -670,7 +672,7 @@ def v3_launcher(k):
         # Split cabs either side of the missile's nose.
         with k.at(0, s * 1.02, 0): cab(k, 3.2, 5.5, .95, 1.4, 1.4, c, slope=.5)
         roof_panel(k, 4.1, s * 1.02, 2.8, 1.0, .6)
-        k.box(-4.8, s * (W / 2 + .01) - .02, 1.5, 3.2, .04, .3, TEAM)
+        k.box(-4.8, s * (W / 2 + .01) - .02, 1.5 + 0.06, 3.2, .04, 0.18, TEAM)
         k.box(-1.2, s * 1.0 - .45, 1.9, 2.6, .9, .7, tint(c, .92))  # equipment lockers
         k.cbox(5.5, s * 1.0, 1.55, .06, .3, .25, LAMP)
     k.cbox(5.52, 0, 1.2, .14, W, .25, DARK)
@@ -704,9 +706,9 @@ def mcv(k):
     k.tube((2.6, W / 2 - .3, 2.9), (2.6, W / 2 - .3, 3.7), .09, STEEL, n=8)
     # The yard module: a ribbed container body with team doors.
     k.box(-4.9, -W / 2, 1.4, 7.0, W, 1.9, remat(c, 'corr'))
-    k.box(-4.92, -W / 2 + .1, 1.5, .04, W - .2, 1.7, TEAM)
+    k.box(-4.92, -W / 2 + .6, 2.2, .04, W - 1.2, .5, TEAM)
     for s in (-1, 1):
-        k.box(-4.4, s * (W / 2 + .01) - .02, 2.5, 6.0, .04, .5, TEAM)
+        k.box(-4.4, s * (W / 2 + .01) - .02, 2.5 + 0.1, 6.0, .04, 0.3, TEAM)
         for xb in (-4.2, 1.6):  # folded outriggers
             k.box(xb, s * W / 2 - (.16 if s < 0 else 0), .7, .3, .16, 1.9, YELLOW)
             k.cbox(xb + .15, s * (W / 2 + .05), .5, .5, .5, .1, IRON)
@@ -742,7 +744,7 @@ def dump_body(k, x0, x1, W, z, h, c, canopy=1.6):
         for i in range(n + 1):
             xa = x0 + i * (x1 - x0) / n
             k.tube((xa, s * (W / 2 - .48), z), (xa - .25, s * (W / 2 + .02), z + h), .07, tint(c, .85), n=4)
-        k.box(x0 - .4, s * (W / 2 + .02) - .03, z + h - .5, x1 - x0, .06, .4, TEAM)
+        k.box(x0 - .4, s * (W / 2 + .02) - .03, z + h - .5 + 0.08, x1 - x0, .06, 0.24, TEAM)
 
 def harvester(k):
     # Ore truck: a rigid mining hauler (after the Cat 777: 9.8 x 6.1 x 5.1 m, scaled down) with a
@@ -806,7 +808,7 @@ def war_miner(k):
     for y in (-1.0, 0, 1.0): k.cbox(3.3, y, 2.25, .04, .6, .2, GLASS_DARK)
     for s in (-1, 1):
         k.cbox(2.3, s * 1.72, 2.25, .9, .04, .2, GLASS_DARK); k.cbox(3.32, s * 1.3, 1.5, .05, .3, .25, LAMP)
-        k.box(-3.6, s * (W / 2 + .01) - .02, 2.2, 4.6, .04, .4, TEAM)
+        k.box(-3.6, s * (W / 2 + .01) - .02, 2.2 + 0.08, 4.6, .04, 0.24, TEAM)
     roof_panel(k, 2.0, 0, 2.9, 1.0, 2.0)
     k.cyl(2.0, -.7, 2.93, .4, .25, tint(c, .9), n=12); mg(k, 2.0, -.7, 3.1, yaw=0, length=1.4)
     # Ore bin.

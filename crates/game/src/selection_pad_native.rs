@@ -55,7 +55,7 @@ fn sp_mission_input() -> (App, Entity, SimId, SimId) {
     for entity in old { app.world_mut().despawn(entity); }
     for (id, (unit, pos), x) in [(plane, plane_data, 0.0), (normal, normal_data, 200.0)] {
         app.world_mut().spawn((UnitView {
-            unit, id, owner: HUMAN, previous: pos, current: pos, altitude: 0.0, drawn: None, stride: 0.0,
+            unit, id, owner: HUMAN, previous: pos, current: pos, altitude: 0.0, drawn: None, stride: 0.0, still: 0.0,
         }, Transform::from_xyz(x, 0.0, 10.0), Visibility::Visible));
     }
     (app, window, plane, normal)
