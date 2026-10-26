@@ -1,0 +1,46 @@
+{
+  "status": "ROOT_INDEPENDENT_FACTUAL_VERIFICATION_PASS_NOT_POLICY_OR_NATIVE_APPROVAL",
+  "utc": "2026-10-26T12:26:59.358147+00:00",
+  "root_factual_id": "ROOT_REBIND_R212_D_SUPER_ME_WALK_01_FACTUAL_2026_10_26_122659",
+  "packet": {
+    "path": "docs/validation/ra2-parity/rebind-r212/D-super-me-walk-01/actual-input-scope.json",
+    "bytes": 243849,
+    "sha256": "b525a0470e0b1b71a9825ec352f32b01f4a6541269f9f8f44dd6f795db9e66d2"
+  },
+  "source_count": 674,
+  "core_count": 105,
+  "derived_count": 15,
+  "authority_count": 64,
+  "source_added": [
+    "crates/game/src/privacy_hover_tests.rs",
+    "crates/game/src/privacy_interact_tests.rs",
+    "crates/game/src/privacy_native.rs",
+    "crates/game/src/privacy_order_tests.rs",
+    "crates/game/src/privacy_scenery_tests.rs",
+    "crates/game/src/privacy_selection_tests.rs",
+    "crates/game/src/privacy_smoke_tests.rs",
+    "crates/sim/src/ai/ra8_lifecycle_remediation_tests.rs",
+    "crates/sim/tests/ra9_audit/single-source-acceptance-negatives.rs",
+    "crates/sim/tests/ra9_bay_current_state.rs",
+    "crates/sim/tests/ra9_crate_cargo_census.rs",
+    "crates/sim/tests/ra9_guard_effective_targets.rs",
+    "crates/sim/tests/ra9_runtime_common/mod.rs",
+    "crates/sim/tests/ra9_runtime_liveness.rs",
+    "crates/sim/tests/ra9_specialist_firepower.rs",
+    "crates/sim/tests/ra9_support_current.rs",
+    "crates/sim/tests/ra9_temporal_pending.rs",
+    "crates/sim/tests/ra9_temporal_sources.rs"
+  ],
+  "source_changed_count": 169,
+  "verified_scope": {
+    "original_sha256": "adc869ca037db5141f562f18092d022045e194de0d1204a46b9ec8372b2b826f",
+    "model_census_sha256": "72d4916fd2b323b39f3e68e8bc865e170435bb4f25f82e2a7c34a76e09a12406",
+    "model_surface_sha256": "97cbecb23fefc2ca40d34698a21016c0da93bb972d6261bea12aa6177392a6eb",
+    "original_closure_sha256": "3f993d84ec5ee9e77643209623121c60c4e241cb7bcc096486d846030439ead7",
+    "special_original_sha256": "2bb1dc56e7f0729621fe625300a19665af24e823b7f026fa7cb2aa91e91469bb"
+  },
+  "physical_branch_rows": 29,
+  "physical_branch_changes": 1,
+  "howtosee_sha256": "8ae4edfadf97fc68138d03c9a12d9c1217cf0c1fb65cf6dd6010c77b1c5bd6c1",
+  "limits": "Authenticates actual bytes, discovered source scope, producer observations, protected spans and factual pointers only. Does not authorize model-policy changes or infer native pass/review."
+}

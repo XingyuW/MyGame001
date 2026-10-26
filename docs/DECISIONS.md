@@ -12551,3 +12551,50 @@ built as fast as expected. Measured causes:
 Unchanged: Super Me is human-only, costs 1 credit per item, keeps prerequisites, placement,
 queue and exit rules, and is part of the hashed state. Equation 3 and invariant I7 still hold:
 progress is still charged unit by unit (`advance_item`).
+
+### R212. Rebind the RA9 source scope to the R211 and walk-cycle source
+
+R211 and the walk-cycle and review work of the same session (2026-10-25/26) changed nine Rust
+source files: `crates/sim/src/{economy,lib}.rs` and `crates/game/src/{hd_art,selection,
+selection_pad_native,skirmish,smoke,units,visual_review}.rs`. The RA9 audit pins the bytes of
+every `crates/*/src` file (`ra9_model_census.tsv`) and, through the final input binding, every
+acceptance row, so 83 of its 185 tests failed on byte drift alone ("actual source bytes changed
+since observed model census"; "legacy current branch bytes changed crates/sim/src/economy.rs";
+"completion actual code changed"). No behavioural assertion failed. The user asked for the
+census to be regenerated and the scope approval and `economy.rs` policy hashes rebound.
+
+**Procedure.** The C-corrected-09 controller scripts were copied unchanged into
+`docs/validation/ra2-parity/rebind-r212/controller-sources/`, except for the output directory,
+the phase pattern (`D-...`) and the verification ID prefix (`ROOT_REBIND_R212_`). Phase
+`D-super-me-walk-01`:
+
+1. `prepare`: ran the producer (`scripts/ra2_reference.py --ra9-scope`, exit 0) and refreshed
+   only the bytes/FNV/SHA-256 columns of `legacy904-branch-files.tsv` (`economy.rs`) and
+   `completion-local-code.tsv` (`economy.rs`, `units.rs`). The census changed exactly the nine
+   files above. Model surface, original closure, special original and R2 original hashes are
+   unchanged; only `model_census_sha256` moved (dee598a1... to 72d4916f...). Packet
+   `actual-input-scope.json`: 674 source files, 105 core files, 64 authority spans, SHA-256
+   `b525a0470e0b1b71a9825ec352f32b01f4a6541269f9f8f44dd6f795db9e66d2`. Finder `.DS_Store`
+   files were moved out of `assets/` and `crates/` for the run and restored afterwards; they
+   are not inputs.
+2. `verify`: independent byte verification passed
+   (`ROOT_REBIND_R212_D_SUPER_ME_WALK_01_FACTUAL_2026_10_26_122659`).
+3. `propagate --apply`: 15 derived outputs, 13 changed, 3,362 cell deltas, all factual:
+   `final_input_sha256`, the `model-census`, `branch-fnv` and `code` tokens of
+   `consumer_bindings`, and the approval's census hash and review ID. The new binding is the
+   packet hash above.
+4. `readback`: passed. Every class, value, reason, route, guard, recorded policy decision and
+   qualified receipt cell is byte-equal to its preimage.
+
+**Policy reconsideration.** The 42 legacy families whose branch FNV changed (F015-F071 AI build
+and recovery keys, F075/F094/F141/F208/F274/F275 ore keys, F155 `RepairDelay`) and the 72
+completion rows pinned to `economy.rs`/`units.rs` were reviewed against the diff. The
+`economy.rs` change only alters the Super Me branch of `production_rate_pm`, the Super Me
+constant and the legacy low power tick rule for Super Me players. Super Me is human-only, so
+no computer player, ore, power-emergency recovery or repair rule they describe reads anything
+that changed. The `units.rs` change is presentation only (walk-frame hold). Every recorded
+policy therefore stands unchanged; only its byte evidence was refreshed.
+
+This is a factual rebind for an extension change, not new parity evidence, a native pass or a
+user acceptance. The C-corrected-09 records, the `ra2-parity-reviewed` tag and the 51 pending
+user checks are untouched. A further source change needs another rebind round.
