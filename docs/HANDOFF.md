@@ -1,5 +1,9 @@
 # MyGame001 — current implementation handoff
 
+The complete RA2 programme handoff, including final validation, independent review, merge/tag
+state, remaining debt and next actions, is in
+[RA2_PARITY_FINAL_HANDOFF.md](RA2_PARITY_FINAL_HANDOFF.md).
+
 <!-- RA2_FINAL_REVIEW2_BEGIN -->
 ## RA2 parity programme closed by independent review 2
 
