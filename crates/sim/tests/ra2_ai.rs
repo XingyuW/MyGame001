@@ -244,12 +244,13 @@ fn a_computer_player_places_its_buildings_within_their_reach_of_a_base_building(
 // --- Super Me (a match option, so tested through the match setup) -----------------------------------
 
 #[test]
-fn super_me_multiplies_the_rate_by_ten_and_pays_one_credit() {
+fn super_me_multiplies_the_rate_and_pays_one_credit() {
     // A human player with Super Me and its yard: a power building of 300 credits and 20 ticks
-    // advances 10 units a tick, so it is ready in the second tick, for 1 credit charged with
-    // the last unit. With three yards: 15.62 units a tick, and still 1 credit.
+    // advances `SUPER_ME_PRODUCTION_FACTOR` (30) units a tick, so it is ready in the first tick,
+    // for 1 credit charged with the last unit. With three yards: 46.86 units a tick, and still
+    // 1 credit.
     let data = data();
-    for (yards, first) in [(1, (10, 0)), (3, (15, 620))] {
+    for (yards, fraction) in [(1, 0), (3, 860)] {
         let mut app = App::new();
         app.add_plugins(SimPlugin { seed: 7 });
         let map = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -298,11 +299,11 @@ fn super_me_multiplies_the_rate_by_ten_and_pays_one_credit() {
         let power = building(&app, "allied_power");
         assert_eq!(rejections(&tick(&mut app, vec![queue(P0, power)])), NONE);
         let head = lane_of(&app, P0, power)[0];
-        assert_eq!((head.progress, head.fraction), first, "{yards} yards");
-        assert_eq!((head.charged, credits(&app, P0)), (0, before));
-        tick(&mut app, Vec::new());
-        let head = lane_of(&app, P0, power)[0];
-        assert_eq!((head.progress, head.charged), (20, 1), "{yards} yards");
+        assert_eq!(
+            (head.progress, head.fraction, head.charged),
+            (20, fraction, 1),
+            "{yards} yards"
+        );
         assert_eq!(credits(&app, P0), before - 1);
     }
 }

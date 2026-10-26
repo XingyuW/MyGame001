@@ -596,13 +596,15 @@ fn allied_and_soviet_units_unlock_through_their_structures_and_obey_orders() {
             target: shore,
         }],
     );
+    // Placement needs every cell of the site in sight, not just one; the build itself (one tick
+    // with Super Me) gives the scouts no time to come closer.
     let mut seen = false;
     for _ in 0..3000 {
         tick(world, Vec::new());
         let players = world.resource::<Players>();
         if players
             .get(HUMAN)
-            .is_some_and(|state| state.vision().sees_footprint(site))
+            .is_some_and(|state| site.cells().all(|cell| state.vision().is_visible(cell)))
         {
             seen = true;
             break;

@@ -24,16 +24,16 @@ pub fn facing_rect(facing: Direction) -> Rect {
 }
 
 /// World size of a frame of a walk cycle (`sprites/hd/walk`): the standing frame less its empty
-/// margin, so that six frames of eight facings stay a moderate texture.
+/// margin, so that eight frames of eight facings stay a moderate texture.
 pub const WALK_SIZE: f32 = 64.0;
 /// Frames in a walk cycle, one row of eight facings each.
-pub const WALK_FRAMES: u32 = 6;
+pub const WALK_FRAMES: u32 = 8;
 /// How far below the centre of a walk frame the ground point is (22 in the standing frame).
 pub const WALK_GROUND_OFFSET: f32 = 14.0;
 /// Cells a figure covers in one cycle of its walk, and of its run, so that its feet stay where
 /// they are planted instead of sliding (scripts/hd_infantry.py: two steps of the gait).
-pub const WALK_CYCLE_CELLS: f32 = 0.56;
-pub const RUN_CYCLE_CELLS: f32 = 0.9;
+pub const WALK_CYCLE_CELLS: f32 = 0.69;
+pub const RUN_CYCLE_CELLS: f32 = 0.87;
 /// The unit speed (`units.ron`) from which a figure runs instead of walking; the art's
 /// `RUNNERS` are the infantry at or above it.
 pub const RUN_SPEED: u16 = 20;
@@ -120,16 +120,16 @@ pub fn checked(root: &Path, category: &str, id: &str, size: Vec2) -> Result<Vec<
 #[cfg(test)]
 mod tests {
     use super::*;
-    /// A walk cycle runs through its six frames once per cycle, in either direction of time,
+    /// A walk cycle runs through its eight frames once per cycle, in either direction of time,
     /// and every frame of every facing is its own 256-texel cell of the sheet.
     #[test]
     fn a_stride_picks_its_frame_of_the_walk_sheet() {
         assert_eq!(walk_frame(0.0), 0);
-        assert_eq!(walk_frame(0.17), 1);
-        assert_eq!(walk_frame(0.99), 5);
+        assert_eq!(walk_frame(0.13), 1);
+        assert_eq!(walk_frame(0.99), 7);
         assert_eq!(walk_frame(1.0), 0);
-        assert_eq!(walk_frame(7.5), 3);
-        assert_eq!(walk_frame(-0.01), 5);
+        assert_eq!(walk_frame(7.5), 4);
+        assert_eq!(walk_frame(-0.01), 7);
         let mut cells = std::collections::BTreeSet::new();
         for facing in Direction::ALL {
             for frame in 0..WALK_FRAMES {
