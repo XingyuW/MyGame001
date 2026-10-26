@@ -355,6 +355,8 @@ fn capture_features(world: &mut World) {
 /// MYGAME_FX_REVIEW: weapons at work beside a developed base. Prism tanks, Tesla tanks and
 /// troopers, battle tanks, GIs and a V3 launcher engage an armoured column, then the
 /// infantry walks back past the cloning vats, which are selected and given a rally point.
+/// With MYGAME_FX_REVIEW_OFFSCREEN set, the scene is drawn to a 1600 x 1000 image instead of the
+/// window (captures of a sleeping or locked display are black).
 pub fn enable_fx(app: &mut App, directory: PathBuf) {
     app.insert_resource(Review {
         directory,
@@ -495,11 +497,18 @@ fn capture_fx(world: &mut World) {
             .collect()
     };
     let shot = |world: &mut World, name: String| {
+        let screenshot = match world.get_resource::<ReviewTarget>() {
+            Some(target) => Screenshot::image(target.0.clone()),
+            None => Screenshot::primary_window(),
+        };
         world
-            .spawn(Screenshot::primary_window())
+            .spawn(screenshot)
             .observe(save_to_disk(dir.join(name)));
     };
     match frame {
+        5 if std::env::var_os("MYGAME_FX_REVIEW_OFFSCREEN").is_some() => {
+            draw_offscreen(world, UVec2::new(1600, 1000));
+        }
         10 => {
             let original = world.resource::<Catalogue>().clone();
             let (review, choice) = fx_review(&original);
@@ -554,9 +563,8 @@ fn capture_fx(world: &mut World) {
                 world.resource_mut::<crate::selection::SelectedBuilding>().0 = vats;
             }
         }
-        380..=470 if frame % 15 == 5 => {
-            shot(world, format!("fx-walk-{:02}.png", (frame - 380) / 15))
-        }
+        // Every twelfth of a second, enough to follow a stride.
+        380..=470 if frame % 5 == 0 => shot(world, format!("fx-walk-{:02}.png", (frame - 380) / 5)),
         490 => {
             world.write_message(AppExit::Success);
         }
@@ -584,6 +592,26 @@ pub fn enable_menu(app: &mut App, directory: PathBuf) {
 /// The image the menu review draws to.
 #[derive(Resource)]
 struct ReviewTarget(Handle<Image>);
+
+/// Makes every camera, and the interface with them, draw to an image of `size` instead of the
+/// window ([`ReviewTarget`]), so that captures work while the display sleeps or is locked.
+fn draw_offscreen(world: &mut World, size: UVec2) {
+    use bevy::render::render_resource::{TextureFormat, TextureUsages};
+    let mut image = Image::new_target_texture(size.x, size.y, TextureFormat::Rgba8UnormSrgb, None);
+    image.texture_descriptor.usage |= TextureUsages::COPY_SRC;
+    let handle = world.resource_mut::<Assets<Image>>().add(image);
+    let cameras: Vec<Entity> = world
+        .query_filtered::<Entity, With<Camera2d>>()
+        .iter(world)
+        .collect();
+    for camera in cameras {
+        world.entity_mut(camera).insert((
+            bevy::camera::RenderTarget::Image(handle.clone().into()),
+            bevy::ui::IsDefaultUiCamera,
+        ));
+    }
+    world.insert_resource(ReviewTarget(handle));
+}
 
 /// The menu with the longest text in every place, for the review: the longest map name at its
 /// largest size, and ten players who all play the country with the longest name.
@@ -637,7 +665,6 @@ fn capture_menu(world: &mut World) {
     match frame {
         // The camera draws to an image of the smallest window's size, and the interface with it.
         5 => {
-            use bevy::render::render_resource::{TextureFormat, TextureUsages};
             let size = std::env::var("MYGAME_MENU_REVIEW_SIZE")
                 .ok()
                 .and_then(|size| {
@@ -646,21 +673,7 @@ fn capture_menu(world: &mut World) {
                 })
                 .filter(|size| (640..=4096).contains(&size.x) && (480..=4096).contains(&size.y))
                 .unwrap_or(crate::skirmish::MENU_FIT.as_uvec2());
-            let mut image =
-                Image::new_target_texture(size.x, size.y, TextureFormat::Rgba8UnormSrgb, None);
-            image.texture_descriptor.usage |= TextureUsages::COPY_SRC;
-            let handle = world.resource_mut::<Assets<Image>>().add(image);
-            let cameras: Vec<Entity> = world
-                .query_filtered::<Entity, With<Camera2d>>()
-                .iter(world)
-                .collect();
-            for camera in cameras {
-                world.entity_mut(camera).insert((
-                    bevy::camera::RenderTarget::Image(handle.clone().into()),
-                    bevy::ui::IsDefaultUiCamera,
-                ));
-            }
-            world.insert_resource(ReviewTarget(handle));
+            draw_offscreen(world, size);
         }
         40 => shot(world, "ra1-menu-opening.png"),
         50 => {
