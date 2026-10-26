@@ -17,7 +17,8 @@
 //! times 1000 / `multiple_factory_pm` for every further working factory of the item's group up
 //! to [`MAX_COUNTED_FACTORIES`] ([`factory_rate_pm`]), times the low power factor
 //! ([`power_rate_pm`]: between `min_low_power_speed_pm` and `max_low_power_speed_pm` while the
-//! player is short of power), times 10 with Super Me. The rate is added to the item's
+//! player is short of power), or with Super Me [`SUPER_ME_PRODUCTION_FACTOR`] times the factory
+//! rate whatever the power (docs/DECISIONS.md R211). The rate is added to the item's
 //! [`QueueItem::fraction`] every tick; each whole unit is one unit of progress, charged as
 //! above, so equation 3 and invariant I7 hold with every rate; a unit the player cannot pay
 //! ends the tick's progress, and the fraction below one unit is kept. The Construction Yard has
@@ -67,6 +68,10 @@ pub const MAX_COUNTED_FACTORIES: usize = 10;
 /// Largest production rate in permille of a progress unit per tick, whatever the rules file
 /// holds (invariant I12).
 pub const MAX_PRODUCTION_RATE_PM: u64 = 1_000_000_000;
+
+/// How many times faster than normal a Super Me player produces (docs/DECISIONS.md R211). Low
+/// power does not slow a Super Me player down.
+pub const SUPER_ME_PRODUCTION_FACTOR: u32 = 30;
 
 /// The lane of a queue (RA2, docs/RA2_PARITY_PLAN.md section 5, RA2 item 3). With a rules file
 /// the buildings of the Construction Yard are produced in two lanes that progress side by side:
@@ -210,7 +215,11 @@ impl PlayerState {
         if self.super_me { 1 } else { base }
     }
     pub fn production_speed(&self) -> u32 {
-        if self.super_me { 10 } else { 1 }
+        if self.super_me {
+            SUPER_ME_PRODUCTION_FACTOR
+        } else {
+            1
+        }
     }
 
     /// Credits, never negative (invariant I7).
@@ -588,7 +597,8 @@ pub fn power_rate_pm(rules: &crate::rules::ProductionRules, produced: i32, consu
 }
 
 /// The production rate of a player in permille of a unit of progress per tick (RA2, section
-/// 4.2): [`factory_rate_pm`] times [`power_rate_pm`], rounded down, times 10 with Super Me.
+/// 4.2): [`factory_rate_pm`] times [`power_rate_pm`], rounded down; with Super Me
+/// [`factory_rate_pm`] times [`SUPER_ME_PRODUCTION_FACTOR`], whatever the power.
 pub fn production_rate_pm(
     rules: &crate::rules::ProductionRules,
     factories: usize,
@@ -596,11 +606,10 @@ pub fn production_rate_pm(
     consumed: i32,
     super_me: bool,
 ) -> u64 {
-    let rate = factory_rate_pm(rules, factories) * power_rate_pm(rules, produced, consumed) / 1000;
     let rate = if super_me {
-        rate.saturating_mul(10)
+        factory_rate_pm(rules, factories).saturating_mul(u64::from(SUPER_ME_PRODUCTION_FACTOR))
     } else {
-        rate
+        factory_rate_pm(rules, factories) * power_rate_pm(rules, produced, consumed) / 1000
     };
     rate.min(MAX_PRODUCTION_RATE_PM)
 }
@@ -1047,9 +1056,10 @@ pub(crate) fn advance_production(
                                 / u64::from(ai_build_time_pm);
                         advance_item(head, terms.cost, terms.build_time, rate, super_me, credits);
                     }
-                    // Without a rules file: one unit per tick, on even ticks under low power.
+                    // Without a rules file: one unit per tick, on even ticks under low power
+                    // (Super Me: `speed` units on every tick, whatever the power).
                     None => {
-                        if low_power && !even_tick {
+                        if low_power && !even_tick && !super_me {
                             continue;
                         }
                         let next = head.progress.saturating_add(speed).min(terms.build_time);

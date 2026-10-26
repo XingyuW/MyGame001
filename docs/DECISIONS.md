@@ -12530,3 +12530,24 @@ preserved without pass credit. This independent GO WITH DEBT authorizes the alre
 local merge of `ra2-parity` into `main` and annotated tag `ra2-parity-reviewed`; it does not
 authorize a user approval tag or claim signing, notarization, universal/other-machine launch,
 render smoothness, subjective quality or completion of the 51 user checks.
+
+### R211. Super Me is three times faster to produce and moves at 3x by default
+
+Playtest feedback (2026-10-25): with Super Me on, the human player's units neither moved nor
+built as fast as expected. Measured causes:
+
+1. **Movement.** Super Me never changed movement on its own: the separate UNIT SPEED row
+   defaulted to 1x, and R7's conversion makes a GI cover 0.86 cells a second and a Grizzly
+   1.02. The lobby's unit speed now defaults to 3x (`skirmish::DEFAULT_UNIT_SPEED`). It still
+   takes effect only with Super Me, so normal matches and computer players are unchanged, and
+   1x to 4x stay selectable.
+2. **Production.** Super Me multiplied the rate by 10, and the low power factor still applied
+   on top, so a 2,000-credit War Factory took 8.4 s at 1x game speed, or up to 16.8 s short of
+   power (840 ticks per 1,000 credits, `BuildSpeed=.7`). Super Me now multiplies the factory
+   rate by `sim::SUPER_ME_PRODUCTION_FACTOR` (30) and ignores low power: a War Factory takes
+   2.8 s, a Grizzly about 1 s, a power plant about 1.1 s. The legacy (no rules file) path uses
+   the same factor and skips the even-tick low power rule for Super Me.
+
+Unchanged: Super Me is human-only, costs 1 credit per item, keeps prerequisites, placement,
+queue and exit rules, and is part of the hashed state. Equation 3 and invariant I7 still hold:
+progress is still charged unit by unit (`advance_item`).
