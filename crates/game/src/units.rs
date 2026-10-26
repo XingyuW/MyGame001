@@ -212,7 +212,13 @@ pub struct UnitView {
     /// it (in cycles): a figure's legs move with the ground it covers.
     pub drawn: Option<Vec2>,
     pub stride: f32,
+    /// Game seconds since the unit last moved ([`WALK_HOLD_SECONDS`]).
+    pub still: f32,
 }
+
+/// How long a figure that stops keeps its walk frame: a unit that waits a tick or two for room
+/// in the next cell or for a new path is still walking, and must not flick to its standing frame.
+pub const WALK_HOLD_SECONDS: f32 = 0.3;
 
 /// The shadow an aircraft casts on the ground far below it: a child of its unit view.
 #[derive(Component, Debug)]
@@ -500,6 +506,7 @@ pub(crate) fn spawn_unit_views(
                     altitude: 0.0,
                     drawn: None,
                     stride: 0.0,
+                    still: WALK_HOLD_SECONDS,
                 },
                 bevy::sprite::Anchor::CENTER,
                 Sprite {
@@ -652,7 +659,13 @@ fn place_unit_views(
         }
         view.current = position.0;
         let cell = interpolate(view.previous, view.current, fraction);
-        let walking = view.previous != view.current;
+        let moved = view.previous != view.current;
+        view.still = if moved {
+            0.0
+        } else {
+            view.still + speed.delta()
+        };
+        let walking = moved || view.still < WALK_HOLD_SECONDS;
         // A figure with a walk cycle shows the frame its stride has reached while it moves, and
         // its standing frame otherwise. The stride follows the ground covered, not the clock.
         let gait = kind
@@ -718,7 +731,7 @@ fn place_unit_views(
             .is_some_and(|m| m.category == sim::Category::Infantry);
         let phase = speed.clock() * 11.0 + view.id.0 as f32;
         // A figure without a walk cycle at least bobs as it goes.
-        if walking && infantry && gait.is_none() && !sink.paused() {
+        if moved && infantry && gait.is_none() && !sink.paused() {
             ground.y += phase.sin().abs() * 1.2;
         }
 
@@ -748,7 +761,7 @@ fn place_unit_views(
             // An aircraft that stands on its dock has landed there (RA4); with the legacy
             // ruleset a strike aircraft that has flown home sits on the ground beside its base
             // while it rearms. Everything else that flies stays up.
-            let landed = !walking
+            let landed = !moved
                 && (aircraft_landed(dock_cells.get(&view.id).copied(), mobile)
                     || rearming.is_some_and(|state| state.rearming.contains_key(&view.id))
                         && host

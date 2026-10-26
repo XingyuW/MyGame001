@@ -334,7 +334,7 @@ def unit(ident,facing):
     hd_units.build(m,ident)
     return m.render()
 
-WALK_FRAMES=6
+WALK_FRAMES=8
 def walkers():
     import hd_infantry
     return hd_infantry.WALKERS

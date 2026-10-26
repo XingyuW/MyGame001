@@ -1546,6 +1546,7 @@ mod tests {
                 altitude: 0.0,
                 drawn: None,
                 stride: 0.0,
+                still: 0.0,
             },
             Transform::from_xyz(0.0, 0.0, 10.0),
             Visibility::Visible,
@@ -2135,6 +2136,7 @@ mod tests {
                 altitude: 0.0,
                 drawn: None,
                 stride: 0.0,
+                still: 0.0,
             },
             Transform::default(),
             // The disguise intentionally remains rendered with friendly paint.
@@ -2575,6 +2577,7 @@ mod tests {
                 altitude: 0.0,
                 drawn: None,
                 stride: 0.0,
+                still: 0.0,
             },
             Transform::from_xyz(200.0, 0.0, 10.0),
             Visibility::Visible,
@@ -3049,6 +3052,7 @@ mod tests {
                     altitude: 0.0,
                     drawn: None,
                     stride: 0.0,
+                    still: 0.0,
                 },
                 Transform::from_xyz(x, 0.0, 10.0),
                 Visibility::Visible,
@@ -3452,6 +3456,7 @@ mod tests {
                     altitude: 0.0,
                     drawn: None,
                     stride: 0.0,
+                    still: 0.0,
                 };
             }
             // Independent single-click trials; do not accidentally invoke the separate
