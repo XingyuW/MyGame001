@@ -63,27 +63,31 @@ pub const FJORD_COAST: Layout = Layout {
 };
 
 /// The fjords of the western coast, each a line from its mouth to its head (or an arm from where
-/// it branches) and its half-width; the fjords of the eastern coast are their mirrors.
+/// it branches) and its half-width; the fjords of the eastern coast are their mirrors. The heads
+/// stop short of x = 100, so that the fjell between the two coasts stays some 60 cells wide:
+/// with the heads at x = 110 (and their towns) it narrowed to 20 between a head and the mirror
+/// of another, and the waves of two easy computer players met there head-on until the end of a
+/// match (docs/DECISIONS.md, "Twenty-one more maps").
 const FJORDS: [(&[(i32, i32)], i32); 15] = [
     // Below the first bench: a narrows near the sea, a hooked head.
     (&[(-8, 36), (10, 36), (26, 40)], 4),
     (&[(26, 40), (42, 41)], 2),
-    (&[(42, 41), (56, 40), (70, 44), (86, 46)], 3),
-    (&[(86, 46), (96, 46), (104, 41)], 2),
+    (&[(42, 41), (56, 40), (70, 44), (82, 46)], 3),
+    (&[(82, 46), (90, 45), (96, 40)], 2),
     // Below the second: rising inland, with a side arm into the second bench.
     (&[(-8, 106), (12, 103), (30, 98)], 4),
-    (&[(30, 98), (50, 94), (66, 92), (84, 87), (100, 84)], 3),
+    (&[(30, 98), (50, 94), (66, 92), (80, 88), (90, 85)], 3),
     (&[(66, 92), (74, 81), (80, 75)], 2),
     // Below the third: the longest, falling inland, with a narrows and a forked head.
     (&[(-8, 140), (12, 142), (26, 146)], 4),
     (&[(26, 146), (40, 148)], 2),
-    (&[(40, 148), (56, 150), (72, 156), (88, 158), (98, 156)], 3),
-    (&[(98, 156), (106, 148), (110, 140)], 2),
-    (&[(98, 156), (106, 161)], 2),
+    (&[(40, 148), (56, 150), (72, 156), (86, 157)], 3),
+    (&[(86, 157), (93, 150), (96, 143)], 2),
+    (&[(86, 157), (94, 162)], 2),
     // Below the fourth: winding up inland to a narrow head.
     (&[(-8, 216), (10, 213), (26, 207)], 4),
-    (&[(26, 207), (42, 204), (58, 198), (72, 197), (86, 191)], 3),
-    (&[(86, 191), (96, 184)], 2),
+    (&[(26, 207), (42, 204), (58, 198), (72, 197), (84, 191)], 3),
+    (&[(84, 191), (92, 185)], 2),
 ];
 
 /// A short sound into the outer coast.
@@ -160,7 +164,7 @@ pub fn fjord_coast(p: &mut Painter) {
     p.paint(
         |p, x, y| {
             let crag = if x.min(p.w - 1 - x) > 100 {
-                p.noise(x, y, 7, 4015) > 720
+                p.noise(x, y, 7, 4015) > 760
             } else {
                 p.noise(x, y, 13, 4015) > 760
             };
@@ -195,7 +199,7 @@ pub fn fjord_coast(p: &mut Painter) {
     // The fishing towns at the fjord heads, and hamlets on the outer coast.
     p.city(
         |p, x, y| {
-            [(109, 44), (105, 87), (106, 153), (101, 187)]
+            [(101, 42), (96, 86), (97, 151), (97, 187)]
                 .iter()
                 .any(|&(cx, cy)| {
                     let (mx, my) = p.mirror_of(cx, cy);
@@ -204,8 +208,8 @@ pub fn fjord_coast(p: &mut Painter) {
                         || (x - mx).pow(2) + (y - my).pow(2) <= r * r
                 })
         },
-        109,
-        44,
+        101,
+        42,
         3,
         4,
         4023,

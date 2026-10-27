@@ -12692,3 +12692,38 @@ The map generator examples were then formatted with rustfmt (`8015bf9`; output u
 else), so 131 families' branch fingerprints changed. No recorded policy (AI build and recovery
 plans, ore, power, repair, data conversions) reads the map list or the map limit; every policy
 stands unchanged.
+
+## Twenty-one more maps: the duels, and the fjords of Fjord Coast (2026-10-27; follows R215)
+
+R215 merged the twenty-one maps of the session "Map expansion and landscape diversity" before
+its computer-player check had finished. That check, `m14_duels` on the twenty-one maps (four
+pairings each, seed 14, on the code of `c6a70cb`), ended 83 of 84 matches; the slowest was
+Oil Fields, brutal against brutal, at 229,302 ticks (its `m6_production_matches` limit is
+252,000). The one that did not end was Fjord Coast, France (easy) against Germany (easy): no
+winner in 300,000 ticks, and none with seed 0 either (the seed of `m6_production_matches`,
+whose limit there is 288,000), while seeds 1 to 3 ended between 52,738 and 124,658.
+
+1. **Why.** The trace (`m14_duels -- trace`) showed both players broke from tick 9,000, with
+   one or two miners, sending waves of 3 to 20 units that met in the middle of the map and
+   never reached a base. Every route between the two halves crosses the fjell between the
+   western fjord heads and their eastern mirrors, and the heads reached x = 104 to 110 (mirrors
+   at 143 to 149), each closed by a fishing town and with denser crags on the fjell than on the
+   benches: some 20 cells of clear ground between a head and the mirror of another. It is the
+   head-on deadlock of "Maps at the engine's largest size" (waves of equal players meet halfway
+   on a narrow link), not a shortage of ore: every first base has 138 ore cells within 25
+   cells, as on the other maps.
+2. **Fix, in the map.** The fjord heads end some 10 cells nearer the coast (x = 90 to 96), the
+   towns moved with them, and the fjell's crags are as sparse as the benches' (noise above 760,
+   not 720): the fjell is about 50 cells wide at its narrowest. Starts, ore, roads and bridges
+   are unchanged, so `skirmish.ron` and the RA9 pins are too (the recipes and map files are not
+   in the audit's scope). With seed 0 the easy pairing now ends at tick 38,158, with seed 14 at
+   131,814, and the other three pairings of the first check at 23,222 to 55,861 (on the code of
+   `c6a70cb`).
+3. **`gen_maps check`** also reports the ore within 25 cells of the first start and the length
+   of the land path between the first pair (four-neighbour steps), which tell an economy that
+   runs dry from a route that is long; on these maps neither set Fjord Coast apart.
+4. **The test's own matches.** On the code of R215 with the fix, `RA2_DUEL_SEED=0 m14_duels --
+   full fjord_coast oil_fields` (the 72 pairings `m6_production_matches` plays on these two
+   maps, with its seed) ended all 72: the slowest at 88,834 ticks on Fjord Coast (limit
+   288,000) and 110,535 on Oil Fields (limit 252,000; its 229,302 above was seed 14 on the
+   earlier code). The other nineteen new maps were checked only by the four-pairing run above.

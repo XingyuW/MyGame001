@@ -788,18 +788,19 @@ impl MapSpec {
         }
         // Land reachable from the first start (four-neighbour steps, as the test).
         let index = |x: i32, y: i32| (y * w + x) as usize;
-        let mut seen = vec![false; (w * h) as usize];
+        let mut steps = vec![u32::MAX; (w * h) as usize];
         let (fx, fy) = starts[0];
         let mut queue = std::collections::VecDeque::from([(fx, fy)]);
-        seen[index(fx, fy)] = true;
+        steps[index(fx, fy)] = 0;
         while let Some((x, y)) = queue.pop_front() {
             for (nx, ny) in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)] {
-                if inside(nx, ny) && tile(nx, ny).passable && !seen[index(nx, ny)] {
-                    seen[index(nx, ny)] = true;
+                if inside(nx, ny) && tile(nx, ny).passable && steps[index(nx, ny)] == u32::MAX {
+                    steps[index(nx, ny)] = steps[index(x, y)] + 1;
                     queue.push_back((nx, ny));
                 }
             }
         }
+        let seen: Vec<bool> = steps.iter().map(|&s| s != u32::MAX).collect();
         for &(sx, sy) in &starts[1..] {
             if !seen[index(sx, sy)] {
                 problems.push(format!(
@@ -827,15 +828,22 @@ impl MapSpec {
             .map(|&(x, y)| (((x - fx).pow(2) + (y - fy).pow(2)) as f64).sqrt() as i32)
             .max()
             .unwrap_or(0);
+        // What a first base mines before it must go far (easy players do not go far).
+        let home_ore = cells
+            .iter()
+            .filter(|&&(x, y)| (x - fx).pow(2) + (y - fy).pow(2) <= 25 * 25 && tile(x, y).ore > 0)
+            .count();
         let summary = format!(
-            "{w} x {h}, {} starts; buildable {}%, passable {}%, water {}%, ore cells {}; \
-             first pair {} cells apart (farthest from the first: {farthest})",
+            "{w} x {h}, {} starts; buildable {}%, passable {}%, water {}%, ore cells {} \
+             ({home_ore} within 25 of the first start); first pair {} cells apart, {} steps \
+             by land (farthest from the first: {farthest})",
             starts.len(),
             share(&|t| t.buildable),
             share(&|t| t.passable),
             share(&|t| t.water),
             cells.iter().filter(|&&(x, y)| tile(x, y).ore > 0).count(),
             (((starts[1].0 - fx).pow(2) + (starts[1].1 - fy).pow(2)) as f64).sqrt() as i32,
+            steps[index(starts[1].0, starts[1].1)],
         );
         problems.truncate(12);
         (summary, problems)
