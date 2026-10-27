@@ -99,7 +99,8 @@ pub use economy::{
 };
 pub use economy_commands::{
     SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, extends_base,
-    missing_prerequisite, placement_reach, produces,
+    missing_prerequisite, missing_prerequisite_for, placement_reach, produces, produces_for,
+    super_me_counterparts, super_me_owned,
 };
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,

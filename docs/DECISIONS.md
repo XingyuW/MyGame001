@@ -12598,3 +12598,41 @@ policy therefore stands unchanged; only its byte evidence was refreshed.
 This is a factual rebind for an extension change, not new parity evidence, a native pass or a
 user acceptance. The C-corrected-09 records, the `ra2-parity-reviewed` tag and the 51 pending
 user checks are untouched. A further source change needs another rebind round.
+
+### R213. Super Me opens every unit of both sides and all countries
+
+The user asked (2026-10-26) for access to the units of every country with Super Me. Before,
+Super Me changed only price and speed; the buildability rule of R10 still applied: an Allied
+player saw no Soviet unit (`NoFactoryOfSide`), no country's specials but its own
+(`CountryRequired`, `CountryForbidden`), and no stolen technology without infiltrating a Battle
+Lab.
+
+For a human player with Super Me (`sim::PlayerState::super_me`), a **unit**:
+
+1. is offered whatever the roster (`PlayerState::offers`);
+2. skips the stolen technology, side and country tests (`check_buildable`);
+3. is produced by any factory of its kind, of either side (`sim::produces_for`): an Allied War
+   Factory builds the Rhino, an Allied Barracks the Conscript;
+4. has its prerequisites checked against the player's buildings and their counterparts of the
+   other side (`sim::super_me_owned`): two building types are counterparts when they are
+   factories of one group, members of one prerequisite group of the rules, or buildings of the
+   same non-combat role (the service depots). An Allied War Factory and Battle Lab so meet the
+   Apocalypse Tank's `soviet_war_factory` and `soviet_battle_lab`.
+
+Buildings keep the rules of the player's side, with one exception: the other side's factory of a
+kind of unit for which the player's side has no factory (`sim::super_me_counterparts`). With the
+shipped data that is only the Airforce Command for a Soviet player, without which the Harrier
+and the Black Eagle have no factory and no dock. No other building card is added, so the
+sidebar does not list both sides' barracks, war factories and so on.
+
+Unchanged: tech level, real prerequisites (base progression is still needed unless ALL UNLOCKED),
+the producer kind, build limits, docks, the superweapons option, and every computer player and
+human player without Super Me. The producer and dock checks use the player's real buildings,
+never counterparts. `crates/sim/tests/super_me_arsenal.rs` proves on the shipped data that an
+American and a Russian Super Me player with a complete base of their side may queue all 50
+queueable units (the Russian after building the Airforce Command), produce the other side's and
+other countries' units at their own factories, and that without Super Me the R10 rules hold.
+
+The user verification procedure of `docs/RA2_GAP_ANALYSIS.md` ("They do not waive country,
+producer or stolen-tech restrictions") is part of the protected HOWTOSEE span and stays as
+reviewed; it describes Super Me before R213.

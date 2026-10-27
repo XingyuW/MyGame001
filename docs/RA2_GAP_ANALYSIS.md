@@ -321,8 +321,8 @@ Engineer capture/paid cross-side production.
 | Teams |Computer players allied against human | Free-for-all available; no live diplomacy |
 | Difficulty |Medium per computer slot | Rules house multipliers plus separate game-owned controller policy |
 | Tech mode |STANDARD |Human-only ALL UNLOCKED convenience, defaultOFF |
-| Super Me |OFF |Human one-credit production and10× progress, with exact finite-credit rules |
-| Human unit speed |1×; selectable1.5×/2×/3×/4× with Super Me |Opponents do not inherit it |
+| Super Me |OFF |Human one-credit production and 30× progress whatever the power, with exact finite-credit rules; every unit of both sides and all countries (R211, R213) |
+| Human unit speed |3× with Super Me (R211); selectable 1×/1.5×/2×/3×/4× |Opponents do not inherit it |
 | Map growth |OFF |Optional scaling/start clearing; unchanged-size maps otherwise need real start capacity |
 | Players |Human plus up to9 computers |Engine capacity10 exceeds recorded original8; map-dependent without growth |
 | Game speed |1× initial, in-match0.5×–4× |Client time scale, not nondeterministic simulation arithmetic |
@@ -1150,7 +1150,7 @@ move the game from Red Alert 2.
 | Bridge destruction | Bridges are indestructible terrain | Bridges can be destroyed and repaired at a repair hut |
 | Game speed | 0.5x, 1x, 1.5x, 2x, 3x, 4x of 20 ticks per second, changeable in match | 7 settings with frame caps of 10, 12, 15, 20, 30, 60 and unlimited in single player |
 | Colour | 10 colours | Lobby colours (*count unverified*) |
-| Additions with no RA2 equivalent | Super Me (1 credit items, 10x build speed, up to 4x unit speed for the human) | None |
+| Additions with no RA2 equivalent | Super Me (1 credit items, 30x build speed, 3x unit speed by default and up to 4x, every unit of both sides and all countries, for the human) | None |
 
 ## 4. Factions and technology tree
 

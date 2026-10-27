@@ -894,7 +894,8 @@ fn human_base(host: &SimHost) -> (Vec<SimId>, Vec<SimId>, bool) {
 /// of the side of its country, and at least one card is listed: an item that the factories of
 /// that side build, and no building that needs the Construction Yard of another side. With ALL
 /// UNLOCKED the player's yard builds the buildings of every side, prerequisites being waived:
-/// then only that some card is listed.
+/// then only that some card is listed. With Super Me the units of every side and the other
+/// side's missing factory are listed too (`sim::super_me_counterparts`, R213).
 fn cards_of_own_side(host: &SimHost, played: Option<&MatchPlayers>) -> bool {
     let Some((definitions, rules)) = host
         .definitions()
@@ -910,24 +911,29 @@ fn cards_of_own_side(host: &SimHost, played: Option<&MatchPlayers>) -> bool {
         .map(|rules| rules.construction_yard)
         .collect();
     let listed = crate::sidebar::listed_items(host);
-    let unlocked = host
-        .players()
-        .and_then(|players| players.get(HUMAN))
-        .is_some_and(PlayerState::unlock_all);
+    let state = host.players().and_then(|players| players.get(HUMAN));
+    let unlocked = state.is_some_and(PlayerState::unlock_all);
     if unlocked {
         return !listed.is_empty();
     }
+    // Super Me lists the units of both sides and the other side's missing factory (R213).
+    let opened = |item: ProductionItem| {
+        state.is_some_and(|state| {
+            sim::super_me_counterparts(definitions, state.super_me(), state.country(), item)
+        })
+    };
     !listed.is_empty()
         && listed.iter().all(|&item| {
-            definitions.metadata(item).is_none_or(|entry| {
-                entry.owner_sides.is_empty()
-                    || side.is_some_and(|side| entry.owner_sides.contains(&side))
-            }) && definitions.production(item).is_some_and(|terms| {
-                !terms
-                    .prerequisites
-                    .iter()
-                    .any(|kind| other_yards.contains(kind))
-            })
+            opened(item)
+                || definitions.metadata(item).is_none_or(|entry| {
+                    entry.owner_sides.is_empty()
+                        || side.is_some_and(|side| entry.owner_sides.contains(&side))
+                }) && definitions.production(item).is_some_and(|terms| {
+                    !terms
+                        .prerequisites
+                        .iter()
+                        .any(|kind| other_yards.contains(kind))
+                })
         })
 }
 
