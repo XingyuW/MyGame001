@@ -91,7 +91,7 @@ fn code_guard() -> AuditResult<()> {
         (
             "scripts/generate_ra2_data.py",
             include_str!("../../../../scripts/generate_ra2_data.py"),
-            0xa7ce0c09a609cad9u64,
+            0x246b26d9622d93a2u64,
         ),
         (
             "crates/sim/src/command.rs",

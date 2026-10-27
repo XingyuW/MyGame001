@@ -880,6 +880,9 @@ pub fn suburbia(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // The brownfields' ore lies among rubble, so their seams are small: a seam in the farmland
+    // too.
+    p.gem_seam(214, 40);
     p.home_ore(4, 5490);
     p.finish(1, 5491);
 }

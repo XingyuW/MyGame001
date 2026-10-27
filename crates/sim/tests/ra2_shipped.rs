@@ -282,9 +282,10 @@ fn shipyard_distances() -> BTreeMap<String, Vec<Option<u32>>> {
 fn shipyard_water_lies_farther_from_the_starts_than_the_shipyards_adjacent_distance() {
     // The measurement behind docs/DECISIONS.md R25. The ini lets a shipyard stand 12 free cells
     // from a base building (`[GAYARD] Adjacent=12`), which is a distance of 13 between the
-    // footprints. On the shipped maps that reaches water from the Construction Yard at 28 of
-    // the 176 start positions, and from the first start (the human player's) on 2 of the 21
-    // maps; the game's 31 free cells reach it at 132, and from the first start on 18.
+    // footprints. On the shipped maps that reaches water from the Construction Yard at 34 of
+    // the 376 start positions, and from the first start (the human player's) on 3 of the 42
+    // maps; the game's 31 free cells reach it at 254, and from the first start on 31 (R216; 28,
+    // 2, 132 and 18 of 176 starts on 21 maps when R25 was decided).
     let distances = shipyard_distances();
     let all: Vec<u32> = distances
         .values()
@@ -296,14 +297,14 @@ fn shipyard_water_lies_farther_from_the_starts_than_the_shipyards_adjacent_dista
         .map(|per_start| per_start[0].expect("water"))
         .collect();
     let within = |distances: &[u32], reach: u32| distances.iter().filter(|&&d| d <= reach).count();
-    assert_eq!((distances.len(), all.len()), (21, 176));
-    assert_eq!((within(&all, 13), within(&first, 13)), (28, 2));
+    assert_eq!((distances.len(), all.len()), (42, 376));
+    assert_eq!((within(&all, 13), within(&first, 13)), (34, 3));
     assert_eq!(
         (
             within(&all, SHIPYARD_PLACEMENT_DISTANCE),
             within(&first, SHIPYARD_PLACEMENT_DISTANCE)
         ),
-        (132, 18)
+        (254, 31)
     );
     // So the shipped shipyards keep the reach they had: 31 free cells, a listed difference
     // (`ra2_differences.tsv`), where the reference has 12.
