@@ -12664,3 +12664,31 @@ moved the census once more (to aff2ee43...); the same procedure gave packet
 `ROOT_REBIND_R214_D_SUPER_ME_ARSENAL_02_FACTUAL_2026_10_27_024931`, 3,290 factual cell deltas,
 no physical branch change and no family change (`smoke.rs` is not pinned by any policy);
 readback passed. This is the binding in force.
+
+### R215. Merge the twenty-one new maps and rebind the RA9 source scope
+
+The user added maps in the session "Map expansion and landscape diversity" (2026-10-26/27) and
+asked for them to be merged into `main` as the only branch. That session's work, uncommitted in
+its worktree on `1d3d274`, was committed as `c6a70cb` and merged into `main` beside R213/R214
+without conflict:
+
+- twenty-one large maps, each around a landscape the earlier maps lack (dune_sea, fjord_coast,
+  canal_city, savanna, river_gorge, badlands, tundra_steppe, polder_lowlands, river_confluence,
+  twin_volcanoes, oil_fields, ice_shelf_rift, inland_sea, old_growth, crater_field,
+  nile_valley, mangrove_coast, rice_terraces, highland_plateau, coastal_cliffs, suburbia),
+  painted by `crates/game/examples/art/{arid,water,cold,green,rugged}_maps.rs`, written by
+  `gen_maps` and listed in `skirmish.ron` through `scripts/generate_ra2_data.py`: 42 maps;
+- `sim::MAX_MAPS` from 24 to 48; README and `assets/LICENSES.md` list the maps.
+
+The map generator examples were then formatted with rustfmt (`8015bf9`; output unchanged,
+`m7_maps` byte-for-byte check passes).
+
+**Rebind.** Phase `D-more-maps-01` of the R212 procedure, scripts in
+`docs/validation/ra2-parity/rebind-r215/controller-sources/`: only `model_census_sha256` moved
+(to 4e62240b...); packet `d4a01b1b23fc7073970629547010ecee5185d3e4ebb336b5aba277e6c9c80eec`
+(722 source files); verification `ROOT_REBIND_R215_D_MORE_MAPS_01_FACTUAL_2026_10_27_043637`;
+3,362 factual cell deltas; readback passed. Two physical pins moved: `skirmish_defs.rs`
+(the `MAX_MAPS` constant) and `scripts/generate_ra2_data.py` (21 added map tuples, nothing
+else), so 131 families' branch fingerprints changed. No recorded policy (AI build and recovery
+plans, ore, power, repair, data conversions) reads the map list or the map limit; every policy
+stands unchanged.
