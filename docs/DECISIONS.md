@@ -12727,3 +12727,50 @@ whose limit there is 288,000), while seeds 1 to 3 ended between 52,738 and 124,6
    maps, with its seed) ended all 72: the slowest at 88,834 ticks on Fjord Coast (limit
    288,000) and 110,535 on Oil Fields (limit 252,000; its 229,302 above was seed 14 on the
    earlier code). The other nineteen new maps were checked only by the four-pairing run above.
+
+### R216. Validation of the merged maps: gem seams, map counts, and the generator's guard
+
+The full validation of `main` at `0411e6c` (R213 to R215 and the Fjord Coast fix) failed four
+suites of `cargo test --workspace --release`, all from the twenty-one merged maps; clippy, the
+release and debug 600-frame smoke tests, the benchmark and the soak passed. Fixed in `be77b5e`
+(items 1 to 3) and `d35f915` (item 4):
+
+1. **Gems (R61).** `ra5_gem_maps` wants at least 34 gem cells on every large map; Ice Shelf
+   Rift had 14 and Suburbia 22, because their contested fields are small or lie among rock and
+   rubble. Each gains a mirrored `gem_seam` in a contested field, (118, 68) and (214, 40): 52 and
+   64 cells, none within 15 cells of a yard. Only these two maps' files change; the other 40 are
+   byte-for-byte the same, and `m7_maps` passes.
+2. **Map counts.** `ra5_world` counts the large maps it checks: 39, not 18. `ra2_shipped` pins
+   the measurement behind R25 over the shipped maps: on 42 maps (376 starts) the reference's 12
+   free cells reach shipyard water from 34 starts and from the first start on 3 maps, the
+   game's 31 free cells from 254 starts and from the first start on 31 maps (on 21 maps: 28, 2,
+   132, 18). R25's choice, the 31 free cells, stands.
+3. **The generator's guard.** `crates/sim/tests/ra9_audit/completion-whole.rs` (`code_guard`)
+   keeps an FNV-1a hash of `scripts/generate_ra2_data.py` in its source, outside the tables a
+   rebind refreshes, so R215 left it on the old bytes and 125 audit tests failed on it. The
+   script gained only the 21 map tuples (R215), which no roster or unit-refund policy reads; the
+   hash is re-pinned to `0x246b26d9622d93a2`. A later rebind that touches a file of a
+   `code_guard` list must re-pin that hash too, and run the whole `ra9_data_parity` before it
+   is recorded.
+4. **The maps' policy rows.** With the guard re-pinned, the audit failed on
+   `undeclared physical origin observation skirmish.map.dune_sea.starts.xy`: it compares every
+   map of `skirmish.ron` with an individually recorded authored-map policy (RA9-P8:
+   `game-arrays.tsv`, `own-policy-contracts.tsv`, `own-policy-acceptance.tsv`) and knew the 21
+   maps of RA9. In `d35f915` the menu registry row `skirmish.ron.maps.identities` lists the 42
+   maps in order, and each merged map gains its `skirmish.map.<id>.starts.xy` row, worded like
+   the existing rows, with the starts of `skirmish.ron`; recorded decision
+   `R216/authored-specific-current-model`, receipt the declaration
+   `docs/validation/ra2-parity/rebind-r216/map-policy/r216-game-array-map-policy-declaration.json`
+   (by its SHA-256), written by `add-map-policy-rows.py` beside it. RA9-P8's generator was never
+   committed, so the new rows' `contract_sha256` is defined here as the SHA-256 of the row's
+   `game-arrays.tsv` line (id, value and policy joined by tabs); the audit checks only that the
+   acceptance carries the contract's hash. The other 79 rows are unchanged. These are game
+   choices like the 21 RA9 maps, not RA2 data, and claim no native coverage.
+
+**Rebind.** The fixed test files and tables are in the RA9 scope, so phase `D-map-fixes-01` of
+the R212 procedure follows on `d35f915`, scripts in
+`docs/validation/ra2-parity/rebind-r216/controller-sources/`: the model census, surface,
+closure and special hashes are unchanged (no `crates/*/src` file changed); packet
+`637eb7fccc3174f67df167771c0698ccd725fc3af1180f2e6976856313f5d8cd` (722 source files);
+independent verification passed; 2,016 factual cell deltas in 12 outputs, 0 branch families
+changed, 72 completion-local rows proved; readback passed with every policy field byte-equal.
