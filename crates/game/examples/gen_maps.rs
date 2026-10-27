@@ -45,6 +45,25 @@
 //! * `thousand_lakes`: a lake district, a web of necks and peninsulas between the lakes.
 //! * `wheel_of_worlds`: ten sectors of five environments around a ruined city.
 //!
+//! Twenty-one more (2026-10-26), each around a landscape the others lack, keep their size and
+//! homes beside their recipes (`world_maps::Layout`) in five files by kind of country:
+//!
+//! * `art/arid_maps.rs`: `dune_sea`, `badlands`, `oil_fields` (256 × 192), `nile_valley`.
+//! * `art/water_maps.rs`: `canal_city`, `polder_lowlands` (256 × 224), `inland_sea`,
+//!   `mangrove_coast` (256 × 224), `coastal_cliffs` (240 × 240).
+//! * `art/cold_maps.rs`: `fjord_coast`, `tundra_steppe`, `ice_shelf_rift` (240 × 240).
+//! * `art/green_maps.rs`: `savanna`, `river_confluence`, `old_growth`, `rice_terraces`
+//!   (224 × 224), `suburbia`.
+//! * `art/rugged_maps.rs`: `river_gorge`, `twin_volcanoes`, `crater_field` (240 × 240),
+//!   `highland_plateau`.
+//!
+//! The rest are 256 × 256, except `badlands` (224 × 224).
+//!
+//! `gen_maps check [id ...]` paints the named maps (all if none) and checks the rules of
+//! `tests/m7_maps.rs` that need no files: symmetry, base sites, ore near every start, starts
+//! apart, and every passable cell reachable by land. It is for working on a recipe; the test is
+//! the authority.
+//!
 //! `gen_maps preview <dir> [id ...]` writes a picture of each map (three pixels a cell) for
 //! reviewing a recipe, and `gen_maps starts` prints the map list of `assets/data/skirmish.ron`.
 //!
@@ -286,7 +305,7 @@ pub struct MapSpec {
     terrain: Terrain,
 }
 
-pub const MAPS: [MapSpec; 20] = [
+pub const MAPS: [MapSpec; 41] = [
     MapSpec {
         id: "crossroads",
         width: 56,
@@ -427,6 +446,27 @@ pub const MAPS: [MapSpec; 20] = [
         homes: &[(32, 96), (186, 46), (68, 46), (222, 96), (127, 27)],
         terrain: Terrain::Painted,
     },
+    MapSpec::painted("dune_sea", world_maps::arid_maps::DUNE_SEA),
+    MapSpec::painted("fjord_coast", world_maps::cold_maps::FJORD_COAST),
+    MapSpec::painted("canal_city", world_maps::water_maps::CANAL_CITY),
+    MapSpec::painted("savanna", world_maps::green_maps::SAVANNA),
+    MapSpec::painted("river_gorge", world_maps::rugged_maps::RIVER_GORGE),
+    MapSpec::painted("badlands", world_maps::arid_maps::BADLANDS),
+    MapSpec::painted("tundra_steppe", world_maps::cold_maps::TUNDRA_STEPPE),
+    MapSpec::painted("polder_lowlands", world_maps::water_maps::POLDER_LOWLANDS),
+    MapSpec::painted("river_confluence", world_maps::green_maps::RIVER_CONFLUENCE),
+    MapSpec::painted("twin_volcanoes", world_maps::rugged_maps::TWIN_VOLCANOES),
+    MapSpec::painted("oil_fields", world_maps::arid_maps::OIL_FIELDS),
+    MapSpec::painted("ice_shelf_rift", world_maps::cold_maps::ICE_SHELF_RIFT),
+    MapSpec::painted("inland_sea", world_maps::water_maps::INLAND_SEA),
+    MapSpec::painted("old_growth", world_maps::green_maps::OLD_GROWTH),
+    MapSpec::painted("crater_field", world_maps::rugged_maps::CRATER_FIELD),
+    MapSpec::painted("nile_valley", world_maps::arid_maps::NILE_VALLEY),
+    MapSpec::painted("mangrove_coast", world_maps::water_maps::MANGROVE_COAST),
+    MapSpec::painted("rice_terraces", world_maps::green_maps::RICE_TERRACES),
+    MapSpec::painted("highland_plateau", world_maps::rugged_maps::HIGHLAND_PLATEAU),
+    MapSpec::painted("coastal_cliffs", world_maps::water_maps::COASTAL_CLIFFS),
+    MapSpec::painted("suburbia", world_maps::green_maps::SUBURBIA),
 ];
 
 /// Discrete neutral anchors are point-symmetric and replace existing scenery where possible.
@@ -611,30 +651,42 @@ fn neutral_sites(spec: &MapSpec, tiles: &mut [u32]) {
     }
 }
 
-/// The painted maps' tiles, painted once (row-major, in `MAPS` order; empty for rule maps).
-fn painted() -> &'static [Vec<u32>] {
-    static PAINTED: std::sync::OnceLock<Vec<Vec<u32>>> = std::sync::OnceLock::new();
-    PAINTED.get_or_init(|| {
-        MAPS.iter()
-            .map(|spec| match spec.terrain {
-                Terrain::Rule(_) => Vec::new(),
-                Terrain::Painted => {
-                    let (_, biome, recipe) = world_maps::RECIPES
-                        .iter()
-                        .find(|(id, _, _)| *id == spec.id)
-                        .unwrap_or_else(|| panic!("no recipe for {}", spec.id));
-                    let mut painter =
-                        world_maps::Painter::new(spec.width, spec.height, &spec.starts(), *biome);
-                    recipe(&mut painter);
-                    neutral_sites(spec, &mut painter.tiles);
-                    painter.tiles
-                }
-            })
-            .collect()
+/// A painted map's tiles (row-major; empty for rule maps), painted once and only when asked
+/// for, so that `gen_maps preview <dir> <id>` or `check <id>` paints that map alone.
+fn painted(index: usize) -> &'static [u32] {
+    static PAINTED: [std::sync::OnceLock<Vec<u32>>; MAPS.len()] =
+        [const { std::sync::OnceLock::new() }; MAPS.len()];
+    PAINTED[index].get_or_init(|| {
+        let spec = &MAPS[index];
+        match spec.terrain {
+            Terrain::Rule(_) => Vec::new(),
+            Terrain::Painted => {
+                let (_, biome, recipe) = world_maps::RECIPES
+                    .iter()
+                    .find(|(id, _, _)| *id == spec.id)
+                    .unwrap_or_else(|| panic!("no recipe for {}", spec.id));
+                let mut painter =
+                    world_maps::Painter::new(spec.width, spec.height, &spec.starts(), *biome);
+                recipe(&mut painter);
+                neutral_sites(spec, &mut painter.tiles);
+                painter.tiles
+            }
+        }
     })
 }
 
 impl MapSpec {
+    /// A painted map whose size and homes are given beside its recipe.
+    const fn painted(id: &'static str, layout: world_maps::Layout) -> MapSpec {
+        MapSpec {
+            id,
+            width: layout.width,
+            height: layout.height,
+            homes: layout.homes,
+            terrain: Terrain::Painted,
+        }
+    }
+
     /// The start positions: every home followed by its point mirror (the yard is 3 x 3 cells and
     /// a start position is its origin, so the mirror of (x, y) is (W - 3 - x, H - 3 - y)).
     pub fn starts(&self) -> Vec<(u32, u32)> {
@@ -653,7 +705,7 @@ impl MapSpec {
                     .iter()
                     .position(|spec| spec.id == self.id)
                     .expect("a shipped map");
-                return painted()[index][(y * self.width + x) as usize];
+                return painted(index)[(y * self.width + x) as usize];
             }
         };
         // Point symmetry: the second half of the cells takes the terrain of its mirror cell, so
@@ -672,6 +724,116 @@ impl MapSpec {
             battlefield_layout::Detail::Village => COTTAGE,
             _ => base,
         }
+    }
+
+    /// The rules of `tests/m7_maps.rs` that need no files, on the generator's own tiles: point
+    /// symmetry, a base site and nine ore cells within 10 cells of every start, starts at least
+    /// 12 cells apart, and every passable cell reachable by land from the first start. Returns a
+    /// summary of the map's ground and the rules it breaks (at most a few of each kind).
+    pub fn check(&self) -> (String, Vec<String>) {
+        let (w, h) = (self.width as i32, self.height as i32);
+        let tile = |x: i32, y: i32| &TILES[self.tile_at(x as u32, y as u32) as usize];
+        let inside = |x: i32, y: i32| (0..w).contains(&x) && (0..h).contains(&y);
+        let mut problems = Vec::new();
+        let mut asymmetric = 0;
+        for y in 0..h {
+            for x in 0..w {
+                if self.tile_at(x as u32, y as u32)
+                    != self.tile_at((w - 1 - x) as u32, (h - 1 - y) as u32)
+                {
+                    asymmetric += 1;
+                }
+            }
+        }
+        if asymmetric > 0 {
+            problems.push(format!("{asymmetric} cells differ from their point mirror"));
+        }
+        if w > 256 || h > 256 {
+            problems.push(format!("{w} x {h} is over 256 cells a side"));
+        }
+        let starts: Vec<(i32, i32)> = self
+            .starts()
+            .iter()
+            .map(|&(x, y)| (x as i32, y as i32))
+            .collect();
+        for &(sx, sy) in &starts {
+            let blocked = (sy - 1..=sy + 3)
+                .flat_map(|y| (sx - 1..=sx + 3).map(move |x| (x, y)))
+                .filter(|&(x, y)| !inside(x, y) || !tile(x, y).buildable)
+                .count();
+            if blocked > 0 {
+                problems.push(format!(
+                    "start ({sx}, {sy}): {blocked} of the 25 yard cells not buildable"
+                ));
+            }
+            let ore = (sy - 10..=sy + 10)
+                .flat_map(|y| (sx - 10..=sx + 10).map(move |x| (x, y)))
+                .filter(|&(x, y)| inside(x, y) && tile(x, y).ore > 0)
+                .count();
+            if ore < 9 {
+                problems.push(format!(
+                    "start ({sx}, {sy}): {ore} ore cells within 10 (needs 9)"
+                ));
+            }
+        }
+        for (i, a) in starts.iter().enumerate() {
+            for b in &starts[i + 1..] {
+                if (a.0 - b.0).abs().max((a.1 - b.1).abs()) < 12 {
+                    problems.push(format!("starts {a:?} and {b:?} are under 12 cells apart"));
+                }
+            }
+        }
+        // Land reachable from the first start (four-neighbour steps, as the test).
+        let index = |x: i32, y: i32| (y * w + x) as usize;
+        let mut seen = vec![false; (w * h) as usize];
+        let (fx, fy) = starts[0];
+        let mut queue = std::collections::VecDeque::from([(fx, fy)]);
+        seen[index(fx, fy)] = true;
+        while let Some((x, y)) = queue.pop_front() {
+            for (nx, ny) in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)] {
+                if inside(nx, ny) && tile(nx, ny).passable && !seen[index(nx, ny)] {
+                    seen[index(nx, ny)] = true;
+                    queue.push_back((nx, ny));
+                }
+            }
+        }
+        for &(sx, sy) in &starts[1..] {
+            if !seen[index(sx, sy)] {
+                problems.push(format!("start ({sx}, {sy}) has no land path from the first"));
+            }
+        }
+        let cells: Vec<(i32, i32)> = (0..h).flat_map(|y| (0..w).map(move |x| (x, y))).collect();
+        let cut_off: Vec<_> = cells
+            .iter()
+            .filter(|&&(x, y)| tile(x, y).passable && !seen[index(x, y)])
+            .collect();
+        if let Some(first) = cut_off.first() {
+            problems.push(format!(
+                "{} passable cells cut off from the first start, e.g. {first:?}",
+                cut_off.len()
+            ));
+        }
+        let share = |f: &dyn Fn(&TileKind) -> bool| {
+            cells.iter().filter(|&&(x, y)| f(tile(x, y))).count() * 100 / cells.len()
+        };
+        let farthest = starts
+            .iter()
+            .skip(1)
+            .map(|&(x, y)| (((x - fx).pow(2) + (y - fy).pow(2)) as f64).sqrt() as i32)
+            .max()
+            .unwrap_or(0);
+        let summary = format!(
+            "{w} x {h}, {} starts; buildable {}%, passable {}%, water {}%, ore cells {}; \
+             first pair {} cells apart (farthest from the first: {farthest})",
+            starts.len(),
+            share(&|t| t.buildable),
+            share(&|t| t.passable),
+            share(&|t| t.water),
+            cells.iter().filter(|&&(x, y)| tile(x, y).ore > 0).count(),
+            (((starts[1].0 - fx).pow(2) + (starts[1].1 - fy).pow(2)) as f64).sqrt() as i32,
+        );
+        problems.truncate(12);
+        (summary, problems)
     }
 
     pub fn output_dir(&self) -> PathBuf {
@@ -939,6 +1101,24 @@ fn main() -> std::io::Result<()> {
                 let path = dir.join(format!("{}.png", spec.id));
                 std::fs::write(&path, preview_png(spec, 3))?;
                 println!("wrote {}", path.display());
+            }
+            return Ok(());
+        }
+        Some("check") => {
+            let mut failed = false;
+            for spec in &MAPS {
+                if arguments.len() > 1 && !arguments[1..].iter().any(|id| id == spec.id) {
+                    continue;
+                }
+                let (summary, problems) = spec.check();
+                println!("{}: {summary}", spec.id);
+                for problem in &problems {
+                    println!("  {problem}");
+                }
+                failed |= !problems.is_empty();
+            }
+            if failed {
+                std::process::exit(1);
             }
             return Ok(());
         }

@@ -106,7 +106,7 @@ pub const MAX_STARTING_TYPES: usize = 16;
 pub const MAX_LABEL_LEN: usize = 32;
 
 /// Largest number of maps.
-pub const MAX_MAPS: usize = 24;
+pub const MAX_MAPS: usize = 48;
 
 /// Largest number of starting buildings of a faction.
 pub const MAX_STARTING_BUILDINGS: usize = 16;
