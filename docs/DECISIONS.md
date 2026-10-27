@@ -12636,3 +12636,31 @@ other countries' units at their own factories, and that without Super Me the R10
 The user verification procedure of `docs/RA2_GAP_ANALYSIS.md` ("They do not waive country,
 producer or stolen-tech restrictions") is part of the protected HOWTOSEE span and stays as
 reviewed; it describes Super Me before R213.
+
+### R214. Rebind the RA9 source scope to the R213 source
+
+R213 changed `crates/sim/src/{economy,economy_commands,lib}.rs` and
+`crates/game/src/{sidebar,sim_host}.rs` and added `crates/sim/tests/super_me_arsenal.rs`. The R212
+procedure was repeated with its scripts copied to
+`docs/validation/ra2-parity/rebind-r214/controller-sources/` (only the directory and the
+`ROOT_REBIND_R214_` prefix changed), phase `D-super-me-arsenal-01`: producer exit 0, only
+`model_census_sha256` moved (to 466d85bd...); packet SHA-256
+`fd6b92a8961d656ba96e75f0cf75eced3b9e5665a4488b1faa642f0da4ff8d0f` (675 source files, 105
+core, 64 authority spans); independent verification
+`ROOT_REBIND_R214_D_SUPER_ME_ARSENAL_01_FACTUAL_2026_10_26_200355`; propagation 3,362 factual
+cell deltas in 13 of 15 outputs; readback passed.
+
+The same 42 legacy families and 72 completion rows moved (their pinned files are `economy.rs`,
+`economy_commands.rs` and `units.rs`). Every R213 change is guarded by Super Me, which is
+human-only, so the computer-player, ore, power-emergency and repair policies they record read
+nothing that changed; they stand unchanged.
+
+R214 phase 2 (`D-super-me-arsenal-02`). The full validation of phase 1 found one failure: the
+smoke test's own-side card check (`smoke::cards_of_own_side`) still required every listed card
+to be of the human player's side, which R213 deliberately changes for Super Me. The check now
+exempts the items of `sim::super_me_counterparts`. That edit to `crates/game/src/smoke.rs`
+moved the census once more (to aff2ee43...); the same procedure gave packet
+`cc0defb170f7f3458fe55ac7a9722124be928295ab72795f1c5bcb0ade6b4d61`, verification
+`ROOT_REBIND_R214_D_SUPER_ME_ARSENAL_02_FACTUAL_2026_10_27_024931`, 3,290 factual cell deltas,
+no physical branch change and no family change (`smoke.rs` is not pinned by any policy);
+readback passed. This is the binding in force.
