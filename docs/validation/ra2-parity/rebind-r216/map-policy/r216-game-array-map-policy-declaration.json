@@ -1,0 +1,143 @@
+{
+  "status": "R216_STATIC_POLICY_DECLARATION_OF_THE_MERGED_MAPS",
+  "decision": "docs/DECISIONS.md#R216",
+  "follows": "docs/validation/ra2-parity/ra9/evidence/32-game-array-policy-declaration.json",
+  "contract_rule": "contract_sha256 = sha256(array_id TAB value TAB specific_policy)",
+  "source": "assets/data/skirmish.ron",
+  "native_or_loaded_comparison_claim": false,
+  "meaning": "The menu registry of 42 maps and the starts of the 21 maps merged in R215, authored current-model choices recorded like RA9-P8; the audit compares each with the loaded map.",
+  "rows": [
+    {
+      "array_id": "skirmish.ron.maps.identities",
+      "contract_sha256": "1480cb51903c72865cbb5a9837eb720f51b4f6c78aeac1ddd08c18d5429981d5",
+      "specific_policy": "Exact ordered original generated map menu registry 'demo,crossroads,riverlands,liberty_bay,frostline,oasis_gulf,coral_archipelago,continental_divide,steel_harbor,glacier_pass,red_canyon,jungle_delta,pacific_atoll,iron_isthmus,arctic_floes,ember_caldera,frozen_sound,harvest_plains,black_water,thousand_lakes,wheel_of_worlds,dune_sea,fjord_coast,canal_city,savanna,river_gorge,badlands,tundra_steppe,polder_lowlands,river_confluence,twin_volcanoes,oil_fields,ice_shelf_rift,inland_sea,old_growth,crater_field,nile_valley,mangrove_coast,rice_terraces,highland_plateau,coastal_cliffs,suburbia'; each actual loaded map/start tuple is separately compared; no original RA2 map-data coverage.",
+      "value": "demo,crossroads,riverlands,liberty_bay,frostline,oasis_gulf,coral_archipelago,continental_divide,steel_harbor,glacier_pass,red_canyon,jungle_delta,pacific_atoll,iron_isthmus,arctic_floes,ember_caldera,frozen_sound,harvest_plains,black_water,thousand_lakes,wheel_of_worlds,dune_sea,fjord_coast,canal_city,savanna,river_gorge,badlands,tundra_steppe,polder_lowlands,river_confluence,twin_volcanoes,oil_fields,ice_shelf_rift,inland_sea,old_growth,crater_field,nile_valley,mangrove_coast,rice_terraces,highland_plateau,coastal_cliffs,suburbia"
+    },
+    {
+      "array_id": "skirmish.map.dune_sea.starts.xy",
+      "contract_sha256": "68699716a8ee101d524ef683eb03bb996683beb25f800ebb7caf7a86a835f3c7",
+      "specific_policy": "Original authored map 'dune_sea': exact ordered 10 player-start (x,y) pairs, components='222,25,31,228,29,35,224,218,29,83,224,170,29,131,224,122,29,179,224,74'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "222,25,31,228,29,35,224,218,29,83,224,170,29,131,224,122,29,179,224,74"
+    },
+    {
+      "array_id": "skirmish.map.fjord_coast.starts.xy",
+      "contract_sha256": "f33152d73637f3b767cc25595a4b643ea55bf10c53b8642f0f26b05e471a6f13",
+      "specific_policy": "Original authored map 'fjord_coast': exact ordered 10 player-start (x,y) pairs, components='40,16,213,237,52,66,201,187,44,118,209,135,54,172,199,81,42,226,211,27'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "40,16,213,237,52,66,201,187,44,118,209,135,54,172,199,81,42,226,211,27"
+    },
+    {
+      "array_id": "skirmish.map.canal_city.starts.xy",
+      "contract_sha256": "174b05235dc04bab059b9527a3a2ddd0907d1a59d4cb3ee10d6b7270255d02e3",
+      "specific_policy": "Original authored map 'canal_city': exact ordered 10 player-start (x,y) pairs, components='26,26,227,227,226,28,27,225,126,20,127,233,76,40,177,213,176,40,77,213'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "26,26,227,227,226,28,27,225,126,20,127,233,76,40,177,213,176,40,77,213"
+    },
+    {
+      "array_id": "skirmish.map.savanna.starts.xy",
+      "contract_sha256": "f7f0b72f5c4fd212ff4dcb9a06b22a0c739a518b6ad9769e26674c0563943014",
+      "specific_policy": "Original authored map 'savanna': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,125,22,128,231,22,125,231,128,175,22,78,231,94,94,159,159'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,125,22,128,231,22,125,231,128,175,22,78,231,94,94,159,159"
+    },
+    {
+      "array_id": "skirmish.map.river_gorge.starts.xy",
+      "contract_sha256": "0055309eb9697e053ce02f0f5544abff9404eb16f29aa10e6926f90378b0e3a7",
+      "specific_policy": "Original authored map 'river_gorge': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,125,23,128,230,221,29,32,224,25,113,228,140,75,85,178,168'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,125,23,128,230,221,29,32,224,25,113,228,140,75,85,178,168"
+    },
+    {
+      "array_id": "skirmish.map.badlands.starts.xy",
+      "contract_sha256": "557058aceb39d37a8d470697d00208e0c8c1b64edd64da6c1ea338a7ae24039d",
+      "specific_policy": "Original authored map 'badlands': exact ordered 8 player-start (x,y) pairs, components='25,25,196,196,196,25,25,196,109,18,112,203,18,109,203,112'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "25,25,196,196,196,25,25,196,109,18,112,203,18,109,203,112"
+    },
+    {
+      "array_id": "skirmish.map.tundra_steppe.starts.xy",
+      "contract_sha256": "6944dfb8a4c3584402573e595abd7c90f3ae9c6cc065b74120de7eeb16c6ef6f",
+      "specific_policy": "Original authored map 'tundra_steppe': exact ordered 10 player-start (x,y) pairs, components='18,16,235,237,232,20,21,233,124,14,129,239,68,88,185,165,182,92,71,161'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "18,16,235,237,232,20,21,233,124,14,129,239,68,88,185,165,182,92,71,161"
+    },
+    {
+      "array_id": "skirmish.map.polder_lowlands.starts.xy",
+      "contract_sha256": "eec263220cc2c41edd30b5b3823a648dcddb46101c808b234c71c8e56b856a81",
+      "specific_policy": "Original authored map 'polder_lowlands': exact ordered 8 player-start (x,y) pairs, components='44,24,209,197,210,28,43,193,98,34,155,187,156,30,97,191'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "44,24,209,197,210,28,43,193,98,34,155,187,156,30,97,191"
+    },
+    {
+      "array_id": "skirmish.map.river_confluence.starts.xy",
+      "contract_sha256": "50a93cab049898cc3ad18bb72939b64addf510133c1e1583a9648c63e2e0925a",
+      "specific_policy": "Original authored map 'river_confluence': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,130,22,123,231,22,128,231,125,62,98,191,155,174,18,79,235'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,130,22,123,231,22,128,231,125,62,98,191,155,174,18,79,235"
+    },
+    {
+      "array_id": "skirmish.map.twin_volcanoes.starts.xy",
+      "contract_sha256": "0b4574beb8e1c64e01153792ebbb133a1e5d331c4e9de5193dd2e3b5d7f0c31b",
+      "specific_policy": "Original authored map 'twin_volcanoes': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,221,33,32,220,125,21,128,232,75,71,178,182,179,75,74,178'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,221,33,32,220,125,21,128,232,75,71,178,182,179,75,74,178"
+    },
+    {
+      "array_id": "skirmish.map.oil_fields.starts.xy",
+      "contract_sha256": "f6dd19178333824c28641579b2e1301377eb34cf4cb3e15f8f726cb715bbf759",
+      "specific_policy": "Original authored map 'oil_fields': exact ordered 8 player-start (x,y) pairs, components='48,22,205,167,205,22,48,167,125,16,128,173,90,64,163,125'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "48,22,205,167,205,22,48,167,125,16,128,173,90,64,163,125"
+    },
+    {
+      "array_id": "skirmish.map.ice_shelf_rift.starts.xy",
+      "contract_sha256": "bb1953581c8a424cb13e629ddbbe7aa8dac22c0d5b749fe7a9c0d0540c8dda3c",
+      "specific_policy": "Original authored map 'ice_shelf_rift': exact ordered 10 player-start (x,y) pairs, components='28,34,209,203,208,36,29,201,118,30,119,207,72,76,165,161,168,60,69,177'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "28,34,209,203,208,36,29,201,118,30,119,207,72,76,165,161,168,60,69,177"
+    },
+    {
+      "array_id": "skirmish.map.inland_sea.starts.xy",
+      "contract_sha256": "6c7bd8cc44f53908d92c7f2eaf02fe31ec9da0509f09d7566c41f665ba6591f4",
+      "specific_policy": "Original authored map 'inland_sea': exact ordered 10 player-start (x,y) pairs, components='24,24,229,229,226,30,27,223,96,20,157,233,160,22,93,231,20,120,233,133'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "24,24,229,229,226,30,27,223,96,20,157,233,160,22,93,231,20,120,233,133"
+    },
+    {
+      "array_id": "skirmish.map.old_growth.starts.xy",
+      "contract_sha256": "1586c7980686c6814819a81372c80da43a1fef6dc1f4141353aaf1cce47bbd31",
+      "specific_policy": "Original authored map 'old_growth': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,118,24,135,229,24,118,229,135,196,26,57,227,90,90,163,163'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,118,24,135,229,24,118,229,135,196,26,57,227,90,90,163,163"
+    },
+    {
+      "array_id": "skirmish.map.crater_field.starts.xy",
+      "contract_sha256": "85f04684609cdf682ecc7dffd8fcbaaeeda9c46cce16494618a7c08657f251c5",
+      "specific_policy": "Original authored map 'crater_field': exact ordered 10 player-start (x,y) pairs, components='29,29,208,208,205,37,32,200,117,21,120,216,63,83,174,154,165,77,72,160'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,208,208,205,37,32,200,117,21,120,216,63,83,174,154,165,77,72,160"
+    },
+    {
+      "array_id": "skirmish.map.nile_valley.starts.xy",
+      "contract_sha256": "3c24d3403c5a3e6be019d8f0a4ebc65f342a13c72bfa4b61a66da4654408c340",
+      "specific_policy": "Original authored map 'nile_valley': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,224,29,29,224,22,125,231,128,52,77,201,176,52,176,201,77'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,224,29,29,224,22,125,231,128,52,77,201,176,52,176,201,77"
+    },
+    {
+      "array_id": "skirmish.map.mangrove_coast.starts.xy",
+      "contract_sha256": "545df6e183ad0937159fd998801a0233a2c12b7951ecef3e4bd1082be4b3d5c5",
+      "specific_policy": "Original authored map 'mangrove_coast': exact ordered 8 player-start (x,y) pairs, components='86,22,167,199,164,30,89,191,88,84,165,137,162,78,91,143'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "86,22,167,199,164,30,89,191,88,84,165,137,162,78,91,143"
+    },
+    {
+      "array_id": "skirmish.map.rice_terraces.starts.xy",
+      "contract_sha256": "79601f465dc91c216ea00604ad365c5b6cb136cd3fb49f2112b327b79d185d77",
+      "specific_policy": "Original authored map 'rice_terraces': exact ordered 8 player-start (x,y) pairs, components='29,29,192,192,110,22,111,199,190,40,31,181,72,78,149,143'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,192,192,110,22,111,199,190,40,31,181,72,78,149,143"
+    },
+    {
+      "array_id": "skirmish.map.highland_plateau.starts.xy",
+      "contract_sha256": "eec696fe4d431b661e65977d7f50589f191e2cef35a88be702446c5845d73032",
+      "specific_policy": "Original authored map 'highland_plateau': exact ordered 10 player-start (x,y) pairs, components='29,29,224,224,104,20,149,233,20,104,233,149,90,90,163,163,210,24,43,229'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "29,29,224,224,104,20,149,233,20,104,233,149,90,90,163,163,210,24,43,229"
+    },
+    {
+      "array_id": "skirmish.map.coastal_cliffs.starts.xy",
+      "contract_sha256": "d9d64c59dd64ec3a55c636ef87341bbb6af05ccb42e65a988fcbc41f715a2b45",
+      "specific_policy": "Original authored map 'coastal_cliffs': exact ordered 10 player-start (x,y) pairs, components='22,22,215,215,84,20,153,217,20,86,217,151,86,86,151,151,140,48,97,189'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "22,22,215,215,84,20,153,217,20,86,217,151,86,86,151,151,140,48,97,189"
+    },
+    {
+      "array_id": "skirmish.map.suburbia.starts.xy",
+      "contract_sha256": "b4761b1c919ea3d8e3a9e155382e94cc4d2f177d0bcabc2dca493ff5a0a3d18c",
+      "specific_policy": "Original authored map 'suburbia': exact ordered 10 player-start (x,y) pairs, components='28,28,225,225,109,16,144,237,180,21,73,232,231,73,22,180,237,144,16,109'; actual MapDef positions and raw tuple identities must match. These are generated game map choices, not original RA2 map assets or native source-key coverage.",
+      "value": "28,28,225,225,109,16,144,237,180,21,73,232,231,73,22,180,237,144,16,109"
+    }
+  ]
+}
