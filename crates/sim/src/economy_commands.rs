@@ -21,7 +21,11 @@
 //!   (`QueueFull`: [`Definitions::queue_capacity`]). This is the buildability rule of Red Alert 2
 //!   (docs/RA2_PARITY_PLAN.md section 3.3, docs/DECISIONS.md R10): the first three tests look
 //!   at the player's buildings, so a captured factory opens the other side's items, and the
-//!   country test keeps national specials national;
+//!   country test keeps national specials national. For a unit, a Super Me player
+//!   ([`PlayerState::super_me`]) skips the roster, stolen technology, side and country tests, and
+//!   its buildings also stand in for their counterparts of the other side as prerequisites of a
+//!   unit, and of the other side's factory for a kind of unit its side has no factory for
+//!   ([`super_me_counterparts`], [`super_me_owned`], docs/DECISIONS.md R213);
 //! * `CancelProduction`: the item is defined and producible, and queued (`NotQueued`);
 //! * `PlaceBuilding`: the building type is defined, a complete building of that type is at the
 //!   head of its queue (`NotReady`), the footprint lies inside the map (`Placement(OutsideMap)`),
@@ -219,6 +223,119 @@ pub fn produces(definitions: &Definitions, building: BuildingKind, item: Product
     }
 }
 
+/// Whether a building of type `building` produces `item` for a player with or without Super Me:
+/// [`produces`], and for a Super Me player every unit a factory of its kind produces, whatever
+/// the side of either (docs/DECISIONS.md R213).
+pub fn produces_for(
+    definitions: &Definitions,
+    super_me: bool,
+    building: BuildingKind,
+    item: ProductionItem,
+) -> bool {
+    produces(definitions, building, item)
+        || super_me
+            && matches!(item, ProductionItem::Unit(_))
+            && definitions
+                .production(item)
+                .is_some_and(|terms| definitions.same_factory(building, terms.producer))
+}
+
+/// Whether buildings of the types `a` and `b` do the same job for the two sides, so that a Super
+/// Me player's building of one type stands in for the other as a unit's prerequisite: they are
+/// factories of one group (the barracks, the war factories, the shipyards), members of one
+/// prerequisite group of the rules (radar, battle lab, refinery, power), or buildings of the
+/// same role other than plain combat (the service depots).
+fn counterparts(definitions: &Definitions, a: BuildingKind, b: BuildingKind) -> bool {
+    if a == b || definitions.same_factory(a, b) {
+        return true;
+    }
+    let grouped = definitions.rules().is_some_and(|rules| {
+        rules
+            .prerequisite_groups
+            .iter()
+            .any(|group| group.buildings.contains(&a) && group.buildings.contains(&b))
+    });
+    let (role_a, role_b) = (
+        definitions.metadata(ProductionItem::Building(a)),
+        definitions.metadata(ProductionItem::Building(b)),
+    );
+    grouped
+        || role_a.zip(role_b).is_some_and(|(x, y)| {
+            x.role == y.role && x.role != crate::arsenal::Role::Combat && x.side != y.side
+        })
+}
+
+/// The building types that buildings of the types `owned` count as when a Super Me player's unit
+/// is checked for its prerequisites: the owned types and every counterpart of them
+/// ([`counterparts`]). An Allied War Factory and Battle Lab so open the Apocalypse Tank, whose
+/// prerequisites are the Soviet ones (docs/DECISIONS.md R213).
+pub fn super_me_owned(definitions: &Definitions, owned: &[BuildingKind]) -> Vec<BuildingKind> {
+    (0..definitions.buildings().len())
+        .filter_map(|index| u16::try_from(index).ok())
+        .map(BuildingKind)
+        .filter(|&kind| {
+            owned
+                .iter()
+                .any(|&have| counterparts(definitions, have, kind))
+        })
+        .collect()
+}
+
+/// Whether `item` is checked against [`super_me_owned`] for a player of `country` with or without
+/// Super Me: with Super Me every unit, and the other side's factory of a kind of unit for which
+/// the player's side has no factory (the Airforce Command for a Soviet player, which alone
+/// builds and docks the Allied jets). Other buildings keep the prerequisites of the player's
+/// side (docs/DECISIONS.md R213).
+pub fn super_me_counterparts(
+    definitions: &Definitions,
+    super_me: bool,
+    country: Option<crate::rules::CountryId>,
+    item: ProductionItem,
+) -> bool {
+    if !super_me {
+        return false;
+    }
+    let kind = match item {
+        ProductionItem::Unit(_) => return true,
+        ProductionItem::Building(kind) => kind,
+    };
+    let (Some(group), Some(side)) = (
+        definitions.factory_group(kind),
+        definitions
+            .rules()
+            .zip(country)
+            .and_then(|(rules, country)| rules.country(country))
+            .map(|country| country.side),
+    ) else {
+        return false;
+    };
+    !(0..definitions.buildings().len())
+        .filter_map(|index| u16::try_from(index).ok())
+        .map(BuildingKind)
+        .any(|other| {
+            definitions.factory_group(other) == Some(group)
+                && definitions
+                    .metadata(ProductionItem::Building(other))
+                    .is_some_and(|entry| entry.side == Some(side))
+        })
+}
+
+/// [`missing_prerequisite`] for a player of `country` with or without Super Me: an item of
+/// [`super_me_counterparts`] is checked against [`super_me_owned`].
+pub fn missing_prerequisite_for(
+    definitions: &Definitions,
+    super_me: bool,
+    country: Option<crate::rules::CountryId>,
+    owned: &[BuildingKind],
+    item: ProductionItem,
+) -> Option<BuildingKind> {
+    if super_me_counterparts(definitions, super_me, country, item) {
+        missing_prerequisite(definitions, &super_me_owned(definitions, owned), item)
+    } else {
+        missing_prerequisite(definitions, owned, item)
+    }
+}
+
 /// The first prerequisite of `item` that a player owning buildings of the types `owned` lacks:
 /// a building type of the economy file's list, or the first member of a prerequisite group of
 /// the arsenal of which the player owns no member. Without a rules file the basic power plants
@@ -264,6 +381,8 @@ pub fn check_buildable(
         .production(item)
         .ok_or(RejectReason::UnknownItem(item))?;
     let entry = definitions.metadata(item);
+    // Super Me opens every unit of both sides and all countries (docs/DECISIONS.md R213).
+    let any_unit = state.super_me() && matches!(item, ProductionItem::Unit(_));
     if let Some(entry) = entry {
         let highest = definitions
             .rules()
@@ -274,10 +393,12 @@ pub fn check_buildable(
             return Err(RejectReason::UnknownItem(item));
         }
     }
-    if entry.is_some_and(|e| {
-        (e.stolen_allied && state.infiltration & 4 == 0)
-            || (e.stolen_soviet && state.infiltration & 8 == 0)
-    }) {
+    if !any_unit
+        && entry.is_some_and(|e| {
+            (e.stolen_allied && state.infiltration & 4 == 0)
+                || (e.stolen_soviet && state.infiltration & 8 == 0)
+        })
+    {
         return Err(RejectReason::AbilityUnavailable(
             "Infiltrate the required Battle Lab first",
         ));
@@ -292,7 +413,8 @@ pub fn check_buildable(
         return Err(RejectReason::DisabledByOptions);
     }
     if !state.unlock_all()
-        && let Some(prerequisite) = missing_prerequisite(definitions, owned, item)
+        && let Some(prerequisite) =
+            missing_prerequisite_for(definitions, state.super_me(), state.country(), owned, item)
     {
         return Err(RejectReason::MissingPrerequisite { item, prerequisite });
     }
@@ -305,17 +427,22 @@ pub fn check_buildable(
             producer: terms.producer,
         });
     }
-    if !owned.iter().any(|&kind| produces(definitions, kind, item)) {
+    if !owned
+        .iter()
+        .any(|&kind| produces_for(definitions, state.super_me(), kind, item))
+    {
         return Err(RejectReason::NoFactoryOfSide(item));
     }
     if let Some(entry) = entry {
         let country = state.country();
-        if !entry.required_countries.is_empty()
+        if !any_unit
+            && !entry.required_countries.is_empty()
             && !country.is_some_and(|country| entry.required_countries.contains(&country))
         {
             return Err(RejectReason::CountryRequired(item));
         }
-        if country.is_some_and(|country| entry.forbidden_countries.contains(&country)) {
+        if !any_unit && country.is_some_and(|country| entry.forbidden_countries.contains(&country))
+        {
             return Err(RejectReason::CountryForbidden(item));
         }
         // RA4: an aircraft that needs a dock can be queued only while the docks of the

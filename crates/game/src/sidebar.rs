@@ -313,11 +313,21 @@ pub fn availability_text(
     // The producer is always needed (units leave it): a building that produces the item, or
     // with factory groups (RA1) a factory of its group and of a side that builds it. With
     // "unlock all" nothing else is needed; otherwise every prerequisite of the economy file and
-    // a member of every prerequisite group of the arsenal (named by its first member).
+    // a member of every prerequisite group of the arsenal (named by its first member). With
+    // Super Me a unit may come from a factory of either side, and the player's buildings stand
+    // in for their other-side counterparts (`sim::super_me_owned`, R213).
     let waived = state.is_some_and(PlayerState::unlock_all);
+    let super_me = state.is_some_and(PlayerState::super_me);
+    let counted: BTreeSet<BuildingKind> =
+        if sim::super_me_counterparts(defs, super_me, state.and_then(PlayerState::country), item) {
+            let kinds: Vec<BuildingKind> = owned.iter().copied().collect();
+            sim::super_me_owned(defs, &kinds).into_iter().collect()
+        } else {
+            owned.clone()
+        };
     let unmet = |k: &BuildingKind| match defs.rules() {
-        Some(_) => !owned.contains(k),
-        None => !defs.prerequisite_met(*k, owned.iter().copied()),
+        Some(_) => !counted.contains(k),
+        None => !defs.prerequisite_met(*k, counted.iter().copied()),
     };
     let groups: Vec<BuildingKind> = defs
         .metadata(item)
@@ -327,13 +337,17 @@ pub fn availability_text(
                 .prerequisite_groups
                 .iter()
                 .filter_map(|&group| rules.group(group))
-                .filter(|group| !group.buildings.iter().any(|k| owned.contains(k)))
+                .filter(|group| !group.buildings.iter().any(|k| counted.contains(k)))
                 .filter_map(|group| group.buildings.first().copied())
                 .collect()
         })
         .unwrap_or_default();
     let missing: Vec<_> = std::iter::once(&p.producer)
-        .filter(|_| !owned.iter().any(|&k| sim::produces(defs, k, item)))
+        .filter(|_| {
+            !owned
+                .iter()
+                .any(|&k| sim::produces_for(defs, super_me, k, item))
+        })
         .chain(p.prerequisites.iter().filter(|k| !waived && unmet(k)))
         .chain(groups.iter().filter(|_| !waived))
         .map(|k| {
@@ -689,8 +703,9 @@ fn within_reach(check: Result<(), sim::RejectReason>) -> bool {
 /// can build):
 ///
 /// * some owned building is a factory of the item's kind and of a side that builds it
-///   (`sim::produces`): an Allied player sees no Soviet unit, sees the Conscript once it owns a
-///   captured Soviet Barracks, and sees no infantry at all before it owns a barracks;
+///   (`sim::produces_for`): an Allied player sees no Soviet unit, sees the Conscript once it owns
+///   a captured Soviet Barracks, and sees no infantry at all before it owns a barracks; with
+///   Super Me a factory lists every unit of its kind, of either side and any country (R213);
 /// * the player could queue the item if it owned every building it can come to own by building
 ///   alone (`sim::check_buildable` with `reachable`): the item is not closed to the player's
 ///   country, nor outside the tech level of the rules or the roster of a faction without a
@@ -715,7 +730,7 @@ pub fn item_listed(
     queued > 0
         || (owned
             .iter()
-            .any(|&kind| sim::produces(definitions, kind, item))
+            .any(|&kind| sim::produces_for(definitions, state.super_me(), kind, item))
             && within_reach(sim::check_buildable(
                 definitions,
                 state,
@@ -1871,6 +1886,72 @@ mod tests {
         assert_eq!(owned_kinds(&roomy).len(), owned_kinds(&full).len());
         let found = status(&roomy);
         assert!(found.available && !found.limited);
+    }
+
+    /// R213: with Super Me the factories of an Allied player list the Soviet units and the
+    /// specials of other countries, which it can queue; without Super Me they are not listed.
+    #[test]
+    fn super_me_lists_the_units_of_both_sides_and_all_countries() {
+        let catalogue = crate::skirmish::tests::production_catalogue();
+        for super_me in [false, true] {
+            let selection = crate::skirmish::MenuSelection {
+                super_me,
+                mcv_start: false,
+                ..crate::skirmish::MenuSelection::versus(&catalogue)
+            };
+            let human = &catalogue.skirmish.factions[selection.faction()];
+            assert_eq!(human.side, Some(sim::Side::Allied), "{}", human.id);
+            let (mut host, _) = crate::sim_host::tests::match_host(&catalogue, selection, 0);
+            crate::sim_host::tests::with_world(&mut host, |world| {
+                let yard = {
+                    let mut query = world.query::<(&sim::Owner, &sim::Building)>();
+                    query
+                        .iter(world)
+                        .find(|(owner, _)| owner.0 == HUMAN)
+                        .map(|(_, building)| building.footprint.origin)
+                        .expect("the human player's yard")
+                };
+                for id in [
+                    "power_plant",
+                    "power_plant",
+                    "barracks",
+                    "war_factory",
+                    "refinery",
+                ] {
+                    let placed = (-12..12)
+                        .flat_map(|dy| (-12..12).map(move |dx| (dx, dy)))
+                        .any(|(dx, dy)| {
+                            sim::spawn_building(
+                                world,
+                                HUMAN,
+                                id,
+                                CellPos::new(yard.x + dx, yard.y + dy),
+                            )
+                            .is_ok()
+                        });
+                    assert!(placed, "ground for {id}");
+                }
+            });
+            let definitions = host.definitions().expect("definitions");
+            let listed = listed_items(&host);
+            let owned = owned_kinds(&host);
+            let state = host.players().and_then(|players| players.get(HUMAN));
+            for id in [
+                "conscript",
+                "rhino",
+                "flak_track",
+                "terror_drone",
+                "desolator",
+            ] {
+                let item = ProductionItem::Unit(definitions.unit_kind(id).expect(id));
+                assert_eq!(listed.contains(&item), super_me, "{id} listed");
+                if super_me && id != "desolator" {
+                    // Its Soviet prerequisites are met by the Allied counterparts.
+                    let text = availability_text(item, definitions, &owned, state, 1);
+                    assert!(!text.starts_with("Needs"), "{id}: {text}");
+                }
+            }
+        }
     }
 
     #[test]

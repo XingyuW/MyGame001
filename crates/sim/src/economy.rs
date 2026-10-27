@@ -44,7 +44,7 @@ use crate::building::{Building, Footprint, Producer, exit_cell};
 use crate::combat::combat_components;
 use crate::command::PlayerId;
 use crate::definitions::{Definitions, UnitKind};
-use crate::economy_commands::{missing_prerequisite, produces};
+use crate::economy_commands::{missing_prerequisite_for, produces_for};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::harvest::Harvester;
@@ -293,11 +293,13 @@ impl PlayerState {
     }
 
     /// Whether the player's faction may produce `item` (every item for a player without a
-    /// faction).
+    /// faction). A Super Me player is offered every unit of both sides (docs/DECISIONS.md R213).
     pub fn offers(&self, item: ProductionItem) -> bool {
-        self.roster
-            .as_ref()
-            .is_none_or(|roster| roster.contains(&item))
+        (self.super_me && matches!(item, ProductionItem::Unit(_)))
+            || self
+                .roster
+                .as_ref()
+                .is_none_or(|roster| roster.contains(&item))
     }
 
     /// The roster of the player's faction, or `None` for a player added without one.
@@ -992,6 +994,7 @@ pub(crate) fn advance_production(
         let low_power = state.low_power();
         let speed = state.production_speed();
         let super_me = state.super_me;
+        let country = state.country;
         let ai_build_time_pm = state.ai_build_time_pm();
         let unlock_all = state.unlock_all;
         let (produced, consumed) = (state.power_produced, state.power_consumed);
@@ -1026,11 +1029,11 @@ pub(crate) fn advance_production(
             };
             // The player's buildings that produce the item, in id order: those of the producer's
             // type, or with factory groups (RA1) the factories of its group whose side builds
-            // the item.
+            // the item (with Super Me, any side for a unit).
             let mut owned: Vec<Exit> = exits
                 .iter()
                 .filter(|((owner, kind), _)| {
-                    *owner == player && produces(&definitions, *kind, head.item)
+                    *owner == player && produces_for(&definitions, super_me, *kind, head.item)
                 })
                 .flat_map(|(_, list)| list.iter().copied())
                 .collect();
@@ -1038,7 +1041,14 @@ pub(crate) fn advance_production(
             if head.progress < terms.build_time {
                 if owned.is_empty()
                     || !unlock_all
-                        && missing_prerequisite(&definitions, &prerequisites, head.item).is_some()
+                        && missing_prerequisite_for(
+                            &definitions,
+                            super_me,
+                            country,
+                            &prerequisites,
+                            head.item,
+                        )
+                        .is_some()
                 {
                     continue;
                 }

@@ -962,6 +962,11 @@ pub(crate) mod tests {
         host
     }
 
+    /// Runs `setup` on the simulation world of `host` (scenario setup in tests only).
+    pub(crate) fn with_world(host: &mut SimHost, setup: impl FnOnce(&mut World)) {
+        setup(&mut host.world);
+    }
+
     /// Takes the actual client input commands for exact mapping assertions in game tests.
     pub(crate) fn take_commands(app: &mut App) -> Vec<Command> {
         app.world_mut().resource_mut::<CommandSink>().take()
