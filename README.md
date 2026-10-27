@@ -123,7 +123,7 @@ this work; only the user approves quality and creates an approval tag.
 An original single-player real-time strategy game for Apple Silicon macOS, in the tradition of the classic
 isometric base-building RTS: deploy your base, harvest ore, produce an army, and defeat the computer
 opponents before they defeat you. It offers skirmish matches with the sides, countries and lobby
-options of Red Alert 2 on twenty-one maps, from small duels to large battlefields with cities,
+options of Red Alert 2 on forty-two maps, from small duels to large battlefields with cities,
 coasts and different environments, against one to nine computer players at three difficulties.
 
 The game is written in Rust with [Bevy](https://bevyengine.org) 0.19. All rules live in the
@@ -514,6 +514,52 @@ frozen lake or a swamp is ground to fight over, not to settle. **Lava** blocks a
 alike. **Fields in crop** and **volcanic ash** are ordinary building ground with a look of their
 own.
 
+Twenty-one more maps, each around a landscape none of the others has, painted with the same
+grounds:
+
+* **dune_sea** (256 × 256): a sand sea of long parallel dunes whose rocky crests open only at
+  saddles; armies travel the gravel corridors between them, round caravan oases and a salt pan.
+* **badlands** (224 × 224): eroded clay country of washes, gullies, buttes and hoodoos, a dry
+  riverbed and a railway meeting at a ghost mining town.
+* **oil_fields** (256 × 192): a flat desert between two gulfs, a grid of pipeline roads with ore
+  along it, refinery ports with tank farms, and a salt-marsh shore.
+* **nile_valley** (256 × 256): a river winding through the desert in a green floodplain of fields,
+  palms and villages, under mesa escarpments cut by wadis; a twin city and temples at the centre.
+* **canal_city** (256 × 256): a lagoon city on islands, split by a grand canal, reached by
+  causeways from farmland shores and flanked by barrier islands with inlets.
+* **polder_lowlands** (256 × 224): land won from the sea: dikes, strip fields, ditches with earth
+  dams, windmill villages and a reclaimed lake ringed by a canal.
+* **inland_sea** (256 × 256): a ring of land of every kind of coast round an enclosed sea, with an
+  island fortress joined to two peninsulas by bridges; fleets matter here.
+* **mangrove_coast** (256 × 224): firm upland between two wide belts of mangrove and marsh, cut
+  by tidal creeks, with stilt villages at the creek mouths.
+* **coastal_cliffs** (240 × 240): a moorland plateau ending at the sea in cliffs, with a few
+  coves, sea stacks, a lighthouse town on a headland and a harbour at a river mouth.
+* **fjord_coast** (256 × 256): long branching fjords between walls of snowy rock, fishing towns at
+  their heads; bases on the benches between them, a high fell along the middle.
+* **tundra_steppe** (256 × 256): open snow plain with countless frozen lakes, gravel eskers,
+  frozen rivers with thin taiga, and an open-pit mining town on a dead-straight road.
+* **ice_shelf_rift** (240 × 240): an ice shelf you cross but cannot build on, split by two rifts
+  with wide ice bridges; every base on a rocky nunatak of its own.
+* **savanna** (256 × 256): grassland and bare earth with acacias, kopjes, waterholes and huts,
+  and a seasonal river in its gallery forest with sandy fords.
+* **river_confluence** (256 × 256): two tributaries meeting a great river at a city with a
+  fortress on a crag; floodplain marsh, vineyards and wooded uplands.
+* **old_growth** (256 × 256): a primeval forest crossed by a grid of straight rides and two old
+  roads, with clearings, bogs, a burn scar and a lake at the centre.
+* **rice_terraces** (224 × 224): hills stepped by terraces of flooded and green paddies, bamboo
+  on the spurs, a river valley of fields and villages below.
+* **suburbia** (256 × 256): a downtown inside a beltway with cloverleaf interchanges, rings of
+  houses and lawns, parks, a golf course and a mall; farms beyond.
+* **river_gorge** (256 × 256): a plateau split by a deep gorge, crossed by three high bridges and
+  two fords reached by cuts down its walls.
+* **twin_volcanoes** (256 × 256): two volcanoes in the jungle sending lava to the sea and into the
+  forest, with a valley town and terraced fields between them.
+* **crater_field** (240 × 240): steppe pocked by impact craters, some flooded, some young and ringed
+  by ash, and a giant central crater with a rich floor and six breaches.
+* **highland_plateau** (256 × 256): four tablelands from moorland summit to desert plain, stepped
+  by long escarpments that are climbed only on the roads' ramps.
+
 With MAP GROWTH on (see below) a map file of the largest size is played as it is by any number of
 players (the smaller ones grow with the players, up to that size); start positions a file lacks
 are made as before.
@@ -565,7 +611,7 @@ The game opens on the main menu, which is the lobby of a skirmish. Every choice 
 
 | Row | Choices (the first is what the menu opens with) |
 |-----|--------------------------------------------------|
-| Map | the 21 maps, with the size the match is played at |
+| Map | the 42 maps, with the size the match is played at |
 | Enemy players | 1 up to the start positions of the map file less one; with Map growth on, 1 to 9 on every map |
 | Team mode | **ALLIED AI**: the computer players fight you and never each other. **FREE FOR ALL**: everyone against everyone |
 | Map growth | **OFF**, ON (see "Map growth" above) |
