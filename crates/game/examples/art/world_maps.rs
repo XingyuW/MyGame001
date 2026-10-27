@@ -25,6 +25,24 @@ use super::{
 
 #[path = "frontier_maps.rs"]
 mod frontier_maps;
+#[path = "arid_maps.rs"]
+pub mod arid_maps;
+#[path = "cold_maps.rs"]
+pub mod cold_maps;
+#[path = "green_maps.rs"]
+pub mod green_maps;
+#[path = "rugged_maps.rs"]
+pub mod rugged_maps;
+#[path = "water_maps.rs"]
+pub mod water_maps;
+
+/// The size and homes of a painted map whose recipe sits in one of the later map modules: the
+/// homes (`MapSpec::homes` in `gen_maps.rs`) live beside the recipe that clears their sites.
+pub struct Layout {
+    pub width: u32,
+    pub height: u32,
+    pub homes: &'static [(u32, u32)],
+}
 
 /// An ore field of at least this radius has a seam of gems at its heart (RA5).
 pub const GEM_FIELD_RADIUS: i32 = 5;
@@ -2079,7 +2097,7 @@ pub fn arctic_floes(p: &mut Painter) {
 
 /// The painted maps: id, biome function, recipe.
 #[allow(clippy::type_complexity)]
-pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 18] = [
+pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 39] = [
     ("liberty_bay", temperate, liberty_bay),
     ("frostline", arctic_biome, frostline),
     ("oasis_gulf", desert_biome, oasis_gulf),
@@ -2109,5 +2127,110 @@ pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 1
         "wheel_of_worlds",
         frontier_maps::wheel_biome,
         frontier_maps::wheel_of_worlds,
+    ),
+    (
+        "dune_sea",
+        arid_maps::dune_sea_biome,
+        arid_maps::dune_sea,
+    ),
+    (
+        "fjord_coast",
+        cold_maps::fjord_coast_biome,
+        cold_maps::fjord_coast,
+    ),
+    (
+        "canal_city",
+        water_maps::canal_city_biome,
+        water_maps::canal_city,
+    ),
+    (
+        "savanna",
+        green_maps::savanna_biome,
+        green_maps::savanna,
+    ),
+    (
+        "river_gorge",
+        rugged_maps::river_gorge_biome,
+        rugged_maps::river_gorge,
+    ),
+    (
+        "badlands",
+        arid_maps::badlands_biome,
+        arid_maps::badlands,
+    ),
+    (
+        "tundra_steppe",
+        cold_maps::tundra_steppe_biome,
+        cold_maps::tundra_steppe,
+    ),
+    (
+        "polder_lowlands",
+        water_maps::polder_lowlands_biome,
+        water_maps::polder_lowlands,
+    ),
+    (
+        "river_confluence",
+        green_maps::river_confluence_biome,
+        green_maps::river_confluence,
+    ),
+    (
+        "twin_volcanoes",
+        rugged_maps::twin_volcanoes_biome,
+        rugged_maps::twin_volcanoes,
+    ),
+    (
+        "oil_fields",
+        arid_maps::oil_fields_biome,
+        arid_maps::oil_fields,
+    ),
+    (
+        "ice_shelf_rift",
+        cold_maps::ice_shelf_rift_biome,
+        cold_maps::ice_shelf_rift,
+    ),
+    (
+        "inland_sea",
+        water_maps::inland_sea_biome,
+        water_maps::inland_sea,
+    ),
+    (
+        "old_growth",
+        green_maps::old_growth_biome,
+        green_maps::old_growth,
+    ),
+    (
+        "crater_field",
+        rugged_maps::crater_field_biome,
+        rugged_maps::crater_field,
+    ),
+    (
+        "nile_valley",
+        arid_maps::nile_valley_biome,
+        arid_maps::nile_valley,
+    ),
+    (
+        "mangrove_coast",
+        water_maps::mangrove_coast_biome,
+        water_maps::mangrove_coast,
+    ),
+    (
+        "rice_terraces",
+        green_maps::rice_terraces_biome,
+        green_maps::rice_terraces,
+    ),
+    (
+        "highland_plateau",
+        rugged_maps::highland_plateau_biome,
+        rugged_maps::highland_plateau,
+    ),
+    (
+        "coastal_cliffs",
+        water_maps::coastal_cliffs_biome,
+        water_maps::coastal_cliffs,
+    ),
+    (
+        "suburbia",
+        green_maps::suburbia_biome,
+        green_maps::suburbia,
     ),
 ];
