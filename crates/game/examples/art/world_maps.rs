@@ -23,12 +23,12 @@ use super::{
     SNOW_ORE, SNOW_PINES, SNOW_ROAD, SNOW_ROCK, SNOW_TOWER, STREET, TILES, TOWER, TRACK, WATER,
 };
 
-#[path = "frontier_maps.rs"]
-mod frontier_maps;
 #[path = "arid_maps.rs"]
 pub mod arid_maps;
 #[path = "cold_maps.rs"]
 pub mod cold_maps;
+#[path = "frontier_maps.rs"]
+mod frontier_maps;
 #[path = "green_maps.rs"]
 pub mod green_maps;
 #[path = "rugged_maps.rs"]
@@ -2128,11 +2128,7 @@ pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 3
         frontier_maps::wheel_biome,
         frontier_maps::wheel_of_worlds,
     ),
-    (
-        "dune_sea",
-        arid_maps::dune_sea_biome,
-        arid_maps::dune_sea,
-    ),
+    ("dune_sea", arid_maps::dune_sea_biome, arid_maps::dune_sea),
     (
         "fjord_coast",
         cold_maps::fjord_coast_biome,
@@ -2143,21 +2139,13 @@ pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 3
         water_maps::canal_city_biome,
         water_maps::canal_city,
     ),
-    (
-        "savanna",
-        green_maps::savanna_biome,
-        green_maps::savanna,
-    ),
+    ("savanna", green_maps::savanna_biome, green_maps::savanna),
     (
         "river_gorge",
         rugged_maps::river_gorge_biome,
         rugged_maps::river_gorge,
     ),
-    (
-        "badlands",
-        arid_maps::badlands_biome,
-        arid_maps::badlands,
-    ),
+    ("badlands", arid_maps::badlands_biome, arid_maps::badlands),
     (
         "tundra_steppe",
         cold_maps::tundra_steppe_biome,
@@ -2228,9 +2216,5 @@ pub const RECIPES: [(&str, fn(&Painter, i32, i32) -> Biome, fn(&mut Painter)); 3
         water_maps::coastal_cliffs_biome,
         water_maps::coastal_cliffs,
     ),
-    (
-        "suburbia",
-        green_maps::suburbia_biome,
-        green_maps::suburbia,
-    ),
+    ("suburbia", green_maps::suburbia_biome, green_maps::suburbia),
 ];

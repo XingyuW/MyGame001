@@ -464,7 +464,10 @@ pub const MAPS: [MapSpec; 41] = [
     MapSpec::painted("nile_valley", world_maps::arid_maps::NILE_VALLEY),
     MapSpec::painted("mangrove_coast", world_maps::water_maps::MANGROVE_COAST),
     MapSpec::painted("rice_terraces", world_maps::green_maps::RICE_TERRACES),
-    MapSpec::painted("highland_plateau", world_maps::rugged_maps::HIGHLAND_PLATEAU),
+    MapSpec::painted(
+        "highland_plateau",
+        world_maps::rugged_maps::HIGHLAND_PLATEAU,
+    ),
     MapSpec::painted("coastal_cliffs", world_maps::water_maps::COASTAL_CLIFFS),
     MapSpec::painted("suburbia", world_maps::green_maps::SUBURBIA),
 ];
@@ -799,7 +802,9 @@ impl MapSpec {
         }
         for &(sx, sy) in &starts[1..] {
             if !seen[index(sx, sy)] {
-                problems.push(format!("start ({sx}, {sy}) has no land path from the first"));
+                problems.push(format!(
+                    "start ({sx}, {sy}) has no land path from the first"
+                ));
             }
         }
         let cells: Vec<(i32, i32)> = (0..h).flat_map(|y| (0..w).map(move |x| (x, y))).collect();
