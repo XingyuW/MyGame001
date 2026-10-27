@@ -615,6 +615,8 @@ pub fn ice_shelf_rift(p: &mut Painter) {
     ] {
         p.ore(x, y, r, s);
     }
+    // Gems in the ridge's field too: the fields on the small nunataks are mostly too small.
+    p.gem_seam(118, 68);
     p.home_ore(4, 4224);
     p.finish(1, 4225);
 }

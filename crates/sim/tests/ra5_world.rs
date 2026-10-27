@@ -1148,7 +1148,7 @@ fn ra5_all_large_maps_have_symmetric_tech_and_real_objects_after_two_to_ten_play
         }
         checked += 1;
     }
-    assert_eq!(checked, 18);
+    assert_eq!(checked, 39);
 }
 
 #[test]
