@@ -30,3 +30,7 @@ rustc-ice-*.txt
 
 # Python bytecode of the art and data scripts
 __pycache__/
+
+# macOS Finder metadata, and the desktop app's local worktrees
+.DS_Store
+/.claude/
