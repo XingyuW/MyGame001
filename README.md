@@ -823,14 +823,12 @@ cargo build --release -p game
 cargo run --release -p game -- --smoke-test 600
 cargo run -p game -- --smoke-test 600
 cargo run --release -p sim --example m7_benchmark
-cargo run --release -p sim --example m7_soak
-cargo run --release -p sim --example m14_duels -- full
 sh scripts/package_macos.sh
 python3 scripts/generate_ra2_data.py --check
 python3 scripts/ra2_reference.py --check
 ```
 
-`sh scripts/validate_ra2_parity.sh <label>` runs all thirteen in this order and keeps their logs
+`sh scripts/validate_ra2_parity.sh <label>` runs all eleven in this order and keeps their logs
 under `docs/validation/ra2-parity/<label>/`.
 
 `--smoke-test <frames>` runs the real game for that many frames, plays the menu flow, and exits
@@ -840,8 +838,9 @@ mouse are not driven; one match with most rows of the lobby changed, in which it
 MCV, packs the yard up and deploys it again; its restart; one that starts with the Construction
 Yards; one with the lobby's defaults), and compares each with its choices of countries, options
 and rules (not with the chosen game speed and difficulty). The
-benchmark times ticks of 200 fighting units against the budget in `docs/DECISIONS.md`; the soak
-plays computer players against each other for 36,000 ticks on every map and pairing of the sides.
+benchmark times ticks of 200 fighting units against the budget in `docs/DECISIONS.md`. The soak
+and the full duel sweep are no longer part of the validation (`docs/DECISIONS.md` R217): the
+release test run already plays every pairing on every map to the end.
 `m14_duels` plays computer players one against one to the end on every map (all pairings of sides
 and difficulties with `full`, with the countries in turn; a few maps by naming them; `trace` to
 see where a slow match stands) and reports the tick each match ended in: the first check after

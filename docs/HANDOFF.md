@@ -394,7 +394,7 @@ The ordered stages are Commands → AI → Economy → Pathfinding → Movement 
 | Shared terrain layout | `crates/game/examples/art/battlefield_layout.rs`, map generators and generated TMX maps |
 | Integration validation | `crates/sim/tests/`, especially `m9_arsenal.rs`; `crates/game/tests/`; inline game tests |
 | Native smoke/captures | `crates/game/src/smoke.rs`, `visual_review.rs` |
-| Performance/package | sim examples `m7_benchmark.rs`, `m7_soak.rs`; `scripts/package_macos.sh` |
+| Performance/package | sim example `m7_benchmark.rs` (the soak was removed in R217); `scripts/package_macos.sh` |
 
 Read `PLAN.md`, the recent sections of `DECISIONS.md` and the top of `STATUS.md` before changing implementation. U3 authorizes the M8 continuation; later M9 and RTS decisions record subsequent user scope. The obsolete earlier handoff’s assertion that nothing after M7 was authorized no longer applies.
 
@@ -442,7 +442,6 @@ cargo build --release -p game
 cargo run --release -p game -- --smoke-test 600
 cargo run -p game -- --smoke-test 600
 cargo run --release -p sim --example m7_benchmark
-cargo run --release -p sim --example m7_soak
 sh scripts/package_macos.sh
 ```
 
