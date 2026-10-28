@@ -1,22 +1,24 @@
 #!/bin/sh
 # Runs the validation commands of docs/prompts/RA2_PARITY_PROMPT.md section 9, one after another,
-# and keeps their logs under docs/validation/ra2-parity/<label>/. After the eleven commands of
-# the prompt, which keep their numbers, come two of the programme's own (docs/RA2_PARITY_PLAN.md
-# section 6.1, docs/DECISIONS.md R56): 12, the shipped data files are what the generator writes
-# from the committed tables; 13, the committed reference table is the one the reference script
-# wrote (its recorded SHA-256) and, where the ini files are cached, what it extracts from them
-# (without the cache that comparison is skipped with a note, and the command passes).
+# and keeps their logs under docs/validation/ra2-parity/<label>/. The prompt's soak and full duel
+# sweep were dropped (docs/DECISIONS.md R217): the release test run plays every pairing on every
+# map to the end already. After the nine commands left come two of the programme's own
+# (docs/RA2_PARITY_PLAN.md section 6.1, docs/DECISIONS.md R56): 10, the shipped data files are
+# what the generator writes from the committed tables; 11, the committed reference table is the
+# one the reference script wrote (its recorded SHA-256) and, where the ini files are cached, what
+# it extracts from them (without the cache that comparison is skipped with a note, and the
+# command passes).
 #
 # Run from anywhere: `sh scripts/validate_ra2_parity.sh <label> [first] [last]` (label: the
 # milestone, for example `ra3`; first and last: the numbers of the first and last command to run,
-# default 1 and 13). Every command runs even when an earlier one failed, so that one run shows
+# default 1 and 11). Every command runs even when an earlier one failed, so that one run shows
 # every failure. `summary.txt` lists each command with its exit status and, for the test run, the
 # number of tests passed, failed and ignored. Exit code 0 only if every command run exited 0.
 set -u
 
 label="${1:?usage: validate_ra2_parity.sh <label> [first] [last]}"
 first="${2:-1}"
-last="${3:-13}"
+last="${3:-11}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root" || exit 2
 out="$root/docs/validation/ra2-parity/$label"
@@ -64,11 +66,9 @@ run 5 build-release cargo build --release -p game
 run 6 smoke-release cargo run --release -p game -- --smoke-test 600
 run 7 smoke-debug cargo run -p game -- --smoke-test 600
 run 8 benchmark cargo run --release -p sim --example m7_benchmark
-run 9 soak cargo run --release -p sim --example m7_soak
-run 10 duels cargo run --release -p sim --example m14_duels -- full
-run 11 package sh scripts/package_macos.sh
-run 12 data-generated python3 scripts/generate_ra2_data.py --check
-run 13 reference-table python3 scripts/ra2_reference.py --check
+run 9 package sh scripts/package_macos.sh
+run 10 data-generated python3 scripts/generate_ra2_data.py --check
+run 11 reference-table python3 scripts/ra2_reference.py --check
 
 echo "validation $label: $([ "$status" -eq 0 ] && echo PASSED || echo FAILED)" | tee -a "$summary"
 exit "$status"

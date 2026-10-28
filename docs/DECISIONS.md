@@ -12774,3 +12774,26 @@ closure and special hashes are unchanged (no `crates/*/src` file changed); packe
 `637eb7fccc3174f67df167771c0698ccd725fc3af1180f2e6976856313f5d8cd` (722 source files);
 independent verification passed; 2,016 factual cell deltas in 12 outputs, 0 branch families
 changed, 72 completion-local rows proved; readback passed with every policy field byte-equal.
+
+### R217. Drop the redundant long validation runs and the stray RA6B logs
+
+Decision (2026-10-28, at the user's request): a full validation took about 20 hours on 42 maps,
+most of it in two runs that repeat what the release test run already checks.
+
+1. **The soak goes.** `crates/sim/examples/m7_soak.rs` is deleted, and
+   `scripts/validate_ra2_parity.sh` no longer runs it. Its question, whether computer players
+   run for 36,000 ticks on every map and pairing without failing, is a subset of
+   `m6_production_matches`, which plays the same pairings on every map to the end. The comment
+   of `crates/sim/src/unit.rs` that names the soak is left as it is: changing a source byte
+   needs a rebind, and the comment changes no behaviour.
+2. **The full duel sweep leaves the validation, not the repository.** `m14_duels -- full`
+   replays the 1,512 matches of `m6_production_matches` with seed 14 instead of seed 0, about
+   12 hours. `m14_duels` itself stays: `m14_duels -- <map id>` is the minute-long check after
+   adding or reshaping a map, and `full` remains available when a change to the AI warrants a
+   second seed.
+3. **The script keeps eleven commands**, renumbered 1 to 11 (package 9, data 10, reference 11).
+   README and HANDOFF list the same commands.
+4. **The stray logs go.** The 20 `docs/validation/ra2-parity/ra6b-*.log` files (focused, clippy
+   and preflight retries, about 200 KB) are deleted: no decision, acceptance record or later
+   evidence names them. Every attempt folder of RA5 to RA8 stays, because `docs/DECISIONS.md`,
+   an acceptance record or a later checkpoint cites it as evidence.
