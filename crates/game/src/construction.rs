@@ -27,7 +27,7 @@ use bevy::prelude::*;
 use bevy::transform::TransformSystems;
 use sim::{
     Building, BuildingKind, CellPos, Command, Definitions, Footprint, Grid, Owner, PlacementError,
-    PlayerId, PlayerState, ProductionItem, RejectReason, SimId,
+    PlayerId, PlayerState, ProductionItem, RejectReason, SimId, UnitKind,
 };
 
 use crate::buildings::{BuildingSprites, BuildingView, own_building_at};
@@ -76,6 +76,8 @@ pub enum InterfaceMode {
     ChronoDestination(SimId, sim::CellPos),
     /// Place the ready building of this type.
     Place(BuildingKind),
+    /// Place the ready Super Me unit of this type on any free cell (docs/DECISIONS.md R218).
+    PlaceUnit(UnitKind),
     /// Sell the player's building under the cursor.
     Sell,
     /// Start or stop repairing the player's building under the cursor.
@@ -171,6 +173,23 @@ pub fn ready_buildings(state: &PlayerState, definitions: &Definitions) -> Vec<Bu
             };
             let terms = definitions.production(head.item)?;
             (head.progress >= terms.build_time).then_some(kind)
+        })
+        .collect()
+}
+
+/// Every placed Super Me unit type of `state` that is complete and waits for `PlaceUnit`
+/// (docs/DECISIONS.md R218), in the order of the queues.
+pub fn ready_units(state: &PlayerState, definitions: &Definitions) -> Vec<UnitKind> {
+    state
+        .queues()
+        .filter_map(|(_, items)| {
+            let head = items.first()?;
+            let ProductionItem::Unit(kind) = head.item else {
+                return None;
+            };
+            let terms = definitions.production(head.item)?;
+            (definitions.placed_on_completion(head.item) && head.progress >= terms.build_time)
+                .then_some(kind)
         })
         .collect()
 }
@@ -284,6 +303,14 @@ pub fn mode_while_ready(mode: InterfaceMode, ready: Option<BuildingKind>) -> Int
     }
 }
 
+/// Unit placement mode lasts while its unit is among the `ready` ones ([`ready_units`]).
+pub fn mode_while_unit_ready(mode: InterfaceMode, ready: &[UnitKind]) -> InterfaceMode {
+    match mode {
+        InterfaceMode::PlaceUnit(kind) if !ready.contains(&kind) => InterfaceMode::Normal,
+        mode => mode,
+    }
+}
+
 /// What the map needs to know for a left click in a mode.
 pub struct ClickContext<'a> {
     pub definitions: &'a Definitions,
@@ -319,6 +346,13 @@ pub fn mode_click(
                 Some(command) => (vec![command], InterfaceMode::Normal),
                 None => (Vec::new(), mode),
             },
+            _ => (Vec::new(), mode),
+        },
+        InterfaceMode::PlaceUnit(unit) => match (context.placement, hovered) {
+            (Some(Ok(_)), Some(cell)) => (
+                vec![Command::PlaceUnit { unit, cell }],
+                InterfaceMode::Normal,
+            ),
             _ => (Vec::new(), mode),
         },
         InterfaceMode::Sell => (
@@ -429,6 +463,33 @@ pub fn placement_preview(
     Some((footprint, check))
 }
 
+/// The cell `cell` as the footprint a ready Super Me unit of type `kind` would take there, and
+/// whether `PlaceUnit` would accept it now (`sim::check_unit_placement`, R218).
+pub fn unit_placement_preview(
+    host: &SimHost,
+    kind: UnitKind,
+    cell: CellPos,
+) -> Option<(Footprint, Result<Footprint, RejectReason>)> {
+    let (grid, definitions) = (host.grid()?, host.definitions()?);
+    let state = host.players()?.get(HUMAN)?;
+    let footprint = footprint_at(cell, 1, 1);
+    let check = sim::check_unit_placement(grid, definitions, state, kind, cell).map(|()| footprint);
+    Some((footprint, check))
+}
+
+/// The preview of placement mode `mode` at `cell`: of a building or of a Super Me unit.
+fn mode_preview(
+    host: &SimHost,
+    mode: InterfaceMode,
+    cell: CellPos,
+) -> Option<(Footprint, Result<Footprint, RejectReason>)> {
+    match mode {
+        InterfaceMode::Place(kind) => placement_preview(host, kind, cell),
+        InterfaceMode::PlaceUnit(kind) => unit_placement_preview(host, kind, cell),
+        _ => None,
+    }
+}
+
 /// The human player's ready building that `mode` deals with ([`ready_in_mode`]).
 fn human_ready_building(host: &SimHost, mode: InterfaceMode) -> Option<BuildingKind> {
     let definitions = host.definitions()?;
@@ -450,6 +511,9 @@ fn issue_economy_commands(
     };
     let ready = human_ready_building(&host, *mode);
     let mut next = mode_while_ready(*mode, ready);
+    if let Some(state) = host.players().and_then(|players| players.get(HUMAN)) {
+        next = mode_while_unit_ready(next, &ready_units(state, definitions));
+    }
     let mut commands = Vec::new();
     let (owners, producers) = building_owners(&host, definitions);
     for key in pressed_hotkeys(&keys) {
@@ -471,12 +535,10 @@ fn issue_economy_commands(
         && hovered.0.is_some()
         && let Some(grid) = host.grid()
     {
-        let placement = match (next, hovered.0) {
-            (InterfaceMode::Place(kind), Some(cell)) => {
-                placement_preview(&host, kind, cell).map(|(_, check)| check)
-            }
-            _ => None,
-        };
+        let placement = hovered
+            .0
+            .and_then(|cell| mode_preview(&host, next, cell))
+            .map(|(_, check)| check);
         let context = ClickContext {
             definitions,
             grid,
@@ -508,10 +570,10 @@ fn draw_placement_preview(
     host: Res<SimHost>,
     mut gizmos: Gizmos,
 ) {
-    let (Some(cell), Some(view), InterfaceMode::Place(kind)) = (hovered.0, view, *mode) else {
+    let (Some(cell), Some(view)) = (hovered.0, view) else {
         return;
     };
-    let Some((footprint, check)) = placement_preview(&host, kind, cell) else {
+    let Some((footprint, check)) = mode_preview(&host, *mode, cell) else {
         return;
     };
     let colour = preview_colour(check.is_ok()).with_alpha(1.0);
@@ -556,6 +618,7 @@ pub(crate) fn update_placement_ghost(
     mode: Res<InterfaceMode>,
     host: Res<SimHost>,
     sprites: Option<Res<BuildingSprites>>,
+    unit_sprites: Option<Res<crate::units::UnitSprites>>,
     mut ghost: Query<
         (&mut Sprite, &mut Transform, &mut Visibility),
         (
@@ -570,12 +633,18 @@ pub(crate) fn update_placement_ghost(
             (Some(cell), Some(view), InterfaceMode::Place(kind), Some(sprites)) => {
                 placement_preview(&host, kind, cell).and_then(|(footprint, check)| {
                     let image = sprites.0.get(&kind)?.clone();
-                    Some((footprint, check.is_ok(), image, view.tile))
+                    Some((footprint, check.is_ok(), image, view.tile, false))
+                })
+            }
+            (Some(cell), Some(view), InterfaceMode::PlaceUnit(kind), _) => {
+                unit_placement_preview(&host, kind, cell).and_then(|(footprint, check)| {
+                    let image = unit_sprites.as_deref()?.0.get(&kind)?.clone();
+                    Some((footprint, check.is_ok(), image, view.tile, true))
                 })
             }
             _ => None,
         };
-        let Some((footprint, valid, image, tile)) = shown else {
+        let Some((footprint, valid, image, tile, unit)) = shown else {
             if *visibility != Visibility::Hidden {
                 *visibility = Visibility::Hidden;
             }
@@ -586,11 +655,25 @@ pub(crate) fn update_placement_ghost(
         }
         sprite.color = preview_colour(valid);
         // Above every unit and building (their depths lie below 2, `crate::units::unit_depth`).
-        sprite.custom_size = Some(crate::hd_art::building_size(
-            footprint.width,
-            footprint.height,
-        ));
-        transform.translation = crate::hd_art::building_position(footprint, tile).extend(3.0);
+        if unit {
+            // A Super Me unit (R218): its south-east facing, standing on the cell.
+            sprite.rect = Some(crate::hd_art::facing_rect(sim::Direction::SouthEast));
+            sprite.custom_size = Some(Vec2::splat(crate::hd_art::UNIT_SIZE));
+            let ground = to_world(
+                footprint.origin.x as f32 + 0.5,
+                footprint.origin.y as f32 + 0.5,
+                tile,
+            );
+            transform.translation =
+                Vec3::new(ground.x, ground.y + crate::hd_art::UNIT_GROUND_OFFSET, 3.0);
+        } else {
+            sprite.rect = None;
+            sprite.custom_size = Some(crate::hd_art::building_size(
+                footprint.width,
+                footprint.height,
+            ));
+            transform.translation = crate::hd_art::building_position(footprint, tile).extend(3.0);
+        }
         if *visibility != Visibility::Inherited {
             *visibility = Visibility::Inherited;
         }
@@ -850,6 +933,17 @@ mod tests {
         );
         assert_eq!(after, InterfaceMode::Normal);
         commands.extend(placed);
+        // A ready Super Me unit (R218) is placed on the clicked cell.
+        let unit = sim::UnitKind(0);
+        let one_cell = Ok(footprint_at(cell, 1, 1));
+        let (placed, after) = mode_click(
+            InterfaceMode::PlaceUnit(unit),
+            Some(cell),
+            &context(Some(&one_cell)),
+        );
+        assert_eq!(after, InterfaceMode::Normal);
+        assert_eq!(placed, [Command::PlaceUnit { unit, cell }]);
+        commands.extend(placed);
         let (sold, after) = mode_click(
             InterfaceMode::Sell,
             Some(CellPos::new(6, 6)),
@@ -890,6 +984,7 @@ mod tests {
                 Command::QueueProduction { .. } => "QueueProduction",
                 Command::CancelProduction { .. } => "CancelProduction",
                 Command::PlaceBuilding { .. } => "PlaceBuilding",
+                Command::PlaceUnit { .. } => "PlaceUnit",
                 Command::SellBuilding { .. } => "SellBuilding",
                 Command::RepairBuilding { .. } => "RepairBuilding",
                 Command::SetRallyPoint { .. } => "SetRallyPoint",
@@ -903,7 +998,7 @@ mod tests {
                 Command::QueueMove { .. } => "QueueMove",
             });
         }
-        assert_eq!(variants.len(), 15, "{variants:?}");
+        assert_eq!(variants.len(), 16, "{variants:?}");
         assert!(commands.contains(&Command::PlaceBuilding {
             building: power,
             origin: footprint.origin,

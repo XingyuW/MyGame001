@@ -43,6 +43,7 @@ mod rng;
 mod rules;
 mod schedule;
 mod skirmish_defs;
+mod super_me_units;
 mod unit;
 mod veterancy;
 mod visibility;
@@ -89,7 +90,8 @@ pub use crew::{ENGINEER_ESCAPE_PERCENT, survivors};
 pub use data::{DataError, DataErrorKind, MAX_DATA_FILE_BYTES, MAX_STRING_BYTES};
 pub use definitions::{
     Definitions, MAX_NAME_LEN, MAX_UNIT_SPEED, MAX_UNIT_TYPES, UNITS_SCHEMA_VERSION, UnitDef,
-    UnitKind, load_definitions, load_match_definitions, load_ruleset, load_unit_definitions,
+    UnitKind, load_definitions, load_game_ruleset, load_match_definitions, load_ruleset,
+    load_unit_definitions,
 };
 pub use economy::{
     Lane, MAX_COUNTED_FACTORIES, MAX_PRODUCTION_RATE_PM, MAX_QUEUE_LENGTH, PlayerSetupError,
@@ -98,9 +100,9 @@ pub use economy::{
     repair_step_cost,
 };
 pub use economy_commands::{
-    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, extends_base,
-    missing_prerequisite, missing_prerequisite_for, placement_reach, produces, produces_for,
-    super_me_counterparts, super_me_owned,
+    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, check_unit_placement,
+    extends_base, missing_prerequisite, missing_prerequisite_for, placement_reach, produces,
+    produces_for, super_me_counterparts, super_me_owned,
 };
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
@@ -153,6 +155,9 @@ pub use skirmish_defs::{
     MAX_STARTING_CREDITS, MAX_STARTING_GROUPS, MAX_STARTING_TYPES, MIN_MATCH_PLAYERS, MapDef,
     SKIRMISH_SCHEMA_VERSION, SideStart, SkirmishDefinitions, StartProblem, StartingBuilding,
     StartingGroup, check_map_starts, country_tree, load_skirmish, map_asset_path, start_problem,
+};
+pub use super_me_units::{
+    MAX_BUILD_RADIUS, MAX_SUPER_ME_UNITS, SUPER_ME_UNITS_SCHEMA_VERSION, SuperMeUnit,
 };
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,

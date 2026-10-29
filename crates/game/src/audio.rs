@@ -2137,7 +2137,9 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
         SimEvent::StrategicActivated { player, building, .. } => (*player==HUMAN || (context.seen)(*building)).then_some(Sfx::Explosion),
         SimEvent::CommandRejected { player, .. } => (*player == HUMAN).then_some(Sfx::Error),
         SimEvent::ProductionComplete { player, .. } => (*player == HUMAN).then_some(Sfx::Ready),
-        SimEvent::BuildingPlaced { player, .. } => (*player == HUMAN).then_some(Sfx::Placed),
+        SimEvent::BuildingPlaced { player, .. } | SimEvent::UnitPlaced { player, .. } => {
+            (*player == HUMAN).then_some(Sfx::Placed)
+        }
         SimEvent::BuildingSold { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
         SimEvent::BuildingUndeployed { player, .. } => (*player == HUMAN).then_some(Sfx::Sold),
         SimEvent::OreDelivered { player, .. } => (*player == HUMAN).then_some(Sfx::Credits),

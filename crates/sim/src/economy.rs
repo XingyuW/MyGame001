@@ -81,6 +81,9 @@ pub const SUPER_ME_PRODUCTION_FACTOR: u32 = 30;
 pub enum Lane {
     Main,
     Defences,
+    /// The placed Super Me units (docs/DECISIONS.md R218): a complete one waits here for
+    /// `PlaceUnit` without holding up the buildings of its producer.
+    Placed,
 }
 
 /// What a player's queue is kept under: the building type of its producer, or the first
@@ -159,6 +162,14 @@ pub struct PlayerState {
     pub(crate) aircraft: u32,
     /// The docks of the player's buildings, as of the last `Economy` stage.
     pub(crate) docks: u32,
+    /// Whether a Super Me unit with `unlimited_power` of the player stands, as of the last
+    /// `Economy` stage (docs/DECISIONS.md R218); the player is then never low on power.
+    pub(crate) unlimited_power: bool,
+    /// The cells of the player's Super Me units with a build radius and that radius, as of the
+    /// last `Economy` stage: buildings may be placed within it ([`check_placement`]).
+    ///
+    /// [`check_placement`]: crate::check_placement
+    pub(crate) build_anchors: Vec<(CellPos, u32)>,
 }
 
 impl PlayerState {
@@ -198,6 +209,16 @@ impl PlayerState {
     /// The docks of the player's buildings, as of the last `Economy` stage (RA4).
     pub fn docks(&self) -> u32 {
         self.docks
+    }
+    /// Whether a Super Me unit gives the player unlimited power, as of the last `Economy` stage
+    /// (docs/DECISIONS.md R218).
+    pub fn unlimited_power(&self) -> bool {
+        self.unlimited_power
+    }
+    /// The cells of the player's Super Me units near which buildings may be placed, each with
+    /// its reach in cells, as of the last `Economy` stage (docs/DECISIONS.md R218).
+    pub fn build_anchors(&self) -> &[(CellPos, u32)] {
+        &self.build_anchors
     }
     /// Whether building prerequisites are waived for this player (match option).
     pub fn unlock_all(&self) -> bool {
@@ -794,6 +815,7 @@ pub(crate) fn update_power(
     mut players: ResMut<Players>,
     definitions: Res<Definitions>,
     buildings: Query<(&SimId, &Owner, &Building, Option<&crate::Health>)>,
+    units: Query<(&Owner, &crate::Unit, &crate::Mobile, Option<&crate::Health>)>,
     special: Res<crate::SpecialState>,
     tick: Res<SimTick>,
 ) {
@@ -834,14 +856,48 @@ pub(crate) fn update_power(
                 .collect()
         })
         .unwrap_or_default();
+    // The Super Me units (docs/DECISIONS.md R218) grant their powers only to a Super Me owner.
+    let mut unlimited: BTreeSet<PlayerId> = BTreeSet::new();
+    let mut anchors: BTreeMap<PlayerId, Vec<(CellPos, u32)>> = BTreeMap::new();
+    if !definitions.super_me_units().is_empty() {
+        for (owner, unit, mobile, health) in &units {
+            if health.is_some_and(|h| h.hit_points <= 0) {
+                continue;
+            }
+            let Some(grants) = definitions.super_me_unit(unit.kind) else {
+                continue;
+            };
+            if !players.get(owner.0).is_some_and(PlayerState::super_me) {
+                continue;
+            }
+            if grants.unlimited_power {
+                unlimited.insert(owner.0);
+            }
+            if grants.build_radius > 0 {
+                anchors
+                    .entry(owner.0)
+                    .or_default()
+                    .push((mobile.cell, grants.build_radius));
+            }
+        }
+    }
     for (player, state) in &mut players.players {
         let (produced, consumed) = totals.get(player).copied().unwrap_or_default();
         let outage = special.outages.get(player).is_some_and(|t| *t > tick.0);
-        state.power_produced = if outage { 0 } else { produced };
+        state.unlimited_power = unlimited.contains(player);
+        state.build_anchors = anchors.remove(player).unwrap_or_default();
+        // Unlimited power covers every consumer, and a spy's outage does not cut it.
+        state.power_produced = if state.unlimited_power {
+            produced.max(consumed)
+        } else if outage {
+            0
+        } else {
+            produced
+        };
         state.power_consumed = consumed;
         state.radar = definitions.rules().is_none()
             || (radars.contains(player)
-                && !outage
+                && (!outage || state.unlimited_power)
                 && !state.low_power()
                 && !storm_suppressed.contains(player));
     }
@@ -1101,9 +1157,11 @@ pub(crate) fn advance_production(
             {
                 continue;
             }
-            // Complete: a building waits for `PlaceBuilding`; a unit leaves the first of the
+            // Complete: a building waits for `PlaceBuilding` and a placed Super Me unit for
+            // `PlaceUnit` (docs/DECISIONS.md R218); any other unit leaves the first of the
             // player's producing buildings (in id order) that has a free ring cell.
             if let ProductionItem::Unit(kind) = head.item
+                && !definitions.placed_on_completion(head.item)
                 && let Some(unit) = owned
                     .iter()
                     .find_map(|&exit| spawner.leave(player, kind, exit))

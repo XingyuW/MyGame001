@@ -211,7 +211,8 @@ pub fn item_status(
         .first()
         .filter(|head| head.item == item)
         .map(|head| (head.progress, terms.build_time));
-    let ready = matches!(item, ProductionItem::Building(_))
+    // A complete building, or a placed Super Me unit (R218), waits to be placed.
+    let ready = definitions.placed_on_completion(item)
         && progress.is_some_and(|(done, total)| done >= total);
     ItemStatus {
         available,
@@ -253,11 +254,15 @@ pub fn button_effect(
             let Some(index) = menu.iter().position(|&entry| entry == item) else {
                 return SidebarEffect::Nothing;
             };
-            if left
-                && status.ready
-                && let ProductionItem::Building(kind) = item
-            {
-                return SidebarEffect::Mode(InterfaceMode::Place(kind));
+            if left && status.ready {
+                match item {
+                    ProductionItem::Building(kind) => {
+                        return SidebarEffect::Mode(InterfaceMode::Place(kind));
+                    }
+                    ProductionItem::Unit(kind) => {
+                        return SidebarEffect::Mode(InterfaceMode::PlaceUnit(kind));
+                    }
+                }
             }
             // A full queue takes nothing (RA2: the lane of a building in production).
             let command = if left && status.available && !status.full {
@@ -505,11 +510,15 @@ pub fn credits_text(state: Option<&PlayerState>) -> String {
     format!("Credits  {}", state.map_or(0, PlayerState::credits))
 }
 
-/// The power line, e.g. `Power  40 / 120` (used / produced), `LOW` under low power.
+/// The power line, e.g. `Power  40 / 120` (used / produced), `LOW` under low power, and
+/// `Power  40 / Unlimited` while a Super Me unit gives unlimited power (R218).
 pub fn power_text(state: Option<&PlayerState>) -> String {
     let Some(state) = state else {
         return "Power  0 / 0".into();
     };
+    if state.unlimited_power() {
+        return format!("Power  {} / Unlimited", state.power_consumed());
+    }
     format!(
         "Power  {} / {}{}",
         state.power_consumed(),
@@ -540,6 +549,12 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
                 .and_then(|definitions| definitions.building(kind))
                 .map_or("building".to_string(), |def| def.id.replace('_', " "));
             format!("Place {name}: left click on green\nRight click or Esc: cancel")
+        }
+        InterfaceMode::PlaceUnit(kind) => {
+            let name = definitions
+                .and_then(|definitions| definitions.metadata(ProductionItem::Unit(kind)))
+                .map_or("unit".to_string(), |entry| entry.label.clone());
+            format!("Place {name} anywhere: left click on green\nRight click or Esc: cancel")
         }
         InterfaceMode::Sell => "Sell: left click on a building\nRight click or Esc: done".into(),
         InterfaceMode::Repair => {

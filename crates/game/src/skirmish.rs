@@ -2651,6 +2651,7 @@ pub(crate) mod tests {
             crate::units::COMBAT_PATH,
             crate::units::RULES_PATH,
             crate::units::ARSENAL_PATH,
+            crate::units::SUPER_ME_PATH,
             SKIRMISH_PATH,
             AI_PATH,
         ]

@@ -1474,6 +1474,8 @@ pub(super) fn factory_and_producer(
     let actual = match d.lane(actual_item) {
         sim::Lane::Main => "buildings",
         sim::Lane::Defences => "defences",
+        // R218: only the game's own placed Super Me units, never an RA2 item, use this lane.
+        sim::Lane::Placed => "placed",
     };
     text(
         a,

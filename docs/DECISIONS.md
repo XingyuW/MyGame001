@@ -12797,3 +12797,109 @@ most of it in two runs that repeat what the release test run already checks.
    and preflight retries, about 200 KB) are deleted: no decision, acceptance record or later
    evidence names them. Every attempt folder of RA5 to RA8 stays, because `docs/DECISIONS.md`,
    an acceptance record or a later checkpoint cites it as evidence.
+
+### R218. Futa, the game's own Super Me unit
+
+The user asked (2026-10-28) for "a unique unit for myself only" under Super Me: it attacks
+ground and air units, gives infinite power, lets any building be placed near it, is called Futa
+and looks like a towel. They chose (same day): buildable with no limit, placed on any cell of
+the map like a building rather than leaving a factory, powers only while it stands, hovering over
+land, and a rebind of the RA9 scope once it works.
+
+1. **Data outside the RA2 ruleset.** Futa is in its own file, `assets/data/super_me.ron`
+   (`crates/sim/src/super_me_units.rs`, schema version 1), not in the six files that
+   `scripts/generate_ra2_data.py` writes and the data parity audit compares with the reference.
+   `sim::load_ruleset` stays exactly the Red Alert 2 ruleset; `sim::load_game_ruleset` (and the
+   game's `units::with_match_data`, with a rules file) appends the file's units after the
+   arsenal. A Super Me unit copies the arsenal entry and combat terms of a `template` unit (the
+   Apocalypse Tank) and overrides label, description, art, hit points, armour, sight and weapons;
+   it has no side, owner sides, countries, prerequisite groups or prerequisites, tech level 1,
+   and `immune_psionics`, so no Yuri can take what it grants.
+2. **Super Me only.** `check_buildable` refuses a Super Me unit to a player without Super Me
+   (`NotInRoster`), whatever its roster, so no computer player and no ordinary human player can
+   queue it. Its producer is the Construction Yard (with Super Me any yard of the factory group).
+3. **Placed, in a lane of its own.** A complete Futa waits at the head of the new queue lane
+   `Lane::Placed` (it does not hold up the yard's buildings) and is put on the map by the new
+   command `PlaceUnit { unit, cell }` (`check_unit_placement`): inside the map, a cell the unit
+   could stand on, no building (`Placement(Overlap)`), no unit (`Placement(Occupied)`), seen or
+   not, at any distance from the base. Event `UnitPlaced`; a refusal of a not-ready type is
+   `UnitNotReady`. The queue holds as many as a unit queue does; there is no build limit. A
+   placed unit never leaves its producer, so it does not make the Construction Yard a unit
+   producer with a rally point (`Definitions::produces_units`).
+4. **Weapons.** Primary `gun_120mmx` (ground), secondary `mammoth_tusk` (air), elite
+   `gun_120mmx_e`: the Apocalypse's, so their effects and sounds exist already.
+5. **Powers, while one stands and its owner has Super Me** (`update_power`, first system of the
+   `Economy` stage): `PlayerState::unlimited_power` (power produced is raised to at least the
+   power consumed, a spy's outage does not cut it, and radar ignores the outage), and
+   `PlayerState::build_anchors`, the unit's cell with its `build_radius` of 6: a building may
+   be placed if it is within that reach of a Futa, otherwise the RA2 reach from a base
+   building applies as before. A destroyed Futa (hit points 0) grants nothing from the next
+   stage.
+6. **Presentation.** The sidebar lists Futa among the vehicles of a Super Me player; a ready
+   one is clicked into `InterfaceMode::PlaceUnit` with a one-cell preview and a ghost of the
+   unit. The power line reads `Power  n / Unlimited`. The model (`futa` in
+   `scripts/hd_vehicles.py`) is a terry bath towel hovering 1.2 m up with team-coloured stripe
+   bands, its front rolled round the gun and a missile pod on the rear fold; the game adds a
+   gentle sway (`units::HOVER_SWAY`).
+
+Unchanged: every computer player, every human player without Super Me, and the RA2 data and
+its audit. `crates/sim/tests/super_me_futa.rs` proves the six points above on the shipped data.
+
+### R219. Rebind the RA9 source scope to Futa, with the approved PlaceUnit surface
+
+R218 changed `crates/sim/src/{arsenal,command,definitions,economy,economy_commands,event,lib}.rs`
+and `crates/game/src/{announcer,audio,construction,hover_info,sidebar,skirmish,units}.rs`, and
+added `crates/sim/src/super_me_units.rs`, `crates/sim/tests/super_me_futa.rs`,
+`assets/data/super_me.ron` and `assets/sprites/hd/units/futa.png`. Unlike R212 to R216, the
+model surface moved too: `ra9_model_surface.txt` lists every `Command` variant, and R218 added
+`PlaceUnit`. The user approved (2026-10-28) adding `PlaceUnit` to the approved model surface
+and running the rebind.
+
+**Procedure.** The R216 controller scripts were copied to
+`docs/validation/ra2-parity/rebind-r219/controller-sources/` (output directory and the
+`ROOT_REBIND_R219_` prefix changed) with two narrow, documented extensions:
+
+1. `prepare` and `verify` accept exactly one input of packet 195 as deleted,
+   `crates/sim/examples/m7_soak.rs`, which R217 deleted at the user's request after the R216
+   rebind; any other missing input still fails.
+2. `propagate` and the readback accept a changed model surface only if the new surface is the
+   old one with `PlaceUnit` inserted after `PlaceBuilding`, and then set
+   `ra9-approved-model-surface.txt` to it; any other surface change still fails.
+
+The RA2 reference cache had been cleared; with the user's permission `rules.ini` and `art.ini`
+were downloaded again from the recorded commit of R2 into
+`~/Library/Caches/MyGame001/ra2-reference/` (SHA-256 `adc869ca...` and `d732bfc8...`, equal to
+the recorded hashes; never committed). The two `code_guard` pins of
+`crates/sim/tests/ra9_audit/completion-whole.rs` were re-pinned by hand before `prepare`:
+`command.rs` to `0x5d0136b20793c1eb`, `arsenal.rs` to `0x7c975bada43c6287`. Finder `.DS_Store`
+files were moved aside for the run and restored.
+
+Phase `D-futa-01`: producer exit 0; only `model_census_sha256` and `model_surface_sha256`
+moved in the observation; packet SHA-256
+`ecfd677ab5e22ede7eeed5566d8f0d347442e189a7fbee122382bf342e37f368` (725 source files, 106 core,
+64 authority spans); verification `ROOT_REBIND_R219_D_FUTA_01_FACTUAL_2026_10_29_014001`;
+propagation 3,384 cell deltas in 14 of 15 outputs (`final_input_sha256`, the factual
+`consumer_bindings` tokens, the scope approval's two hashes and review ID, and the approved
+surface); readback passed with every class, value, reason, route, guard, recorded decision and
+qualified receipt byte-equal.
+
+**Policy reconsideration.** 93 legacy families moved their branch FNV, through `command.rs`,
+`arsenal.rs` and `economy.rs`, and the 72 completion rows of `economy.rs` and `units.rs`. The
+`command.rs` change only adds `PlaceUnit` (with its hash tag and `UnitNotReady`), which no
+computer player issues. The `arsenal.rs` change only gives placed Super Me units their own lane;
+no RA2 item is one. F193 (`HoverBob` and the other hover motion keys) is not touched: Futa's hover
+is a sway of the drawing, its movement is a land unit's. The `economy.rs` changes (unlimited
+power, build anchors, waiting for placement) all require a Super Me owner or a Super Me unit,
+which no computer player has and the RA2 ruleset does not contain, so the AI, power emergency,
+ore and repair policies they record read nothing that changed; `units.rs` is presentation. Every
+recorded policy stands; the surface change is the user's approval above, not new parity
+evidence, a native pass or a user acceptance. The 51 pending user checks are untouched.
+
+R219 phase 2 (`D-futa-02`). The audit itself did not compile after phase 1: two of its
+compile-checked matches name every variant, `sim::Lane` in `ra9_audit/items.rs` (the placed lane
+is mapped to `"placed"`, which no RA2 item can have, so the comparison would fail if one did) and
+`sim::Command` in `ra9_audit/guard75-admission.rs` (`command_surface` gains the approved
+`PlaceUnit`). Those two test files moved no census or surface hash; the same procedure gave
+packet `ff5db8d6f1745a74a08892341ae146c56e4ada4cbe1786063f1af1f883f3d25f`, verification
+`ROOT_REBIND_R219_D_FUTA_02_FACTUAL_2026_10_29_014354`, 2,016 factual cell deltas, no family
+change, and a readback pass.

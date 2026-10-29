@@ -638,6 +638,8 @@ fn command_surface(c: &sim::Command) -> &'static str {
         sim::Command::QueueProduction { .. } => "QueueProduction",
         sim::Command::CancelProduction { .. } => "CancelProduction",
         sim::Command::PlaceBuilding { .. } => "PlaceBuilding",
+        // R218/R219: the user-approved surface addition.
+        sim::Command::PlaceUnit { .. } => "PlaceUnit",
         sim::Command::SellBuilding { .. } => "SellBuilding",
         sim::Command::RepairBuilding { .. } => "RepairBuilding",
         sim::Command::SetRallyPoint { .. } => "SetRallyPoint",

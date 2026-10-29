@@ -87,6 +87,9 @@ pub const RULES_PATH: &str = "data/rules.ron";
 /// The arsenal file, relative to the asset directory.
 pub const ARSENAL_PATH: &str = "data/arsenal.ron";
 
+/// The game's own Super Me units (docs/DECISIONS.md R218), relative to the asset directory.
+pub const SUPER_ME_PATH: &str = "data/super_me.ron";
+
 /// Directory of the data files, relative to the asset directory.
 pub const DATA_DIR: &str = "data";
 
@@ -118,6 +121,9 @@ pub const FLIGHT_ALTITUDE: f32 = 64.0;
 
 /// How high flying infantry (jet packs) hovers.
 pub const HOVER_ALTITUDE: f32 = 40.0;
+
+/// Pixels a hovering Super Me unit sways up and down (R218).
+pub const HOVER_SWAY: f32 = 1.6;
 
 /// How high a strike aircraft sits while it rearms on the ground beside its air base.
 pub const LANDED_ALTITUDE: f32 = 3.0;
@@ -417,9 +423,10 @@ fn with_match_data(
 ) -> Result<(LoadedUnits, Vec<CheckedBuildingSprite>), SetupError> {
     let LoadedUnits {
         definitions,
-        sheets,
+        mut sheets,
     } = units;
     let economy_file = data_file(data, ECONOMY_PATH);
+    let super_me_file = data_file(data, SUPER_ME_PATH);
     let definitions = definitions
         .with_economy(&economy_file)
         .and_then(|definitions| definitions.with_combat(data_file(data, COMBAT_PATH)))
@@ -432,7 +439,36 @@ fn with_match_data(
             }
         })
         .and_then(|definitions| definitions.with_arsenal(data_file(data, ARSENAL_PATH)))
+        // The game's own Super Me units come last, after the Red Alert 2 ruleset (R218); a
+        // ruleset without their file (the legacy fixtures) has none.
+        .and_then(|definitions| {
+            if rules && super_me_file.is_file() {
+                definitions.with_super_me_units(&super_me_file)
+            } else {
+                Ok(definitions)
+            }
+        })
         .map_err(SetupError::Data)?;
+    let (width, height) = sheet_size();
+    for (index, unit) in definitions.super_me_units().iter().enumerate() {
+        let Some(def) = definitions.unit(unit.kind) else {
+            continue;
+        };
+        let asset_path = sprite_asset_path(&def.sprite);
+        let bytes =
+            check_png_file(&asset_root.join(&asset_path), width, height).map_err(|image| {
+                SetupError::Sprite(Box::new(SpriteError {
+                    file: super_me_file.clone(),
+                    field: format!("units[{index}].sprite"),
+                    image,
+                }))
+            })?;
+        sheets.push(CheckedSheet {
+            kind: unit.kind,
+            asset_path,
+            bytes,
+        });
+    }
     let buildings = check_building_sprites(asset_root, &economy_file, &definitions)
         .map_err(SetupError::BuildingSprite)?;
     Ok((
@@ -734,6 +770,16 @@ fn place_unit_views(
         if moved && infantry && gait.is_none() && !sink.paused() {
             ground.y += phase.sin().abs() * 1.2;
         }
+        // A hovering Super Me unit (docs/DECISIONS.md R218) floats in its art, above its own
+        // shadow, and sways gently on the air beneath it, moving or not.
+        let hovers = world.get::<Unit>(view.unit).is_some_and(|u| {
+            host.definitions()
+                .and_then(|definitions| definitions.super_me_unit(u.kind))
+                .is_some_and(|grants| grants.hover)
+        });
+        if hovers {
+            ground.y += (phase * 0.11).sin() * HOVER_SWAY;
+        }
 
         let flying = host
             .grid()
@@ -886,6 +932,10 @@ fn log_sim_events(mut events: MessageReader<SimEvent>) {
             } => info!(
                 "player {}: unit {} left building {}",
                 player.0, unit.0, building.0
+            ),
+            SimEvent::UnitPlaced { player, unit, kind } => info!(
+                "player {}: unit {} of type {} placed",
+                player.0, unit.0, kind.0
             ),
             SimEvent::BuildingPlaced {
                 player,
