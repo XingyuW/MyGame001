@@ -1,0 +1,41 @@
+// The game's own Super Me units, schema version 1 (crates/sim/src/super_me_units.rs;
+// docs/DECISIONS.md R218). No part of the Red Alert 2 ruleset: only a human player with Super Me
+// may build them, and the data parity audit does not read this file.
+//
+// template:        a unit of arsenal.ron whose traits and combat terms the type copies
+// speed:           subcells per tick (256 per cell, 20 ticks per second)
+// sprite:          the legacy placeholder sheet of units.ron; the HD art is sprites/hd/units/<id>.png
+// cost, build_time, producer: production terms (build_time in ticks); no prerequisites
+// hit_points, armour, sight, weapons, elite_weapons: combat terms (weapons of combat.ron,
+//                  primary first; Futa's primary fires at the ground, its secondary at aircraft)
+// build_radius:    cells around the unit within which its owner may place buildings
+// unlimited_power: 1: while one stands its owner is never low on power
+// placed:          1: when complete it is placed on any free cell of the map, like a building
+// hover:           1: drawn floating above the ground
+//
+// Written by hand; not generated.
+(
+    schema_version: 1,
+    units: [
+        (
+            id: "futa",
+            template: "apocalypse",
+            label: "Futa",
+            description: "Super Me only. Place it anywhere. Fires at ground and air; while it stands you have unlimited power and may build near it.",
+            speed: 13,
+            sprite: "heavy_tank",
+            cost: 2000,
+            build_time: 600,
+            producer: "construction_yard",
+            hit_points: 1200,
+            armour: "heavy",
+            sight: 10,
+            weapons: ["gun_120mmx", "mammoth_tusk"],
+            elite_weapons: ["gun_120mmx_e", "mammoth_tusk"],
+            build_radius: 6,
+            unlimited_power: 1,
+            placed: 1,
+            hover: 1,
+        ),
+    ],
+)

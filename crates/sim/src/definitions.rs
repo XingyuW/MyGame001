@@ -75,6 +75,9 @@ pub struct Definitions {
     /// values, sides and countries of the Red Alert 2 ruleset. Without it every rule that reads
     /// it keeps its behaviour of M2 to M9.
     rules: Option<Arc<crate::rules::Rules>>,
+    /// The game's own Super Me units ([`Definitions::with_super_me_units`], docs/DECISIONS.md
+    /// R218); empty unless their file was loaded.
+    pub(crate) super_me_units: Arc<Vec<crate::super_me_units::SuperMeUnit>>,
 }
 
 impl Definitions {
@@ -136,14 +139,21 @@ impl Definitions {
     }
 
     /// Whether units leave buildings of type `kind`, which therefore have a rally point: some
-    /// unit type is produced by them (or, with factory groups, by a factory of their group:
+    /// unit type that is not placed on completion is produced by them (or, with factory groups, by a factory of their group:
     /// `Definitions::same_factory`), or they duplicate trained infantry (the arsenal's cloner,
     /// whose copies would otherwise all stand around it).
     pub fn produces_units(&self, kind: BuildingKind) -> bool {
+        // A placed Super Me unit (R218) is put on the map, never leaves its producer.
         self.economy
             .unit_production
             .iter()
-            .flatten()
+            .enumerate()
+            .filter(|(index, _)| {
+                u16::try_from(*index).is_ok_and(|index| {
+                    !self.placed_on_completion(ProductionItem::Unit(UnitKind(index)))
+                })
+            })
+            .filter_map(|(_, production)| production.as_ref())
             .any(|production| self.same_factory(kind, production.producer))
             || self
                 .metadata(ProductionItem::Building(kind))
@@ -273,6 +283,38 @@ impl Definitions {
                 rules.hash_into(hasher);
             }
         }
+        // Without Super Me units nothing is written, so the hash of the RA2 ruleset is unchanged.
+        for unit in self.super_me_units.iter() {
+            hasher.write(&unit.kind.0.to_le_bytes());
+            hasher.write_u32(unit.build_radius);
+            hasher.write(&[
+                u8::from(unit.unlimited_power),
+                u8::from(unit.placed),
+                u8::from(unit.hover),
+            ]);
+        }
+    }
+
+    /// Appends a unit type with its production terms, combat terms and arsenal entry (the Super
+    /// Me units, [`Definitions::with_super_me_units`]) and returns its kind. The caller checks
+    /// that there is room for it ([`MAX_UNIT_TYPES`]).
+    pub(crate) fn push_unit(
+        &mut self,
+        unit: UnitDef,
+        production: crate::economy_defs::Production,
+        combat: CombatTerms,
+        entry: crate::arsenal::ArsenalEntry,
+    ) -> UnitKind {
+        let kind = UnitKind(u16::try_from(self.units.len()).expect("at most MAX_UNIT_TYPES"));
+        Arc::make_mut(&mut self.units).push(unit);
+        let economy = Arc::make_mut(&mut self.economy);
+        economy.unit_production.push(Some(production));
+        economy.harvesters.push(None);
+        Arc::make_mut(&mut self.combat).units.push(Some(combat));
+        Arc::make_mut(&mut self.arsenal)
+            .0
+            .insert(ProductionItem::Unit(kind), entry);
+        kind
     }
 }
 
@@ -408,6 +450,15 @@ pub fn load_ruleset(dir: impl AsRef<Path>) -> Result<Definitions, DataError> {
     .with_arsenal(dir.join("arsenal.ron"))
 }
 
+/// Loads the definitions the game plays with from the directory `dir`: the ruleset
+/// ([`load_ruleset`]), then the game's own Super Me units of its `super_me.ron`
+/// ([`Definitions::with_super_me_units`], docs/DECISIONS.md R218). [`load_ruleset`] alone keeps
+/// exactly the Red Alert 2 ruleset, which the data parity audit compares with the reference.
+pub fn load_game_ruleset(dir: impl AsRef<Path>) -> Result<Definitions, DataError> {
+    let dir = dir.as_ref();
+    load_ruleset(dir)?.with_super_me_units(dir.join("super_me.ron"))
+}
+
 fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
     let error = |field: String, kind| DataError {
         file: path.to_owned(),
@@ -464,6 +515,7 @@ fn validate(path: &Path, file: UnitsFile) -> Result<Definitions, DataError> {
         combat: Arc::default(),
         arsenal: Arc::default(),
         rules: None,
+        super_me_units: Arc::default(),
     })
 }
 

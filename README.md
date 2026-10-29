@@ -878,6 +878,14 @@ your units move up to 4 times faster; it is separate from the game speed, which 
 everyone. Cancel returns only credits actually spent. Restart retains
 the choices; a new normal game uses the original balance data. AI players cannot receive the bonus.
 
+With Super Me on you may also build **Futa**, a unit of this game's own (not part of Red Alert 2)
+that no one else can build: a hovering bath towel with a 120 mm gun for ground targets and a
+missile pod for aircraft. Its card is among the vehicles of the Construction Yard; when it is
+ready, click the card and then any free cell of the map, however far from your base. Build as
+many as you like. While at least one Futa stands you have unlimited power (`Power  n /
+Unlimited`) and may place buildings within 6 cells of it. Its data is `assets/data/super_me.ron`
+(docs/DECISIONS.md R218).
+
 Team paint uses blue, red, gold, green, purple, cyan, orange, pink, lime or ivory; computer player n receives the
 n-th color after yours, so every player of a match has its own color. Unit/building faction accents, production icons and radar markers use
 these colors, including after capture or mind control. Metal, glass and ground remain natural.

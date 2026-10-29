@@ -1,0 +1,2 @@
+acceptance	recorded_decision	explicit_assumption	final_input_sha256
+EXPLICIT_ASSUMPTION	RA9-P5/preliminary-copy/false-only-human-order-policy	Exact shipped PlayerReturnFire=no is interpreted narrowly as no damage-caused human order override. Actual idle acquisition, AttackMove and explicit Attack remain available. Original false semantics remain uncertain; no generic true/default scope is inferred. Actual78 four human command/damage controls bind this chosen current model.	ff5db8d6f1745a74a08892341ae146c56e4ada4cbe1786063f1af1f883f3d25f

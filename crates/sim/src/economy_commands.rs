@@ -35,6 +35,11 @@
 //!   of a building of the player (`Placement(TooFar)`): the economy file's distance, or with a
 //!   rules file (RA2) the building's own reach from a base building ([`placement_reach`],
 //!   [`extends_base`]);
+//!   with Super Me, a Super Me unit with a build radius is an anchor as well, within its own
+//!   radius (docs/DECISIONS.md R218);
+//! * `PlaceUnit` ([`check_unit_placement`], R218): a complete placed Super Me unit of the type is
+//!   at the head of its queue (`UnitNotReady`), and the cell lies inside the map (`OutsideMap`)
+//!   and is free for the unit (`Placement`), anywhere on the map;
 //! * `SellBuilding`: the building exists (`UnknownBuilding`) and belongs to the player
 //!   (`NotOwned`); under fog of war (M4), another player's building the player does not see is
 //!   reported as `UnknownBuilding`; with a rules file its type is `sellable` (`NotSellable`,
@@ -56,19 +61,19 @@ use bevy_ecs::message::Messages;
 use bevy_ecs::system::{Commands, Query, Res, ResMut, SystemParam};
 
 use crate::building::{
-    Building, Footprint, Producer, building_bundle, check_building_footprint, check_distance,
-    check_visible,
+    Building, Footprint, PlacementError, Producer, building_bundle, check_building_footprint,
+    check_distance, check_visible,
 };
 use crate::combat::Body;
 use crate::combat::combat_components;
 use crate::command::{Command, IssuedCommand, PlayerId, RejectReason};
-use crate::definitions::Definitions;
+use crate::definitions::{Definitions, UnitKind};
 use crate::economy::{PlayerState, Players, QueueItem, QueueKey};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::SimEvent;
 use crate::id::{SimId, SimIdAllocator};
 use crate::map::{CellPos, Grid};
-use crate::unit::Owner;
+use crate::unit::{Owner, unit_bundle};
 use crate::visibility::Vision;
 
 /// The system parameters the economy commands need besides the grid and the event buffer.
@@ -403,7 +408,8 @@ pub fn check_buildable(
             "Infiltrate the required Battle Lab first",
         ));
     }
-    if !state.offers(item) {
+    // The game's own Super Me units are for a Super Me player alone (docs/DECISIONS.md R218).
+    if !state.offers(item) || (!state.super_me() && definitions.is_super_me_item(item)) {
         return Err(RejectReason::NotInRoster(item));
     }
     if !superweapons
@@ -573,9 +579,69 @@ pub(crate) fn check_placement_site(
     let anchors = owned
         .filter(|&(kind, _)| extends_base(definitions, kind))
         .map(|(_, footprint)| footprint);
-    check_distance(footprint, anchors, placement_reach(definitions, building))
-        .map_err(RejectReason::Placement)?;
+    let base = check_distance(footprint, anchors, placement_reach(definitions, building));
+    // A Super Me unit with a build radius is an anchor too, with its own reach (R218).
+    let near_super_me_unit = state.build_anchors().iter().any(|&(cell, radius)| {
+        footprint.distance(&Footprint {
+            origin: cell,
+            width: 1,
+            height: 1,
+        }) <= radius
+    });
+    if !near_super_me_unit {
+        base.map_err(RejectReason::Placement)?;
+    }
     Ok(footprint)
+}
+
+/// The checks of `PlaceUnit` (docs/DECISIONS.md R218): a complete unit of type `unit` that is
+/// placed on completion ([`Definitions::placed_on_completion`]) is at the head of its queue in
+/// `state` (`UnitNotReady`), `cell` lies inside the map (`OutsideMap`), the unit could stand on
+/// it (`Placement(NotBuildable)`), no building covers it (`Placement(Overlap)`) and no unit holds
+/// it (`Placement(Occupied)`). Unlike a building, the cell may be anywhere on the map, seen or
+/// not.
+pub fn check_unit_placement(
+    grid: &Grid,
+    definitions: &Definitions,
+    state: &PlayerState,
+    unit: UnitKind,
+    cell: CellPos,
+) -> Result<(), RejectReason> {
+    let item = ProductionItem::Unit(unit);
+    let ready = definitions.placed_on_completion(item)
+        && definitions
+            .production(item)
+            .zip(definitions.queue_of(item))
+            .and_then(|(terms, key)| {
+                state
+                    .lane(key)
+                    .first()
+                    .map(|head| head.item == item && head.progress >= terms.build_time)
+            })
+            .unwrap_or(false);
+    if !ready {
+        return Err(RejectReason::UnitNotReady(unit));
+    }
+    if !grid.contains(cell) {
+        return Err(RejectReason::OutsideMap(cell));
+    }
+    let domain = definitions.domain(unit);
+    if !grid.passable_for(cell, domain) {
+        if let Some(building) = grid.building(cell) {
+            return Err(RejectReason::Placement(PlacementError::Overlap {
+                cell,
+                building,
+            }));
+        }
+        return Err(RejectReason::Placement(PlacementError::NotBuildable(cell)));
+    }
+    if let Some(unit) = grid.occupant_for(cell, domain) {
+        return Err(RejectReason::Placement(PlacementError::Occupied {
+            cell,
+            unit,
+        }));
+    }
+    Ok(())
 }
 
 /// How far (cells, Chebyshev distance between nearest cells) a naval shipyard may lie from one of
@@ -732,6 +798,45 @@ pub(crate) fn apply(
                 player,
                 building: id,
                 kind: building,
+            });
+        }
+        &Command::PlaceUnit { unit, cell } => {
+            check_unit_placement(grid, definitions, state, unit, cell)?;
+            let item = ProductionItem::Unit(unit);
+            // `check_unit_placement` found the queue and its head.
+            let Some(key) = definitions.queue_of(item) else {
+                return Err(RejectReason::UnitNotReady(unit));
+            };
+            let speed = definitions.unit(unit).map_or(1, |def| def.speed);
+            let domain = definitions.domain(unit);
+            let on_foot = definitions.on_foot(unit);
+            let id = params.ids.allocate().ok_or(RejectReason::IdsExhausted)?;
+            grid.register(id, domain, on_foot);
+            if !grid.claim(cell, id) {
+                grid.unregister(id);
+                return Err(RejectReason::Placement(PlacementError::NotBuildable(cell)));
+            }
+            if let Some(queue) = state.queues.get_mut(&key) {
+                queue.remove(0);
+                if queue.is_empty() {
+                    state.queues.remove(&key);
+                }
+            }
+            let position = grid.standing_point(cell, id);
+            let mut entity = params
+                .commands
+                .spawn(unit_bundle(id, player, unit, speed, cell, position));
+            if let Some(terms) = definitions.unit_combat(unit) {
+                let (components, weapon) = combat_components(terms);
+                entity.insert(components);
+                if let Some(weapon) = weapon {
+                    entity.insert(weapon);
+                }
+            }
+            events.write(SimEvent::UnitPlaced {
+                player,
+                unit: id,
+                kind: unit,
             });
         }
         &Command::SellBuilding { building } => {

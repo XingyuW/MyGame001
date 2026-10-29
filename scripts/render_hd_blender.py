@@ -602,6 +602,8 @@ def roster():
     economy = (ROOT / 'assets/data/economy.ron').read_text().split('    units:')[0]
     blds = [(i, int(w), int(h)) for i, w, h in re.findall(r'id: "([^"]+)".*?width: (\d+),\s*height: (\d+)', economy, re.S)]
     units = re.findall(r'id: "([^"]+)"', (ROOT / 'assets/data/units.ron').read_text())
+    # The game's own Super Me units (docs/DECISIONS.md R218) have their own data file.
+    units += re.findall(r'id: "([^"]+)"', (ROOT / 'assets/data/super_me.ron').read_text())
     return blds, units
 
 def airborne():

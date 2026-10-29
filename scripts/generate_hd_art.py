@@ -359,6 +359,7 @@ def main():
     for ident,w,h in defs:
         building(ident,int(w),int(h)).save(out/'buildings'/f'{ident}.png')
     units=re.findall(r'id: "([^"]+)"',(ROOT/'assets/data/units.ron').read_text())
+    units+=re.findall(r'id: "([^"]+)"',(ROOT/'assets/data/super_me.ron').read_text())  # R218
     for ident in units:
         sheet=Image.new('RGBA',(96*S*8,96*S))
         for facing in range(8):sheet.alpha_composite(unit(ident,facing),(96*S*facing,0))

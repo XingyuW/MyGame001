@@ -200,7 +200,10 @@ pub(crate) fn show_hover_label(
         .cursor_position()
         .filter(|&cursor| window.focused && !over_sidebar(cursor, window.width()));
     let found = cursor
-        .filter(|_| host.running() && !matches!(*mode, InterfaceMode::Place(_)))
+        .filter(|_| {
+            host.running()
+                && !matches!(*mode, InterfaceMode::Place(_) | InterfaceMode::PlaceUnit(_))
+        })
         .and_then(|cursor| {
             let definitions = host.definitions()?;
             let point = camera.viewport_to_world_2d(camera_transform, cursor).ok();
