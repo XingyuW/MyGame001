@@ -20,6 +20,7 @@ Colours are `C(rgb, material)`: the material class picks the shader in render_hd
   rust       heavily corroded steel            water    liquid in vats and basins
   camo       disruptive-pattern vehicle paint  camocloth printed camouflage uniform cloth
   leather    boots, gloves, holsters (takes no dust)
+  holdout    cut out of the render (transparent): a doorway the game draws a scene behind
 """
 from contextlib import contextmanager
 from math import sin, cos, pi, sqrt, radians
@@ -58,9 +59,11 @@ CLAD_GREY = C((146, 152, 154), 'corr'); CLAD_BLUE = C((98, 116, 132), 'corr')
 CLAD_GREEN = C((92, 108, 92), 'corr'); CLAD_SAND = C((176, 164, 136), 'corr')
 CLAD_RUST = C((128, 84, 58), 'corr'); CLAD_WHITE = C((204, 204, 198), 'corr')
 CLAD_RED = C((126, 62, 50), 'corr'); CLAD_DARK = C((78, 82, 84), 'corr')
+DOOR_GREY = C((150, 156, 150), 'corr')
 # Glass and light
 GLASS = C((38, 58, 70), 'glass'); GLASS_GREEN = C((44, 70, 66), 'glass')
 GLASS_DARK = C((22, 30, 36), 'glass')
+HOLDOUT = C((0, 0, 0), 'holdout')
 LAMP = C((255, 236, 190), 'emit'); RED_LAMP = C((255, 60, 40), 'emit')
 GREEN_LAMP = C((90, 255, 120), 'emit'); PLASMA = C((120, 210, 255), 'emit')
 TESLA = C((150, 190, 255), 'emit'); HOT = C((255, 150, 50), 'emit'); PSI = C((190, 110, 255), 'emit')

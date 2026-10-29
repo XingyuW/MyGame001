@@ -257,17 +257,26 @@ pub fn building_shown(owner: PlayerId, footprint: Footprint, players: &Players) 
             .is_some_and(|state| state.vision().sees_footprint(footprint))
 }
 
-/// Removes the views of buildings that no longer exist (sold or destroyed), and hides the views
-/// of other players' buildings while the human player does not see them.
-fn update_building_views(
+/// Removes the views of buildings that no longer exist (sold or destroyed), hides the views of
+/// other players' buildings while the human player does not see them, and shows the frame of a
+/// vehicle door that is opening or open (`crate::arrival`).
+#[allow(clippy::type_complexity)]
+pub(crate) fn update_building_views(
     sprites: Option<Res<BuildingSprites>>,
+    doors: Option<Res<crate::arrival::DoorSprites>>,
     mut paint: crate::presentation::TeamPaint,
     mut commands: Commands,
     mut registry: ResMut<BuildingViews>,
     host: Res<SimHost>,
     // Disjoint from the unit views' query (`crate::units`), which also writes `Visibility`.
     mut views: Query<
-        (Entity, &BuildingView, &mut Visibility, &mut Sprite),
+        (
+            Entity,
+            &BuildingView,
+            &mut Visibility,
+            &mut Sprite,
+            Option<&crate::arrival::Door>,
+        ),
         Without<crate::units::UnitView>,
     >,
 ) {
@@ -275,7 +284,7 @@ fn update_building_views(
         return;
     };
     let world = host.world();
-    for (entity, view, mut visibility, mut sprite) in &mut views {
+    for (entity, view, mut visibility, mut sprite, door) in &mut views {
         let (Some(owner), Some(building)) = (
             world.get::<Owner>(view.building),
             world.get::<Building>(view.building),
@@ -284,10 +293,20 @@ fn update_building_views(
             commands.entity(entity).despawn();
             continue;
         };
-        if let Some(sprites) = sprites.as_ref()
-            && let (Some(human), Some(enemy)) =
-                (sprites.0.get(&building.kind), sprites.1.get(&building.kind))
-        {
+        let frame = door.map_or(0, crate::arrival::Door::frame);
+        let opening = doors
+            .as_ref()
+            .and_then(|doors| doors.0.get(&building.kind))
+            .and_then(|frames| frames.get(frame.checked_sub(1)?))
+            .map(|(human, enemy)| (human, enemy));
+        let pair = opening.or_else(|| {
+            let sprites = sprites.as_ref()?;
+            sprites
+                .0
+                .get(&building.kind)
+                .zip(sprites.1.get(&building.kind))
+        });
+        if let Some((human, enemy)) = pair {
             let image = paint.sprite(owner.0, human, enemy);
             if sprite.image != image {
                 sprite.image = image;

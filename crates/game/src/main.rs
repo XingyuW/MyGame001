@@ -7,6 +7,7 @@
 #![forbid(unsafe_code)]
 
 mod announcer;
+mod arrival;
 mod audio;
 mod battlefield;
 mod buildings;
@@ -97,6 +98,7 @@ fn main() -> AppExit {
         announcer::AnnouncerPlugin,
         ra7_controls::Ra7ControlsPlugin,
         weapon_fx::WeaponFxPlugin,
+        arrival::ArrivalPlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never
     // reads or changes the player's settings (docs/DECISIONS.md D52).
@@ -127,6 +129,10 @@ fn main() -> AppExit {
         && let Some(directory) = std::env::var_os("MYGAME_FX_REVIEW")
     {
         visual_review::enable_fx(&mut app, std::path::PathBuf::from(directory));
+    } else if options.smoke_test_frames.is_none()
+        && let Some(directory) = std::env::var_os("MYGAME_ARRIVAL_REVIEW")
+    {
+        visual_review::enable_arrivals(&mut app, std::path::PathBuf::from(directory));
     } else if options.smoke_test_frames.is_none()
         && let Some(directory) = std::env::var_os("MYGAME_MENU_REVIEW")
     {

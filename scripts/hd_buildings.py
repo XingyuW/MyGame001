@@ -55,21 +55,71 @@ def power_plant(k, w, d):
     k.box(11.6, 18.74, z + .9, 1.0, .05, .7, HAZ)
     flagpole(k, 13.2, 11.0, z, 8.0); floodlight(k, 18.6, 10.6, z, 7.0, yaw=200)
 
+# How far the vehicle door of the war factory, or the entrance of the barracks, is open (0 shut, 1 up in its drum). The shipped sprite
+# has it shut; render_hd_blender.py renders each of DOOR_FRAMES as `<ident>_door<n>`, which the
+# game shows while a vehicle drives out (crates/game/src/arrival.rs).
+DOOR = 0.0
+DOOR_FRAMES = {'war_factory': (1 / 3, 2 / 3, 1.0), 'barracks': (1 / 3, 2 / 3, 1.0)}
+# The vehicle door of the war factory, in metres of the model: it opens in the hall's y+ wall
+# between x0 and x0 + w (arrival.rs holds the same numbers, in cells).
+WF_DOOR_X0, WF_DOOR_W, WF_DOOR_H, WF_WALL_Y = 7.5, 8.0, 6.4, 19.0
+
+def vehicle_door(k, x, w, h, open_=0.0):
+    """A works' vehicle door in a wall's frame (see `face`): a sectional steel door that rolls
+    up into a drum over the lintel, in a portal of hazard-striped jambs. Below the door's edge
+    the doorway is a holdout: the render leaves it transparent, and the game draws the dark hall
+    and the vehicle driving out of it behind the sprite."""
+    hole = h * open_
+    if hole > .05: k.box(x, -.6, 0, w, .62, hole, HOLDOUT)
+    panels = 6
+    shut = h - hole
+    if shut > .05:
+        ph = shut / panels
+        for i in range(panels):
+            zz = hole + i * ph
+            k.box(x, -.06 + (i % 2) * .015, zz, w, .1, ph, tint(DOOR_GREY, .94 if i % 2 else 1.0))
+            k.box(x, .04, zz + ph - .05, w, .03, .05, DARK)   # panel joint
+        # Vision panels in the second section from the top, and the bottom rubber seal.
+        zz = hole + (panels - 2) * ph + ph * .3
+        for i in range(6): k.box(x + .45 + i * (w - .9) / 6, .05, zz, (w - .9) / 6 - .25, .03, ph * .4, GLASS_DARK)
+        k.box(x, .02, hole, w, .1, .08, RUBBER)
+    # Portal: hazard-striped steel jambs, a concrete lintel and the drum housing above it.
+    for xx in (x - .45, x + w):
+        k.box(xx, -.06, 0, .45, .3, h + .45, HAZ)
+    k.box(x - .5, -.08, h, w + 1.0, .36, .45, CONC_LIGHT)
+    k.box(x - .3, -.05, h + .45, w + .6, .55, .6, GALV)
+    # Beacons at the lintel's ends turn while the door moves; a traffic light says when to go.
+    lit = open_ > 0
+    for xx in (x - .25, x + w + .25):
+        k.cyl(xx, .3, h + .45, .16, .1, DARK, n=8)
+        k.cyl(xx, .3, h + .55, .13, .26, HOT if lit else rgb(150, 80, 30, 'glass'), n=10)
+    k.box(x + w + .55, .05, 2.2, .4, .22, 1.0, DARK)
+    k.ball(x + w + .75, .3, 2.95, .1, RED_LAMP if not lit else rgb(70, 20, 16, 'glass'), n=6, k=3)
+    k.ball(x + w + .75, .3, 2.45, .1, GREEN_LAMP if lit else rgb(16, 60, 24, 'glass'), n=6, k=3)
+    # Lamps over the doorway light the apron.
+    for xx in (x + w * .25, x + w * .75):
+        k.box(xx - .3, .0, h + 1.15, .6, .5, .14, DARK); k.box(xx - .26, .3, h + 1.1, .52, .2, .05, LAMP)
+
 def war_factory(k, w, d):
-    # Armoured vehicle works: a saw-tooth assembly hall with two vehicle doors, an office wing,
-    # an outdoor overhead crane over the test apron.
+    # Armoured vehicle works: a saw-tooth assembly hall whose wide vehicle door opens onto a
+    # marked drive lane, an office wing, and a gantry crane over the side of the test apron.
     z = pad(k, w, d)
     apron(k, 1.0, 19.0, 28.0, 10.0, z)
     # Assembly hall.
-    k.box(2, 2, z, 19, 17, 8.5, CLAD_GREY); k.box(1.94, 1.94, z, 19.12, 17.12, 1.4, PRECAST)
+    k.box(2, 2, z, 19, 17, 8.5, CLAD_GREY); k.box(1.94, 1.94, z, 19.12, 16.9, 1.4, PRECAST)
+    # The plinth's front runs either side of the vehicle door, not across it.
+    k.box(1.94, 18.84, z, WF_DOOR_X0 - .45 - 1.94, .22, 1.4, PRECAST)
+    k.box(WF_DOOR_X0 + WF_DOOR_W + .45, 18.84, z, 21.06 - WF_DOOR_X0 - WF_DOOR_W - .45, .22, 1.4, PRECAST)
     sawtooth(k, 2, 2, z + 8.5, 19, 17, 5, 2.6, CLAD_DARK)
     k.box(1.95, 18.98, z + 7.6, 19.1, .08, .7, TEAM)
-    with face(k, 'y+', 2, 19, z):
-        shutter(k, 2.2, 5.6, 6.0, open_=.62); shutter(k, 10.6, 5.6, 6.0, open_=.0)
-        door(k, 17.4); windows(k, 19, 1, z0=6.6, h=.8, margin=1.2, bay=1.6)
+    x0 = WF_DOOR_X0 - 2
+    with face(k, 'y+', 2, WF_WALL_Y, z):
+        vehicle_door(k, x0, WF_DOOR_W, WF_DOOR_H, open_=DOOR)
+        door(k, 17.4)
+        windows(k, x0 - .5, 1, z0=6.0, h=.8, margin=.8, bay=1.6)
+        with k.at(x0 + WF_DOOR_W + 1.6, 0, 0): windows(k, 19 - x0 - WF_DOOR_W - 1.6, 1, z0=6.0, h=.8, margin=.5, bay=1.6)
+        k.box(x0 + WF_DOOR_W / 2 - 1.1, .05, WF_DOOR_H + 1.15, 2.2, .06, .4, TEAM)   # bay number board
     with face(k, 'x+', 21, 19, z): windows(k, 17, 1, z0=5.2, h=1.6, margin=1.5, bay=1.6)
-    # A hull on the line, seen through the open door.
-    with k.at(5.0, 17.6, z + .05, yaw=90, s=.72): veh.tank_hull(k, 7.9, 3.6, .62, NATO_SAND, deck=1.22, glacis=2.2, nose=.8); veh.tracks(k, -3.95, 3.95, 3.6, .62, 7, .32, .95, NATO_SAND)
     # Extraction stacks and roof ventilators.
     for x in (5.5, 11.5, 17.5): vent(k, x, 4.0, z + 9.2, .45, 1.4)
     k.cyl(19.5, 3.5, z + 8.5, .5, 6.0, GALV, n=12); k.rev((19.5, 3.5, z + 14.5), 'z', [(0, .62), (.3, .62)], DARK, n=12)
@@ -78,58 +128,113 @@ def war_factory(k, w, d):
     roof_plant(k, 21.4, 5.4, top, 5.7, 10.2, seed=4)
     with face(k, 'y+', 21, 16, z): door(k, 4.6)
     antenna_mast(k, 26.2, 6.2, top, 6.0, w=.6, dishes=1)
-    # Outdoor gantry crane on its runway.
-    for x in (3.0, 15.5):
-        for y in (20.5, 28.0): k.tube((x, y, z), (x, y, z + 6.5), .16, YELLOW, n=6)
-        k.box(x - .2, 20.3, z + 6.5, .4, 7.9, .45, YELLOW)
-    k.box(2.8, 23.2, z + 6.95, 13.0, .9, .8, YELLOW); k.box(8.4, 23.0, z + 6.4, 1.3, 1.3, .55, DARK)
-    k.tube((9.05, 23.65, z + 6.4), (9.05, 23.65, z + 3.2), .03, DARK, n=4); k.cbox(9.05, 23.65, z + 2.9, .4, .2, .35, YELLOW)
-    # A turret on stands under the hook, crates, drums, a parked forklift, floodlights.
-    with k.at(9.05, 23.65, z + .9, yaw=90, s=.72): veh.turret_welded(k, 0, 0, NATO_SAND, front=2.0, rear=2.1, w=1.5, h=.82, nose=.55)
-    for dx in (-1.0, 1.0): k.cbox(9.05 + dx, 23.65, z, .3, 1.6, .9, IRON)
-    for i in range(3): crate(k, 17.5 + (i % 2) * 1.4, 22.0 + (i // 2) * 1.5, z, 1.2)
-    crate(k, 18.2, 22.4, z + .98, 1.0, yaw=20)
-    barrels(k, 22.5, 20.5, z, 4, rows=2)
-    container(k, 21.5, 23.5, z, rgb(60, 92, 120), yaw=0); container(k, 21.5, 26.3, z, rgb(140, 70, 50), yaw=0)
-    line(k, 4.0, 19.6, .15, 8.6, z); line(k, 9.2, 19.6, .15, 8.6, z); line(k, 12.4, 19.6, .15, 8.6, z); line(k, 17.6, 19.6, .15, 8.6, z)
+    # Drive lane from the door to the apron's edge: yellow edge lines, a zebra threshold, arrows.
+    lx0, lx1 = WF_DOOR_X0 - .4, WF_DOOR_X0 + WF_DOOR_W + .25
+    for xx in (lx0, lx1): line(k, xx, 19.2, .15, 9.4, z, c=YELLOW)
+    for i in range(7): k.box(WF_DOOR_X0 + .3 + i * 1.12, 19.15, z + .03, .56, 1.0, .014, HAZ)
+    cx = WF_DOOR_X0 + WF_DOOR_W / 2
+    for y in (22.6, 26.0):
+        line(k, cx - .12, y, .24, 1.6, z)
+        k.poly([(cx - .7, y + 1.6, z + .045), (cx + .7, y + 1.6, z + .045), (cx, y + 2.5, z + .045)], WHITE)
+    # Right of the lane only low things, so that nothing tall stands between the camera and a
+    # vehicle leaving: a turret on stands, a low-loader with a hull, a parts rack.
+    with k.at(22.85, 21.4, z + .9, yaw=90, s=.72): veh.turret_welded(k, 0, 0, NATO_SAND, front=2.0, rear=2.1, w=1.5, h=.82, nose=.55)
+    for dx in (-1.0, 1.0): k.cbox(22.85 + dx, 21.4, z, .3, 1.6, .9, IRON)
+    k.box(18.6, 25.2, z + .5, 9.0, 2.6, .35, DARK); k.box(18.6, 25.2, z + .85, 9.0, 2.6, .08, rgb(92, 84, 70, 'wood'))
+    for x in (19.4, 20.6, 25.6, 26.8):
+        for y in (25.2, 27.5): k.cyl(x, y + .25 if y < 26 else y + .05, z, .45, .25, TYRE, n=10)
+    with k.at(23.1, 26.5, z + .95, yaw=0, s=.66): veh.tank_hull(k, 7.9, 3.6, .62, NATO_SAND, deck=1.22, glacis=2.2, nose=.8)
+    k.box(18.4, 19.6, z, 1.2, 4.2, 1.8, GALV)
+    for i in range(3): k.box(18.5, 19.7 + i * 1.35, z + .4, 1.0, 1.1, .9, tint(NATO_SAND, .9))
+    for i in range(3): crate(k, 1.6 + (i % 2) * 1.4, 20.0 + (i // 2) * 1.5, z, 1.2)
+    crate(k, 2.2, 20.4, z + .98, 1.0, yaw=20)
+    barrels(k, 4.6, 20.2, z, 2, rows=2)
+    container(k, 1.2, 25.6, z, rgb(60, 92, 120), yaw=0, L=5.9)
     hazard_edge(k, 1.2, 28.6, 27.6, .35, z)
-    flagpole(k, 27.8, 18.5, z, 9.0); floodlight(k, 1.6, 20.0, z, 9.0, yaw=45); floodlight(k, 28.4, 28.4, z, 9.0, yaw=215)
+    flagpole(k, 27.8, 18.5, z, 9.0); floodlight(k, 1.6, 23.8, z, 9.0, yaw=30); floodlight(k, 28.6, 28.6, z, 9.0, yaw=215)
+
+# The barracks' entrance, in metres of the model, as the war factory's door above
+# (arrival.rs holds the same numbers, in cells).
+BK_DOOR_X0, BK_DOOR_W, BK_DOOR_H, BK_WALL_Y = 4.6, 2.8, 2.7, 9.0
+
+def entrance(k, x, w, h, open_=0.0):
+    """A pair of glazed steel doors in a wall's frame (see `face`), swinging outwards about
+    their jambs, under a canopy. Behind open doors the doorway is a holdout, as in
+    `vehicle_door`: the game draws the lobby and the soldier walking out of it."""
+    if open_ > 0: k.box(x, -.5, 0, w, .52, h, HOLDOUT)
+    a = 90 * open_
+    for hinge, yaw, sign in ((x, a, 1), (x + w, -a, -1)):
+        with k.at(hinge, 0, 0, yaw=yaw):
+            x0 = 0 if sign > 0 else -w / 2
+            k.box(x0, -.03, 0, w / 2, .06, h, DARK)
+            k.box(x0 + .1, -.05, .25, w / 2 - .2, .1, h - .4, GLASS)
+            k.box(x0 + (w / 2 - .25 if sign > 0 else .15), .03, h * .45, .1, .08, .5, CHROME)  # push bar
+    # Frame, threshold, the canopy on two posts and its lamps.
+    for xx in (x - .18, x + w): k.box(xx, -.06, 0, .18, .18, h + .2, DARK)
+    k.box(x - .18, -.06, h, w + .36, .18, .2, DARK)
+    k.box(x - .5, 0, -.02, w + 1.0, 1.6, .1, CONC_LIGHT)
+    k.box(x - 1.1, -.1, h + .55, w + 2.2, 2.4, .22, CONC_LIGHT)
+    k.box(x - 1.1, 2.24, h + .55, w + 2.2, .08, .3, TEAM)
+    for xx in (x - .95, x + w + .85): k.cyl(xx, 2.0, 0, .1, h + .55, GALV, n=8)
+    for xx in (x + .3, x + w - .3): k.box(xx - .15, .9, h + .5, .3, .3, .05, LAMP)
 
 def barracks(k, w, d):
-    # Troop barracks: a two-storey accommodation block, a mess hall, a guard tower and the gate.
+    # Infantry training centre: a two-storey instruction block whose glazed entrance opens onto
+    # a parade square, a rappelling tower, an obstacle course, and its colours flying high from
+    # the roof.
     z = pad(k, w, d, c=TARMAC)
-    k.box(1.5, 1.8, z, 13.5, 6.4, 6.6, rgb(182, 176, 160, 'concrete')); k.box(1.44, 1.74, z, 13.62, 6.52, .6, CONC_DARK)
-    gable(k, 1.5, 1.8, z + 6.6, 13.5, 6.4, 2.0, rgb(86, 98, 92, 'corr'), ridge='x', wall=rgb(182, 176, 160, 'concrete'))
-    with face(k, 'y+', 1.5, 8.2, z):
-        punched(k, 13.5, 2, bay=1.9, margin=1.0); door(k, 6.2, 1.3, c=TEAM)
-        k.box(5.6, 0, 2.5, 2.5, 1.4, .15, TEAM)  # entrance canopy
-        for x in (5.75, 7.95): k.strut((x, 1.3, 0), (x, 1.3, 2.5), .08, GALV)
-    with face(k, 'x+', 15, 8.2, z): punched(k, 6.4, 2, bay=2.0, margin=1.2)
-    for x in (4.0, 11.5): vent(k, x, 4.9, z + 8.3, .25, .9)
-    # Mess hall with roof plant.
-    top = block(k, 2, 11.2, 8.5, 6.6, 3.9, CLAD_SAND, plinth=CONC_DARK, floors=1, band=None)
-    roof_plant(k, 2.4, 11.6, top, 7.6, 5.6, seed=8, density=1.3)
-    with face(k, 'y+', 2, 17.8, z): door(k, 6.6)
-    # Guard tower.
-    for x, y in [(15.2, 12.2), (17.8, 12.2), (15.2, 14.8), (17.8, 14.8)]: k.tube((x, y, z), (x, y, z + 7.0), .12, TIMBER, n=4)
-    for zz in (2.3, 4.6):
-        k.strut((15.2, 14.8, z + zz - 2.2), (17.8, 14.8, z + zz), .08, TIMBER); k.strut((17.8, 12.2, z + zz - 2.2), (17.8, 14.8, z + zz), .08, TIMBER)
-    k.box(14.7, 11.7, z + 7.0, 3.6, 3.6, .15, TIMBER)
-    for bx, by, bw, bd in [(14.7, 15.2, 3.6, .1), (18.2, 11.7, .1, 3.6), (14.7, 11.7, 3.6, .1), (14.7, 11.7, .1, 3.6)]: k.box(bx, by, z + 7.15, bw, bd, 1.1, rgb(118, 104, 78, 'wood'))
-    for x, y in [(14.8, 11.8), (18.1, 11.8), (14.8, 15.1), (18.1, 15.1)]: k.strut((x, y, z + 8.25), (x, y, z + 9.5), .08, TIMBER)
-    gable(k, 14.5, 11.5, z + 9.5, 4.0, 4.0, .9, rgb(86, 98, 92, 'corr'), ridge='x')
-    k.ladder(16.5, 15.45, z, z + 7.1, axis='x')
-    with k.at(17.9, 15.0, z + 8.4, yaw=40): k.cbox(0, 0, 0, .5, .4, .4, DARK); k.box(.25, -.15, .05, .03, .3, .3, LAMP)
-    # Gate post, sandbagged checkpoint, parade square markings, flag.
-    sandbags(k, [(11.5, 17.6, z), (13.6, 17.6, z), (13.6, 15.8, z)], 4)
-    sandbags(k, [(11.5, 13.0, z), (11.5, 14.6, z)], 3)
-    k.box(11.9, 16.0, z, 1.3, 1.3, 2.3, rgb(92, 104, 86)); k.box(11.8, 15.9, z + 2.3, 1.5, 1.5, .12, DARK)
-    k.box(13.2, 16.3, z + 1.0, .05, .7, .8, GLASS)
-    k.tube((14.2, 18.6, z + 1.0), (19.4, 18.6, z + 1.2), .06, SIGNAL_RED, n=6); k.cbox(14.2, 18.6, z, .3, .3, 1.1, WHITE)
-    for i in range(4): line(k, 11.6 + i * 1.9, 9.2, 1.2, .14, z)
-    flagpole(k, 18.6, 17.4, z, 9.0, w=2.6)
-    crate(k, 3.0, 9.0, z, 1.0); crate(k, 4.2, 9.1, z, 1.0, c=OLIVE); barrels(k, 16.0, 9.4, z, 3)
-    floodlight(k, 18.9, 1.6, z, 8.0, yaw=135)
+    wall = rgb(186, 178, 156, 'concrete')
+    x1, y0 = 14.0, 1.5
+    top = z + 7.0
+    k.box(1.5, y0, z, x1 - 1.5, BK_WALL_Y - y0, 7.0, wall, top=ROOF)
+    parapet(k, 1.5, y0, top, x1 - 1.5, BK_WALL_Y - y0, wall, .6)
+    # Plinth either side of the entrance, and a band in the owner's colour under the parapet.
+    k.box(1.44, y0 - .06, z, x1 - 1.38, BK_WALL_Y - y0 - .1, .6, CONC_DARK)
+    k.box(1.44, BK_WALL_Y - .2, z, BK_DOOR_X0 - .6 - 1.44, .26, .6, CONC_DARK)
+    k.box(BK_DOOR_X0 + BK_DOOR_W + .6, BK_WALL_Y - .2, z, x1 + .06 - BK_DOOR_X0 - BK_DOOR_W - .6, .26, .6, CONC_DARK)
+    k.box(1.45, BK_WALL_Y - .02, top - .75, x1 - 1.4, .08, .5, TEAM); k.box(x1 - .02, y0 - .05, top - .75, .08, BK_WALL_Y - y0 + .1, .5, TEAM)
+    with face(k, 'y+', 1.5, BK_WALL_Y, z):
+        x0 = BK_DOOR_X0 - 1.5
+        entrance(k, x0, BK_DOOR_W, BK_DOOR_H, open_=DOOR)
+        punched(k, x0 - .9, 2, bay=1.9, margin=.6)
+        with k.at(x0 + BK_DOOR_W + 1.3, 0, 0): punched(k, x1 - 1.5 - x0 - BK_DOOR_W - 1.3, 2, bay=1.9, margin=.5)
+        with k.at(x0, 0, 0): punched(k, BK_DOOR_W, 1, z0=4.4, bay=1.4, margin=.2)
+        # Crest board over the canopy: the owner's colours round a white star.
+        k.box(x0 + BK_DOOR_W / 2 - 1.0, .05, 5.9, 2.0, .08, .7, TEAM)
+        k.poly([(x0 + BK_DOOR_W / 2 + .35 * cos(radians(90 + 144 * i)), .14, 6.25 + .3 * sin(radians(90 + 144 * i))) for i in range(5)], WHITE)
+    with face(k, 'x+', x1, BK_WALL_Y, z): punched(k, BK_WALL_Y - y0, 2, bay=2.0, margin=1.0)
+    roof_plant(k, 2.0, 2.0, top, 7.0, 6.0, seed=8, density=.8)
+    # The colours: a tall mast on the roof with a large flag in the owner's colour.
+    flagpole(k, 11.6, 3.6, top, 8.5, w=3.6)
+    # Rappelling tower beside the block: timber frame, platform, roof and ropes.
+    tx, ty = 15.6, 2.6
+    for x, y in [(tx, ty), (tx + 2.8, ty), (tx, ty + 2.8), (tx + 2.8, ty + 2.8)]: k.tube((x, y, z), (x, y, z + 8.0), .13, TIMBER, n=4)
+    for zz in (2.6, 5.2):
+        k.strut((tx, ty + 2.8, z + zz - 2.4), (tx + 2.8, ty + 2.8, z + zz), .08, TIMBER); k.strut((tx + 2.8, ty, z + zz - 2.4), (tx + 2.8, ty + 2.8, z + zz), .08, TIMBER)
+    k.box(tx - .3, ty - .3, z + 8.0, 3.4, 3.4, .15, TIMBER)
+    for bx, by, bw, bd in [(tx - .3, ty + 3.0, 3.4, .1), (tx + 3.0, ty - .3, .1, 3.4)]: k.box(bx, by, z + 8.15, bw, bd, 1.0, rgb(118, 104, 78, 'wood'))
+    gable(k, tx - .4, ty - .4, z + 9.6, 3.6, 3.6, .8, rgb(86, 98, 92, 'corr'), ridge='x')
+    for x, y in [(tx - .2, ty - .2), (tx + 3.0, ty - .2), (tx - .2, ty + 3.0), (tx + 3.0, ty + 3.0)]: k.strut((x, y, z + 8.15), (x, y, z + 9.6), .07, TIMBER)
+    for y in (ty + .9, ty + 1.9): k.tube((tx + 3.15, y, z + 8.0), (tx + 3.6, y, z + .1), .03, CANVAS, n=4)
+    k.box(tx + 3.0, ty, z, 1.4, 2.8, .25, rgb(60, 70, 56, 'rubber'))   # landing mat
+    # Parade square left of the walk from the door: marker lines, a saluting base.
+    for i in range(4): line(k, 1.4, 10.6 + i * 2.1, 2.6, .14, z)
+    k.box(1.3, 17.6, z, 2.4, 1.6, .35, CONC_LIGHT); k.box(1.3, 19.1, z + .35, 2.4, .08, .7, TEAM)
+    # Obstacle course right of it: low walls, a tyre run, balance beam, monkey bars, net frame.
+    for i, y in enumerate((10.8, 13.4)): k.box(9.8, y, z, 3.2, .3, .9 + .4 * i, rgb(140, 120, 92, 'wood'))
+    for i in range(6): k.rev((10.2 + (i % 2) * .9, 15.4 + (i // 2) * .8, z), 'z', [(.25, 0), (.42, .05), (.42, .22), (.25, .27)], TYRE, n=10)
+    k.box(13.4, 10.6, z + .5, .2, 5.2, .15, TIMBER)
+    for y in (10.8, 15.6): k.cbox(13.5, y, z, .3, .3, .5, TIMBER)
+    for x in (15.2, 17.4):
+        for y in (11.2, 14.0): k.tube((x, y, z), (x, y, z + 2.3), .07, STEEL, n=6)
+    k.box(15.1, 11.1, z + 2.3, 2.4, .1, .06, STEEL); k.box(15.1, 13.9, z + 2.3, 2.4, .1, .06, STEEL)
+    for i in range(6): k.tube((15.2 + i * .44, 11.2, z + 2.32), (15.2 + i * .44, 14.0, z + 2.32), .03, STEEL, n=4)
+    for x in (15.4, 18.6): k.strut((x, 16.2, z), (17.0, 17.4, z + 3.6), .08, TIMBER)
+    for x in (15.4, 18.6): k.strut((x, 18.6, z), (17.0, 17.4, z + 3.6), .08, TIMBER)
+    for i in range(5): k.strut((15.6 + i * .7, 16.3, z + .2), (16.4 + i * .3, 17.3, z + 3.4), .02, CANVAS)
+    sandbags(k, [(9.6, 19.0, z), (13.2, 19.0, z)], 2)
+    crate(k, 2.0, 15.2, z, .9, c=OLIVE); barrels(k, 18.2, 9.6, z, 2, c=OLIVE)
+    floodlight(k, 19.3, 8.8, z, 8.0, yaw=200)
 
 # --- Soviet core ------------------------------------------------------------------------------------
 def tesla_coil_tower(k, x, y, z, h=9.0, r=1.5):

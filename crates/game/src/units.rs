@@ -612,6 +612,7 @@ fn place_unit_views(
             &mut Transform,
             &mut Visibility,
             Option<&Children>,
+            Option<&crate::arrival::Emerging>,
         ),
         (Without<crate::buildings::BuildingView>, Without<AirShadow>),
     >,
@@ -651,8 +652,16 @@ fn place_unit_views(
             )
         })
         .unwrap_or_default();
-    for (entity, mut view, mut sprite, mut anchor, mut transform, mut visibility, children) in
-        &mut views
+    for (
+        entity,
+        mut view,
+        mut sprite,
+        mut anchor,
+        mut transform,
+        mut visibility,
+        children,
+        emerging,
+    ) in &mut views
     {
         let (Some(position), Some(facing), Some(mobile)) = (
             world.get::<Position>(view.unit),
@@ -674,7 +683,13 @@ fn place_unit_views(
         }
         view.current = position.0;
         let cell = interpolate(view.previous, view.current, fraction);
-        let moved = view.previous != view.current;
+        // A unit that has just left the building that produced it is drawn on its way out of
+        // it for a moment (`crate::arrival`), and moves while it is.
+        let arrival = emerging.map(|emerging| emerging.pose(cell));
+        let cell = arrival.map_or(cell, |pose| pose.cell);
+        let moved = view.previous != view.current
+            || arrival.is_some_and(|pose| view.drawn.is_some_and(|drawn| drawn != pose.cell));
+        let facing = arrival.and_then(|pose| pose.facing).unwrap_or(facing.0);
         view.still = if moved {
             0.0
         } else {
@@ -755,12 +770,12 @@ fn place_unit_views(
             .is_some_and(|g| g.domain_of(view.id) == sim::Domain::Air);
         let (rect, size, hang) = match gait {
             Some(_) => (
-                crate::hd_art::walk_rect(facing.0, crate::hd_art::walk_frame(view.stride)),
+                crate::hd_art::walk_rect(facing, crate::hd_art::walk_frame(view.stride)),
                 crate::hd_art::WALK_SIZE,
                 crate::hd_art::walk_anchor(),
             ),
             None => (
-                crate::hd_art::facing_rect(facing.0),
+                crate::hd_art::facing_rect(facing),
                 crate::hd_art::UNIT_SIZE,
                 Vec2::ZERO,
             ),
@@ -771,7 +786,9 @@ fn place_unit_views(
         if anchor.0 != hang {
             anchor.0 = hang;
         }
-        let mut depth = unit_depth(cell);
+        let mut depth = arrival
+            .and_then(|pose| pose.depth)
+            .unwrap_or_else(|| unit_depth(cell));
         if flying {
             // An aircraft that stands on its dock has landed there (RA4); with the legacy
             // ruleset a strike aircraft that has flown home sits on the ground beside its base
@@ -814,6 +831,10 @@ fn place_unit_views(
         );
         if sprite.rect != Some(rect) {
             sprite.rect = Some(rect);
+        }
+        let colour = arrival.map_or(Color::WHITE, |pose| pose.colour());
+        if sprite.color != colour {
+            sprite.color = colour;
         }
     }
 }

@@ -654,6 +654,40 @@ pub(crate) fn load_catalogue(world: &mut World) {
             }
         }
     }
+    // The frames of the vehicle doors of the building types whose art has one.
+    let mut doors = crate::arrival::DoorSprites::default();
+    for &kind in sprites.0.keys() {
+        let item = sim::ProductionItem::Building(kind);
+        let art = catalogue.definitions.art(item);
+        let (Some(_), Some(def)) = (
+            crate::arrival::door_art(art),
+            catalogue.definitions.building(kind),
+        ) else {
+            continue;
+        };
+        let mut frames = Vec::new();
+        for frame in 1..=crate::arrival::DOOR_FRAMES {
+            let pair = crate::hd_art::checked(
+                &root,
+                "buildings",
+                &crate::arrival::door_sprite(art, frame),
+                crate::hd_art::building_size(def.width, def.height),
+            )
+            .and_then(|bytes| {
+                crate::presentation::sprite_pair(&bytes, &mut world.resource_mut::<Assets<Image>>())
+            });
+            match pair {
+                Ok(pair) => frames.push(pair),
+                Err(error) => {
+                    error!("{error}");
+                    world.write_message(AppExit::error());
+                    return;
+                }
+            }
+        }
+        doors.0.insert(kind, frames);
+    }
+    world.insert_resource(doors);
     world.insert_resource(sprites);
     let mut sprites = UnitSprites::default();
     for sheet in sheets {
@@ -2685,7 +2719,16 @@ pub(crate) mod tests {
         let legacy = legacy_catalogue();
         let named = |definitions: &Definitions, file: &Path, stem: &str| {
             let hd_used = if file.starts_with("hd/buildings") {
-                definitions.buildings().iter().any(|d| d.id == stem)
+                // The frames of a vehicle door opening belong to the building with the door.
+                let door = |d: &sim::BuildingDef| {
+                    crate::arrival::door_art(&d.id).is_some()
+                        && (1..=crate::arrival::DOOR_FRAMES)
+                            .any(|frame| crate::arrival::door_sprite(&d.id, frame) == stem)
+                };
+                definitions
+                    .buildings()
+                    .iter()
+                    .any(|d| d.id == stem || door(d))
             } else if file.starts_with("hd/units") || file.starts_with("hd/walk") {
                 // A walk cycle belongs to the unit whose sheet has its name.
                 definitions.units().iter().any(|d| d.id == stem)
