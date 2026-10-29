@@ -12972,3 +12972,17 @@ Me player; `units.rs` only loads `super_me.ron` after the RA2 ruleset. No comput
 Super Me and the RA2 ruleset holds no Super Me building, so every recorded AI, power, ore, repair
 and completion policy reads nothing that changed and stands. The 51 pending user checks are
 untouched.
+
+### R222. Futa looks like the Eiffel Tower
+
+The user asked (2026-10-29) for Futa to look like the Eiffel Tower ("now it looks so ugly"),
+everything else unchanged. Only the model `futa` in `scripts/hd_buildings_c.py` and its sprite
+`assets/sprites/hd/buildings/futa.png` change: a wrought-iron lattice model of the 300 m tower at
+28 m (1:10.7, the most the 2 x 2 frame holds), in its real proportions: four curved lattice legs
+(outer half-width 5 + 57.5 e^(-z/85) m of the tower) on masonry piers over a 125 m square, the
+arches under the first platform, platforms at 57, 115 and 276 m, the single shaft above the
+second, the top cabin with the beacon, a mast and a flag, painted bronze-brown. The owner's colour
+is the first-floor frieze and the flag. Footprint, data, weapon, powers and every rule of R220
+are unchanged. No Rust source changes, so the RA9 census, surface and every pinned file stay as
+R221 left them and the audit needs no rebind; as after R217, the scope packet's record of the
+two changed non-Rust inputs (the script and the sprite) is refreshed by the next rebind round.

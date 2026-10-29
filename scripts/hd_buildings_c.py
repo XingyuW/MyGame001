@@ -7,7 +7,7 @@ protective green on dark concrete, timber and rusting steel. The owner's colour 
 the way armies mark kit: a recognition band, a roof panel, a pennant.
 """
 from contextlib import contextmanager
-from math import sin, cos, pi, radians, degrees, atan2, sqrt
+from math import sin, cos, pi, radians, degrees, atan2, sqrt, exp
 import random
 import numpy as np
 from hd_kit import *
@@ -770,75 +770,91 @@ def fortress_walls(k, w, d):
         k.box(min(x0, x1) - .04, min(y0, y1) - .04, z, abs(x1 - x0) + .08, abs(y1 - y0) + .08, .012, rgb(58, 58, 56, 'concrete'))  # deck joints
 
 def futa(k, w, d):
-    # Futa, the game's own Super Me defence (docs/DECISIONS.md R220): a giant terry bath towel,
-    # 12 m wide, hung over the heavy steel rail of a towel stand on a poured plinth. Woven stripe
-    # bands near both hems carry the owner's colour as dyed bands do on real towels; the light it
-    # strikes with gathers in the cut-crystal finials on the stand's posts.
-    terry = rgb(224, 216, 196, 'cloth'); border = rgb(200, 190, 168, 'cloth')
-    shade = rgb(170, 162, 144, 'cloth'); crystal = C((206, 238, 255), 'emit')
+    # Futa, the game's own Super Me defence (docs/DECISIONS.md R220, R222), built as the Eiffel
+    # Tower: a 1:10.7 wrought-iron lattice of the 300 m tower (28 m here, the most a 2 x 2 frame
+    # holds), in its real proportions. Four curved lattice legs on masonry piers splay out over a
+    # 125 m square (11.7 m), joined by the decorative arches under the first platform; they meet
+    # above the second platform and rise as one shaft to the third, the top cabin, the beacon whose
+    # light it strikes with, and the flag. Owner's colour: the first-floor frieze and the flag.
+    s = 28.0 / 300                             # metres of the model per metre of the tower
     cx, cy = 10.0, 10.0
-    ground(k, cx, cy, 9.6, GRAVEL_DARK, 11)
-    # The plinth: a low poured slab with a chamfered step.
-    k.stack(cx, cy, [(0, 17.0, 17.0, 1.2), (.45, 17.0, 17.0, 1.2), (.45, 15.6, 15.6, 1.0),
-                     (.8, 15.6, 15.6, 1.0)], CONCRETE, smooth=False)
-    zbar, r_bar, y0, y1 = 13.0, .38, 2.6, 17.4
-    # The stand: a splayed pair of legs at each end, a footing under each, the rail between.
-    for y in (y0, y1):
-        for dx in (-2.6, 2.6):
-            k.cbox(cx + dx, y, .8, 1.3, 1.3, .5, CONC_DARK)
-            k.tube((cx + dx, y, 1.3), (cx, y, zbar), .3, STEEL, n=12)
-        k.tube((cx - 1.6, y, 5.0), (cx + 1.6, y, 5.0), .16, STEEL, n=8)
-        k.ball(cx, y, zbar, .62, GALV, n=14, k=7)
-        with k.at(cx, y, zbar + .55):
-            k.ball(0, 0, .75, .55, crystal, rz=1.0, n=6, k=3)       # cut-crystal finial
-            k.cyl(0, 0, 0, .3, .25, GALV, n=10)
-    k.rev((cx, y0, zbar), 'y', [(0, r_bar), (y1 - y0, r_bar)], GALV, n=14)
-    # The towel: a cloth sheet hanging from the rail down both sides, in soft vertical folds.
-    ta, tb = 4.0, 16.0                        # its edges along the rail
-    T = .16                                   # thickness of heavy terry
-    def drape(side, length, nu=18, nv=12):
-        def point(u, v, off=0.0):
-            y = ta + (tb - ta) * u
-            fold = .32 * sin(u * 7 * pi + .6) * v ** .8      # folds open towards the hem
-            lean = .55 * v ** 1.6                              # the hem stands off the stand
-            x = cx + side * (r_bar + .04 + lean + fold + off)
-            z = zbar - v * length
-            return (x, y, z)
-        def colour(v0, v1):
-            m = (v0 + v1) / 2 * length
-            if length - 2.4 < m < length - 1.6: return TEAM     # the dyed stripe band
-            if length - 1.2 < m < length - .9: return TEAM
-            if m > length - .5 or length - 1.6 < m < length - 1.2: return border
-            return terry
-        us = [i / nu for i in range(nu + 1)]; vs = [j / nv for j in range(nv + 1)]
-        with k.grp(smooth=True):
-            for i in range(nu):
-                for j in range(nv):
-                    q = [(us[i], vs[j]), (us[i + 1], vs[j]), (us[i + 1], vs[j + 1]), (us[i], vs[j + 1])]
-                    outer = [point(u, v, T / 2) for u, v in q]
-                    inner = [point(u, v, -T / 2) for u, v in q]
-                    k.poly(outer if side > 0 else outer[::-1], colour(vs[j], vs[j + 1]))
-                    k.poly(inner[::-1] if side > 0 else inner, shade)
-        # Hemmed side edges and the bottom hem.
-        for u in (0.0, 1.0):
-            for j in range(nv):
-                a, b = vs[j], vs[j + 1]
-                pts = [point(u, a, T / 2), point(u, b, T / 2), point(u, b, -T / 2), point(u, a, -T / 2)]
-                k.plate(pts if (u > 0) == (side > 0) else pts[::-1], border)
-        for i in range(nu):
-            a, b = us[i], us[i + 1]
-            pts = [point(a, 1, T / 2), point(b, 1, T / 2), point(b, 1, -T / 2), point(a, 1, -T / 2)]
-            k.plate(pts if side < 0 else pts[::-1], border)
-        # Fringe tassels along the hem.
-        for i in range(25):
-            u = .02 + i * .96 / 24
-            x, y, z = point(u, 1)
-            k.tube((x, y, z), (x + side * .05, y + .05 * sin(i * 1.9), z - .55), .05, border, n=4, r2=.025)
-        return point
-    drape(+1, 10.6)                           # the front fall, to just above the plinth
-    drape(-1, 8.2)                            # the back fall, shorter
-    # Where it folds over the rail: a soft roll of cloth round the bar.
-    k.rev((cx, ta, zbar), 'y', [(0, r_bar + .2), (tb - ta, r_bar + .2)], terry, n=16)
+    iron = rgb(104, 86, 68, 'paint')           # "Eiffel Tower brown", bronze-toned iron paint
+    iron_dark = tint(iron, .78)
+    stone = rgb(176, 164, 140, 'concrete')
+    def o(z):                                  # outer half-width at height z (tower metres)
+        return 5 + 57.5 * exp(-z / 85)
+    def t(z):                                  # side of one leg's square section, to level 2
+        return 25 - 5.1 * z / 115
+    L1, L2, L3, TOP = 57.0, 115.0, 276.0, 300.0
+    P = lambda x, y, z: (cx + x * s, cy + y * s, z * s)
+    def bar(a, b, r, c=iron):
+        k.tube(P(*a), P(*b), r, c, n=5, caps=False)
+    def lattice(corners_at, z0, z1, n, chord=.16, brace=.06):
+        """A lattice column between z0 and z1: corner chords and X bracing on every face.
+        corners_at(z) gives its four corners (x, y) in order round the section."""
+        zs = [z0 + (z1 - z0) * i / n for i in range(n + 1)]
+        for za, zb in zip(zs, zs[1:]):
+            ca, cb = corners_at(za), corners_at(zb)
+            for i in range(4):
+                j = (i + 1) % 4
+                bar((*ca[i], za), (*cb[i], zb), chord)
+                bar((*ca[i], za), (*cb[j], zb), brace, iron_dark)
+                bar((*ca[j], za), (*cb[i], zb), brace, iron_dark)
+                bar((*cb[i], zb), (*cb[j], zb), brace * .8, iron_dark)
+
+    # The Champ de Mars: a paved square and a masonry pier under each leg.
+    k.cbox(cx, cy, 0, 17.6, 17.6, .18, rgb(150, 146, 136, 'concrete'))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            mid = o(0) - t(0) / 2
+            k.cbox(cx + sx * mid * s, cy + sy * mid * s, .18, t(0) * s + .9, t(0) * s + .9, .55, stone)
+            # The leg: a square lattice column whose outer corner follows the tower's curve.
+            def leg(z, sx=sx, sy=sy):
+                a, b = o(z), o(z) - t(z)
+                return [(sx * a, sy * a), (sx * a, sy * b), (sx * b, sy * b), (sx * b, sy * a)]
+            lattice(leg, 0, L2, 10)
+    # The arches under the first platform, one in each face, springing from the legs.
+    for face in range(4):
+        with k.at(cx, cy, 0, yaw=90 * face):
+            pts = []
+            for i in range(17):
+                u = -1 + i / 8
+                zz = 20 + 19 * sqrt(max(0.0, 1 - u * u))
+                half = o(zz) - t(zz)
+                pts.append(((o(zz) - .6) * s, u * half * s, zz * s))
+            k.pipe(pts, .1, iron, n=5)
+            for p0 in pts[2:-2:2]:
+                k.tube(p0, (p0[0], p0[1], L1 * s), .035, iron_dark, n=4, caps=False)
+    # The single shaft from the second platform to the top.
+    def shaft(z):
+        a = o(z)
+        return [(a, a), (a, -a), (-a, -a), (-a, a)]
+    lattice(shaft, L2, L3, 9, chord=.13, brace=.05)
+    lattice(lambda z: [(x * .8, y * .8) for x, y in shaft(z)], L3, TOP - 14, 2, chord=.1, brace=.04)
+    # The platforms: a deck and a gallery railing, the first with its frieze in the owner's colour.
+    for z, over, deck in ((L1, 2.5, .55), (L2, 1.5, .45), (L3, .8, .35)):
+        a = (o(z) + over) * s
+        k.cbox(cx, cy, z * s - deck, 2 * a, 2 * a, deck, iron)
+        if z == L1:
+            for f in range(4):
+                with k.at(cx, cy, z * s - deck, yaw=90 * f):
+                    k.box(a - .02, -a, -.32, .06, 2 * a, .32, TEAM)        # the frieze
+        for f in range(4):
+            with k.at(cx, cy, z * s, yaw=90 * f):
+                k.box(a - .05, -a, 0, .05, 2 * a, .35, iron_dark)          # gallery railing
+        if z in (L1, L2):  # pavilions on the deck
+            for f in range(4):
+                with k.at(cx, cy, z * s, yaw=90 * f + 45):
+                    k.box(.6 * a, -.5, 0, .9, 1.0, .7, rgb(150, 132, 108, 'paint'), top=iron_dark)
+    # The top: the cabin, the lantern and its beacon, the mast and the flag.
+    zc = (TOP - 14) * s
+    k.cbox(cx, cy, zc, 1.2, 1.2, .9, iron, top=iron_dark)
+    k.cyl(cx, cy, zc + .9, .42, .55, GLASS, n=12)
+    k.ball(cx, cy, zc + 1.18, .3, C((214, 242, 255), 'emit'), n=10, k=5)    # the beacon
+    k.dome(cx, cy, zc + 1.45, .48, iron_dark, h=.35, n=12)
+    k.tube((cx, cy, zc + 1.75), (cx, cy, TOP * s + 1.0), .06, iron_dark, n=6, r2=.03)
+    k.plate([(cx, cy, TOP * s + .9), (cx + .9, cy - .45, TOP * s + .9), (cx + .9, cy - .45, TOP * s + .35),
+             (cx, cy, TOP * s + .35)], TEAM)
 
 MODELS = {f.__name__: f for f in [rocket_tower, pillbox, sentry_gun, patriot, flak_cannon, prism_tower, tesla_coil,
                                   grand_cannon, fortress_walls, futa]}
