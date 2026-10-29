@@ -396,6 +396,15 @@ and send tracers, machine guns fire bursts, tank guns boom with a muzzle blast, 
 dust ring, shells and rockets fly (rockets on a smoke trail, artillery on an arc) and burst
 where they land with a sound of their own.
 
+Nothing pops into existence (`crates/game/src/arrival.rs`). A new or deployed building rises
+from its foundation in about a second, revealed from the ground up and growing to full size in
+a ring of dust. The War Factory has one wide roll-up door: it opens, a new vehicle waits in the
+dark hall, drives down the marked lane to its place and the door closes behind it. The Barracks
+of both sides is a training centre with a flag on its roof, a rappelling tower, a parade square
+and an obstacle course; a new soldier steps out through its glazed doors. Units from buildings
+without a door step out of the side. All of it is presentation: the units exist and can be
+ordered from the moment they are built.
+
 This remains a **2D isometric renderer**. Lighting and model shadows are baked into the
 sprites; the animated light glows are composited effects. It does not yet have real-time 3D
 shadows, physically based reflections or a general weather system.
