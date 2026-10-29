@@ -352,6 +352,185 @@ fn capture_features(world: &mut World) {
     }
 }
 
+/// MYGAME_ARRIVAL_REVIEW: new units and buildings arriving (`crate::arrival`), in bursts of
+/// captures: a battle tank drives out of the war factory's door, three GIs walk out of the
+/// barracks' entrance one after another, then the barracks rises from its foundation. The review replays the events the
+/// simulation sends when a unit leaves its factory and a building is placed (the match itself
+/// is not changed). With MYGAME_ARRIVAL_REVIEW_OFFSCREEN set, the scene is drawn to an image (as
+/// MYGAME_FX_REVIEW_OFFSCREEN).
+pub fn enable_arrivals(app: &mut App, directory: PathBuf) {
+    app.insert_resource(Review {
+        directory,
+        frame: 0,
+        last_step: 0.0,
+    })
+    .add_systems(Last, capture_arrivals);
+}
+
+/// [`base_review`] with a battle tank on the cell in front of the war factory's door and three
+/// GIs on the cell in front of the barracks' entrance: where those units would stand had they
+/// just been built.
+fn arrival_review(original: &Catalogue) -> (Catalogue, MenuSelection) {
+    let (mut review, choice) = base_review(original);
+    let faction = &mut review.skirmish.factions[choice.faction()];
+    faction.units.clear();
+    for (id, offset, count) in [("grizzly", (1, 10), 1), ("gi", (4, 5), 3)] {
+        let kind = review.definitions.unit_kind(id).expect("review unit");
+        faction.roster.insert(sim::ProductionItem::Unit(kind));
+        faction.units.push(sim::StartingGroup {
+            kind,
+            offset,
+            count,
+        });
+    }
+    (review, choice)
+}
+
+fn capture_arrivals(world: &mut World) {
+    use crate::units::HUMAN;
+    let now = world.resource::<Time<Real>>().elapsed_secs_f64();
+    if now - world.resource::<Review>().last_step < 1.0 / 60.0 {
+        return;
+    }
+    let (frame, dir) = {
+        let mut review = world.resource_mut::<Review>();
+        review.last_step = now;
+        review.frame += 1;
+        (review.frame, review.directory.clone())
+    };
+    // The human player's first building and unit of these types.
+    let building = |world: &World, id: &str| {
+        let host = world.resource::<crate::sim_host::SimHost>();
+        let kind = host.definitions()?.building_kind(id)?;
+        let mut buildings = host
+            .world()
+            .try_query::<(&sim::SimId, &sim::Owner, &sim::Building)>()?;
+        buildings
+            .iter(host.world())
+            .find(|(_, owner, building)| owner.0 == HUMAN && building.kind == kind)
+            .map(|(id, _, building)| (*id, building.footprint))
+    };
+    let units = |world: &World, id: &str| -> Vec<sim::SimId> {
+        let host = world.resource::<crate::sim_host::SimHost>();
+        let Some(kind) = host.definitions().and_then(|d| d.unit_kind(id)) else {
+            return Vec::new();
+        };
+        let Some(mut units) = host
+            .world()
+            .try_query::<(&sim::SimId, &sim::Owner, &sim::Unit)>()
+        else {
+            return Vec::new();
+        };
+        let mut found: Vec<sim::SimId> = units
+            .iter(host.world())
+            .filter(|(_, owner, unit)| owner.0 == HUMAN && unit.kind == kind)
+            .map(|(id, ..)| *id)
+            .collect();
+        found.sort();
+        found
+    };
+    // The camera looks at the door of the human player's building `id`, as close as `scale`.
+    let look_at = |world: &mut World, id: &str, at: Vec2, scale: f32| {
+        let (Some(view), Some((_, footprint))) = (
+            world.get_resource::<crate::map::MapView>().copied(),
+            building(world, id),
+        ) else {
+            return;
+        };
+        let centre = crate::projection::to_world(
+            footprint.origin.x as f32 + at.x,
+            footprint.origin.y as f32 + at.y,
+            view.tile,
+        );
+        let mut cameras =
+            world.query_filtered::<(&mut Transform, &mut Projection), With<Camera2d>>();
+        for (mut transform, mut projection) in cameras.iter_mut(world) {
+            transform.translation = centre.extend(transform.translation.z);
+            if let Projection::Orthographic(ortho) = &mut *projection {
+                ortho.scale = scale;
+            }
+        }
+    };
+    // Replays the event of `unit` leaving the building `from`.
+    let leave = |world: &mut World, unit: Option<sim::SimId>, from: &str| {
+        if let (Some(unit), Some((building, _))) = (unit, building(world, from)) {
+            world.write_message(sim::SimEvent::UnitSpawned {
+                player: HUMAN,
+                unit,
+                building,
+            });
+        }
+    };
+    let shot = |world: &mut World, name: String| {
+        let screenshot = match world.get_resource::<ReviewTarget>() {
+            Some(target) => Screenshot::image(target.0.clone()),
+            None => Screenshot::primary_window(),
+        };
+        world
+            .spawn(screenshot)
+            .observe(save_to_disk(dir.join(name)));
+    };
+    const DOOR: u32 = 70;
+    const SOLDIERS: u32 = 215;
+    const RISE: u32 = 360;
+    match frame {
+        5 if std::env::var_os("MYGAME_ARRIVAL_REVIEW_OFFSCREEN").is_some() => {
+            draw_offscreen(world, UVec2::new(1600, 1000));
+        }
+        10 => {
+            let original = world.resource::<Catalogue>().clone();
+            let (review, choice) = arrival_review(&original);
+            world.insert_resource(review);
+            world.insert_resource(choice);
+            begin_scene(world, choice);
+            world.insert_resource(original);
+        }
+        40 => look_at(world, "war_factory", Vec2::new(2.2, 1.6), 0.42),
+        60 => shot(world, "arrival-base.png".into()),
+        DOOR => {
+            let tank = units(world, "grizzly").first().copied();
+            leave(world, tank, "war_factory");
+        }
+        f if f > DOOR && f <= DOOR + 120 && (f - DOOR).is_multiple_of(6) => {
+            shot(world, format!("arrival-door-{:02}.png", (f - DOOR) / 6));
+        }
+        200 => look_at(world, "barracks", Vec2::new(0.9, 1.3), 0.25),
+        // One soldier after another walks out of the entrance.
+        f if (SOLDIERS..SOLDIERS + 75).contains(&f) && (f - SOLDIERS).is_multiple_of(25) => {
+            let soldier = units(world, "gi")
+                .get(((f - SOLDIERS) / 25) as usize)
+                .copied();
+            leave(world, soldier, "barracks");
+        }
+        f if f > SOLDIERS && f <= SOLDIERS + 130 && (f - SOLDIERS).is_multiple_of(5) => {
+            shot(
+                world,
+                format!("arrival-soldiers-{:02}.png", (f - SOLDIERS) / 5),
+            );
+        }
+        RISE => {
+            let host = world.resource::<crate::sim_host::SimHost>();
+            let kind = host
+                .definitions()
+                .and_then(|definitions| definitions.building_kind("barracks"));
+            if let (Some((building, _)), Some(kind)) = (building(world, "barracks"), kind) {
+                world.write_message(sim::SimEvent::BuildingPlaced {
+                    player: HUMAN,
+                    building,
+                    kind,
+                });
+            }
+        }
+        f if f > RISE && f <= RISE + 120 && (f - RISE).is_multiple_of(8) => {
+            shot(world, format!("arrival-rise-{:02}.png", (f - RISE) / 8));
+        }
+        500 => {
+            world.write_message(AppExit::Success);
+        }
+        _ => {}
+    }
+}
+
 /// MYGAME_FX_REVIEW: weapons at work beside a developed base. Prism tanks, Tesla tanks and
 /// troopers, battle tanks, GIs and a V3 launcher engage an armoured column, then the
 /// infantry walks back past the cloning vats, which are selected and given a rally point.

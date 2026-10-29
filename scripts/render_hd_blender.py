@@ -26,6 +26,7 @@ import bpy, bmesh
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate_hd_art as g
 import generate_hd_terrain as terrain
+import hd_buildings
 
 ROOT = g.ROOT
 CELL_PX = 32 * sqrt(2)          # one cell edge, in world pixels, seen perpendicular to the view
@@ -354,6 +355,11 @@ def build_class_material(name):
     g_ = Graph(mat); b = g_.bsdf
     col = g_.N('ShaderNodeAttribute', _attribute_name='Col').outputs['Color']
     obj = g_.N('ShaderNodeTexCoord').outputs['Object']
+    if name == 'holdout':
+        # A doorway cut out of the sprite: alpha 0 wherever this surface is the nearest one.
+        out = next(n for n in mat.node_tree.nodes if n.type == 'OUTPUT_MATERIAL')
+        mat.node_tree.links.new(mat.node_tree.nodes.new('ShaderNodeHoldout').outputs[0], out.inputs['Surface'])
+        return mat
     if name == 'emit':
         g_.put(b.inputs['Base Color'], col); g_.put(b.inputs['Emission Color'], col)
         # Bright enough to read as lit, not so bright that the colour clips to white.
@@ -478,7 +484,7 @@ def build_class_material(name):
         g_.put(bn.inputs['Height'], h); g_.put(b.inputs['Normal'], bn.outputs[0])
     return mat
 
-CLASS_NAMES = list(RECIPES) + ['glass', 'water', 'emit']
+CLASS_NAMES = list(RECIPES) + ['glass', 'water', 'emit', 'holdout']
 
 def build_materials():
     return {name: build_class_material(name) for name in CLASS_NAMES}
@@ -633,6 +639,14 @@ def main():
         # Wall segments stand cell against cell: a baked shadow would fall across the neighbour.
         render(sc, cam, catcher, mats, mask, g.building(ident, w, d), out / 'buildings' / ident,
                shadow=ident != 'fortress_walls')
+        # The frames of a vehicle door opening (hd_buildings.DOOR_FRAMES): the same model with
+        # its door rolled further up each time.
+        for n, open_ in enumerate(hd_buildings.DOOR_FRAMES.get(ident, ()), 1):
+            hd_buildings.DOOR = open_
+            try:
+                render(sc, cam, catcher, mats, mask, g.building(ident, w, d), out / 'buildings' / f'{ident}_door{n}')
+            finally:
+                hd_buildings.DOOR = 0.0
     field_light(sc, True)
     for ident in units:
         if only and f'u:{ident}' not in only: continue
