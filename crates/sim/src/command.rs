@@ -9,7 +9,7 @@ use bevy_ecs::system::{Query, Res, ResMut};
 
 use crate::building::PlacementError;
 use crate::combat::{AttackOrder, Body, Weapon};
-use crate::definitions::{Definitions, UnitKind};
+use crate::definitions::Definitions;
 use crate::economy_commands::{self, BuildingIndex, EconomyParams};
 use crate::economy_defs::{BuildingKind, ProductionItem};
 use crate::event::{MoveFailure, SimEvent};
@@ -115,13 +115,6 @@ pub enum Command {
         building: BuildingKind,
         origin: CellPos,
     },
-    /// Put the player's ready unit of type `unit`, a placed Super Me unit (docs/DECISIONS.md
-    /// R218), on `cell`: any cell of the map that the unit could stand on, however far from the
-    /// player's buildings.
-    PlaceUnit {
-        unit: UnitKind,
-        cell: CellPos,
-    },
     /// Sell the building: remove it, free its cells, and refund its sell value.
     SellBuilding {
         building: SimId,
@@ -193,7 +186,6 @@ impl Command {
             | Command::QueueProduction { .. }
             | Command::CancelProduction { .. }
             | Command::PlaceBuilding { .. }
-            | Command::PlaceUnit { .. }
             | Command::SellBuilding { .. }
             | Command::RepairBuilding { .. }
             | Command::SetRallyPoint { .. } => None,
@@ -267,9 +259,6 @@ pub enum RejectReason {
     /// The player has no complete building of this type at the head of its queue
     /// (`PlaceBuilding`).
     NotReady(BuildingKind),
-    /// `PlaceUnit`: no complete unit of the type is at the head of its queue, or the type is not
-    /// one that is placed (docs/DECISIONS.md R218).
-    UnitNotReady(UnitKind),
     /// The building may not be placed there.
     Placement(PlacementError),
     /// No simulation id is left for the new building.
@@ -355,7 +344,6 @@ impl fmt::Display for RejectReason {
             Self::NotRepairable(id) => write!(f, "building {} cannot be repaired", id.0),
             Self::NotQueued(item) => write!(f, "{item:?} is not queued"),
             Self::NotReady(kind) => write!(f, "no building of type {} is ready", kind.0),
-            Self::UnitNotReady(kind) => write!(f, "no unit of type {} is ready to place", kind.0),
             Self::Placement(error) => error.fmt(f),
             Self::IdsExhausted => write!(f, "no simulation id is left"),
             Self::UnknownBuilding(id) => write!(f, "building {} does not exist", id.0),
@@ -638,11 +626,6 @@ fn hash_command(command: &Command, h: &mut crate::Fnv1a64) {
             h.write(&[21]);
             ids(h, units);
             cell(h, *target);
-        }
-        Command::PlaceUnit { unit, cell: p } => {
-            h.write(&[22]);
-            h.write(&unit.0.to_le_bytes());
-            cell(h, *p);
         }
     }
 }
@@ -978,7 +961,6 @@ fn apply_unit_command(
         | Command::QueueProduction { .. }
         | Command::CancelProduction { .. }
         | Command::PlaceBuilding { .. }
-        | Command::PlaceUnit { .. }
         | Command::SellBuilding { .. }
         | Command::RepairBuilding { .. }
         | Command::SetRallyPoint { .. } => {}
@@ -1489,9 +1471,7 @@ pub(crate) fn process_commands(world: &mut bevy_ecs::world::World) {
         } else {
             let boundary = matches!(
                 issued.command,
-                Command::SellBuilding { .. }
-                    | Command::PlaceBuilding { .. }
-                    | Command::PlaceUnit { .. }
+                Command::SellBuilding { .. } | Command::PlaceBuilding { .. }
             ) || issued
                 .command
                 .units()

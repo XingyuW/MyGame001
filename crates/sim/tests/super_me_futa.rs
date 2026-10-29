@@ -1,8 +1,9 @@
-//! Futa, the game's own Super Me unit (docs/DECISIONS.md R218), on the shipped data
-//! (`assets/data`, loaded with `load_game_ruleset`): only a Super Me player may build it, a
-//! finished one waits in its queue and is placed on any free cell of the map, it fires at units
-//! on the ground and in the air, and while it stands its owner has unlimited power and may place
-//! buildings near it. `load_ruleset` alone keeps the Red Alert 2 ruleset without it.
+//! Futa, the game's own Super Me building (docs/DECISIONS.md R218, R220), on the shipped data
+//! (`assets/data`, loaded with `load_game_ruleset`): only a Super Me player may build it, it may
+//! be placed on any free ground of the map, its beam of light strikes units on the ground and in
+//! the air far away, it is hard to destroy and cannot be captured, bombed or entered, and while it
+//! stands its owner has unlimited power and may place buildings near it. `load_ruleset` alone
+//! keeps the Red Alert 2 ruleset without it.
 //!
 //! Driven through `CommandQueue` and `SimSchedule`.
 
@@ -11,11 +12,11 @@ use std::path::PathBuf;
 use bevy_app::App;
 use bevy_ecs::message::Messages;
 use sim::{
-    Building, CellPos, Command, CommandQueue, Controller, Definitions, Grid, Health, IssuedCommand,
-    MatchOptions, Mobile, Owner, PlacementError, PlayerId, PlayerSetup, Players, ProductionItem,
-    RejectReason, SimEvent, SimId, SimPlugin, SimSchedule, Unit, check_buildable, load_ai,
-    load_game_ruleset, load_map, load_ruleset, load_skirmish, map_asset_path,
-    setup_match_configured, spawn_building, spawn_unit,
+    Building, BuildingKind, CellPos, Command, CommandQueue, Controller, Definitions, Grid, Health,
+    IssuedCommand, MatchOptions, Owner, PlacementError, PlayerId, PlayerSetup, Players,
+    ProductionItem, RejectReason, SimEvent, SimId, SimPlugin, SimSchedule, check_buildable,
+    check_placement, load_ai, load_game_ruleset, load_map, load_ruleset, load_skirmish,
+    map_asset_path, setup_match_configured, spawn_building, spawn_unit,
 };
 
 const HUMAN: PlayerId = PlayerId(0);
@@ -93,13 +94,11 @@ fn tick(app: &mut App, commands: Vec<Command>) -> Vec<SimEvent> {
         .collect()
 }
 
-fn futa(app: &App) -> ProductionItem {
-    ProductionItem::Unit(
-        app.world()
-            .resource::<Definitions>()
-            .unit_kind("futa")
-            .expect("futa"),
-    )
+fn futa_kind(app: &App) -> BuildingKind {
+    app.world()
+        .resource::<Definitions>()
+        .building_kind("futa")
+        .expect("futa")
 }
 
 fn human(app: &App) -> &sim::PlayerState {
@@ -135,94 +134,131 @@ fn produce(app: &mut App, item: ProductionItem) {
     panic!("{item:?} was not completed");
 }
 
-/// The free land cell farthest from the human player's yard (Chebyshev), so that no rule of
-/// distance from its base could allow it.
-fn far_cell(app: &mut App) -> CellPos {
+/// The origin of the valid site for a ready `building` farthest from the human player's yard
+/// (Chebyshev), with what the human player's state allows now.
+fn far_site(app: &mut App, building: BuildingKind) -> CellPos {
     let start = yard(app);
-    let grid = app.world().resource::<Grid>();
+    let grid = app.world().resource::<Grid>().clone();
+    let definitions = app.world().resource::<Definitions>().clone();
+    let state = human(app).clone();
     let mut best: Option<(i32, CellPos)> = None;
-    for y in 2..grid.height() as i32 - 2 {
-        for x in 2..grid.width() as i32 - 2 {
-            let cell = CellPos::new(x, y);
-            let open = (-1..=1).all(|dy| {
-                (-1..=1).all(|dx| {
-                    let near = CellPos::new(x + dx, y + dy);
-                    grid.passable_for(near, sim::Domain::Land)
-                        && grid.occupant_for(near, sim::Domain::Land).is_none()
-                })
-            });
+    for y in 0..grid.height() as i32 {
+        for x in 0..grid.width() as i32 {
+            let origin = CellPos::new(x, y);
             let distance = (x - start.x).abs().max((y - start.y).abs());
-            if open && best.is_none_or(|(d, _)| distance > d) {
-                best = Some((distance, cell));
+            if best.is_none_or(|(d, _)| distance > d)
+                && check_placement(
+                    &grid,
+                    &definitions,
+                    &state,
+                    std::iter::empty(),
+                    building,
+                    origin,
+                )
+                .is_ok()
+            {
+                best = Some((distance, origin));
             }
         }
     }
-    best.expect("a free cell").1
+    best.expect("a site").1
 }
 
-/// Produces a Futa and places it on `cell`; returns its id.
-fn place_futa(app: &mut App, cell: CellPos) -> SimId {
-    let item = futa(app);
-    let ProductionItem::Unit(kind) = item else {
-        unreachable!()
-    };
-    produce(app, item);
-    let events = tick(app, vec![Command::PlaceUnit { unit: kind, cell }]);
-    events
+/// Produces Futa and places it on the free site farthest from the base; returns its id and
+/// origin.
+fn place_futa(app: &mut App) -> (SimId, CellPos) {
+    let kind = futa_kind(app);
+    produce(app, ProductionItem::Building(kind));
+    let origin = far_site(app, kind);
+    let events = tick(
+        app,
+        vec![Command::PlaceBuilding {
+            building: kind,
+            origin,
+        }],
+    );
+    let id = events
         .iter()
         .find_map(|e| match e {
-            SimEvent::UnitPlaced {
+            SimEvent::BuildingPlaced {
                 player,
-                unit,
+                building,
                 kind: k,
-            } if *player == HUMAN && *k == kind => Some(*unit),
+            } if *player == HUMAN && *k == kind => Some(*building),
             _ => None,
         })
-        .unwrap_or_else(|| panic!("Futa was not placed: {events:?}"))
+        .unwrap_or_else(|| panic!("Futa was not placed: {events:?}"));
+    (id, origin)
 }
 
-fn units_of(app: &mut App, item: ProductionItem) -> Vec<(SimId, CellPos)> {
-    let ProductionItem::Unit(kind) = item else {
-        unreachable!()
+fn destroy(app: &mut App, id: SimId) {
+    let entity = {
+        let mut query = app
+            .world_mut()
+            .query::<(bevy_ecs::entity::Entity, &SimId)>();
+        query
+            .iter(app.world())
+            .find(|(_, sim_id)| **sim_id == id)
+            .map(|(entity, _)| entity)
+            .expect("Futa")
     };
-    let mut query = app.world_mut().query::<(&SimId, &Owner, &Unit, &Mobile)>();
-    query
-        .iter(app.world())
-        .filter(|(_, owner, unit, _)| owner.0 == HUMAN && unit.kind == kind)
-        .map(|(id, _, _, mobile)| (*id, mobile.cell))
-        .collect()
+    app.world_mut()
+        .get_mut::<Health>(entity)
+        .unwrap()
+        .hit_points = 0;
+    tick(app, Vec::new());
+    tick(app, Vec::new());
 }
 
 #[test]
-fn futa_is_the_games_own_unit_and_load_ruleset_stays_the_ra2_ruleset() {
+fn futa_is_the_games_own_building_and_load_ruleset_stays_the_ra2_ruleset() {
     let ra2 = load_ruleset(data()).unwrap_or_else(|error| panic!("{error}"));
-    assert!(ra2.unit_kind("futa").is_none());
-    assert!(ra2.super_me_units().is_empty());
+    assert!(ra2.building_kind("futa").is_none());
+    assert!(ra2.weapon_kind("futa_beam").is_none());
+    assert!(ra2.super_me_buildings().is_empty());
 
     let game = load_game_ruleset(data()).unwrap_or_else(|error| panic!("{error}"));
-    assert_eq!(game.units().len(), ra2.units().len() + 1);
-    let kind = game.unit_kind("futa").expect("futa");
-    let grants = *game.super_me_unit(kind).expect("a Super Me unit");
-    assert!(grants.unlimited_power && grants.placed && grants.hover);
+    assert_eq!(game.units(), ra2.units(), "no unit is added");
+    assert_eq!(game.buildings().len(), ra2.buildings().len() + 1);
+    assert_eq!(&game.buildings()[..ra2.buildings().len()], ra2.buildings());
+    let kind = game.building_kind("futa").expect("futa");
+    let grants = *game.super_me_building(kind).expect("a Super Me building");
+    assert!(grants.unlimited_power && grants.anywhere);
     assert_eq!(grants.build_radius, 6);
-    let item = ProductionItem::Unit(kind);
+    let item = ProductionItem::Building(kind);
     let entry = game.metadata(item).expect("arsenal entry");
     assert_eq!(entry.label, "Futa");
     assert_eq!(entry.art, "futa");
-    assert!(entry.immune_psionics, "no one may mind control it");
-    assert!(entry.owner_sides.is_empty() && entry.side.is_none());
-    assert_eq!(game.lane(item), sim::Lane::Placed);
-    // One weapon for the ground and one for the air.
-    let terms = game.unit_combat(kind).expect("combat terms");
-    let [ground, air] = terms
-        .weapons(false)
-        .map(|w| game.weapon(w.expect("weapon")).unwrap());
-    assert!(ground.anti_ground && !ground.anti_air, "{}", ground.id);
-    assert!(air.anti_air, "{}", air.id);
-    // The RA2 part of the definitions is the same in both.
-    for (index, unit) in ra2.units().iter().enumerate() {
-        assert_eq!(&game.units()[index], unit);
-    }
+    assert_eq!(entry.category, sim::Category::Armory, "a defence");
+    assert!(entry.side.is_none() && entry.owner_sides.is_empty());
+    assert!(!entry.powered, "it fires whatever the power");
+    // No one takes it or removes it cheaply.
+    assert!(!entry.capturable && !entry.spyable && !entry.can_c4 && !entry.bombable);
+
+    // Its one weapon is a beam of the Prism Tank's light that engages ground and air, much
+    // further and harder than a Prism Tower.
+    let terms = game.building_combat(kind).expect("combat terms");
+    let beam = game.weapon(terms.weapon.expect("a weapon")).unwrap();
+    assert_eq!(beam.id, "futa_beam");
+    assert!(beam.anti_air && beam.anti_ground);
+    assert_eq!(beam.projectile_speed, 0, "light, not a shell");
+    assert_eq!(game.warhead(beam.warhead).unwrap().id, "prism_warhead");
+    let tower = game.building_kind("prism_tower").unwrap();
+    let tower_terms = game.building_combat(tower).unwrap();
+    let tower_beam = game.weapon(tower_terms.weapon.unwrap()).unwrap();
+    assert!(beam.range >= 2 * tower_beam.range);
+    assert!(beam.damage * tower_beam.reload as i32 > 5 * tower_beam.damage * beam.reload as i32);
+    // Very hard to destroy: far more hit points than any building of the ruleset.
+    let strongest = (0..ra2.buildings().len())
+        .filter_map(|i| ra2.building_combat(BuildingKind(i as u16)))
+        .map(|t| t.hit_points)
+        .max()
+        .unwrap();
+    assert!(
+        terms.hit_points >= 3 * strongest,
+        "{} vs {strongest}",
+        terms.hit_points
+    );
 }
 
 #[test]
@@ -230,18 +266,18 @@ fn only_a_super_me_player_may_queue_futa() {
     for super_me in [false, true] {
         let mut app = game(super_me);
         tick(&mut app, Vec::new());
-        let item = futa(&app);
+        let item = ProductionItem::Building(futa_kind(&app));
         let owned = {
             let mut query = app.world_mut().query::<(&Owner, &Building)>();
             query
                 .iter(app.world())
-                .filter(|(owner, _)| owner.0 == HUMAN)
                 .map(|(_, building)| building.kind)
                 .collect::<Vec<_>>()
         };
         let world = app.world();
+        let definitions = world.resource::<Definitions>();
         let state = world.resource::<Players>().get(HUMAN).unwrap();
-        let outcome = check_buildable(world.resource::<Definitions>(), state, true, &owned, item);
+        let outcome = check_buildable(definitions, state, true, &owned, item);
         if super_me {
             assert_eq!(outcome, Ok(()));
         } else {
@@ -250,39 +286,29 @@ fn only_a_super_me_player_may_queue_futa() {
         // The computer player never may.
         let ai = world.resource::<Players>().get(AI).unwrap();
         assert_eq!(
-            check_buildable(world.resource::<Definitions>(), ai, true, &owned, item),
+            check_buildable(definitions, ai, true, &owned, item),
             Err(RejectReason::NotInRoster(item))
         );
     }
 }
 
 #[test]
-fn a_finished_futa_waits_and_is_placed_anywhere_on_the_map() {
+fn futa_is_placed_anywhere_on_the_map_and_there_is_no_limit() {
     let mut app = game(true);
     tick(&mut app, Vec::new());
-    let item = futa(&app);
-    let ProductionItem::Unit(kind) = item else {
-        unreachable!()
-    };
-    produce(&mut app, item);
-    for _ in 0..40 {
-        tick(&mut app, Vec::new());
-    }
-    assert!(units_of(&mut app, item).is_empty(), "it left no factory");
-    let key = app
-        .world()
-        .resource::<Definitions>()
-        .queue_of(item)
-        .unwrap();
-    assert_eq!(human(&app).lane(key).len(), 1, "it waits in its queue");
-
-    // A cell under a building is refused.
+    let kind = futa_kind(&app);
     let start = yard(&mut app);
+    let (_, first) = place_futa(&mut app);
+    // Far beyond the reach of any base building, and on ground the player had not seen.
+    let distance = (first.x - start.x).abs().max((first.y - start.y).abs());
+    assert!(distance > 20, "{distance} cells from the yard");
+    // A second one, and its footprint must still be free.
+    produce(&mut app, ProductionItem::Building(kind));
     let events = tick(
         &mut app,
-        vec![Command::PlaceUnit {
-            unit: kind,
-            cell: start,
+        vec![Command::PlaceBuilding {
+            building: kind,
+            origin: first,
         }],
     );
     assert!(
@@ -295,42 +321,20 @@ fn a_finished_futa_waits_and_is_placed_anywhere_on_the_map() {
         )),
         "{events:?}"
     );
-
-    let cell = far_cell(&mut app);
-    let events = tick(&mut app, vec![Command::PlaceUnit { unit: kind, cell }]);
+    let second = far_site(&mut app, kind);
+    let events = tick(
+        &mut app,
+        vec![Command::PlaceBuilding {
+            building: kind,
+            origin: second,
+        }],
+    );
     assert!(
         events
             .iter()
-            .any(|e| matches!(e, SimEvent::UnitPlaced { kind: k, .. } if *k == kind)),
+            .any(|e| matches!(e, SimEvent::BuildingPlaced { kind: k, .. } if *k == kind)),
         "{events:?}"
     );
-    assert_eq!(
-        units_of(&mut app, item)
-            .into_iter()
-            .map(|(_, c)| c)
-            .collect::<Vec<_>>(),
-        [cell]
-    );
-    assert!(human(&app).lane(key).is_empty());
-
-    // Nothing is ready any more.
-    let events = tick(&mut app, vec![Command::PlaceUnit { unit: kind, cell }]);
-    assert!(events.iter().any(|e| matches!(e,
-        SimEvent::CommandRejected { reason: RejectReason::UnitNotReady(k), .. } if *k == kind)));
-
-    // There is no limit: a second one is built and placed as well.
-    let second = CellPos::new(cell.x + 2, cell.y);
-    let second = if app
-        .world()
-        .resource::<Grid>()
-        .passable_for(second, sim::Domain::Land)
-    {
-        second
-    } else {
-        CellPos::new(cell.x - 2, cell.y)
-    };
-    place_futa(&mut app, second);
-    assert_eq!(units_of(&mut app, item).len(), 2);
 }
 
 #[test]
@@ -361,8 +365,7 @@ fn futa_gives_its_owner_unlimited_power_while_it_stands() {
     assert!(human(&app).low_power());
     assert!(!human(&app).unlimited_power());
 
-    let cell = far_cell(&mut app);
-    let id = place_futa(&mut app, cell);
+    let (id, _) = place_futa(&mut app);
     tick(&mut app, Vec::new());
     let state = human(&app);
     assert!(state.unlimited_power());
@@ -370,22 +373,7 @@ fn futa_gives_its_owner_unlimited_power_while_it_stands() {
     assert!(state.power_produced() >= state.power_consumed());
 
     // Once it is destroyed the power is gone.
-    let entity = {
-        let mut query = app
-            .world_mut()
-            .query::<(bevy_ecs::entity::Entity, &SimId)>();
-        query
-            .iter(app.world())
-            .find(|(_, sim_id)| **sim_id == id)
-            .map(|(entity, _)| entity)
-            .expect("Futa")
-    };
-    app.world_mut()
-        .get_mut::<Health>(entity)
-        .unwrap()
-        .hit_points = 0;
-    tick(&mut app, Vec::new());
-    tick(&mut app, Vec::new());
+    destroy(&mut app, id);
     assert!(!human(&app).unlimited_power());
     assert!(human(&app).low_power());
 }
@@ -394,34 +382,35 @@ fn futa_gives_its_owner_unlimited_power_while_it_stands() {
 fn buildings_may_be_placed_near_futa_far_from_the_base() {
     let mut app = game(true);
     tick(&mut app, Vec::new());
-    let cell = far_cell(&mut app);
-    place_futa(&mut app, cell);
+    let (id, origin) = place_futa(&mut app);
     // Its sight shows the ground around it before anything is placed there.
     for _ in 0..3 {
         tick(&mut app, Vec::new());
     }
-    assert_eq!(human(&app).build_anchors(), &[(cell, 6)]);
+    let anchors = human(&app).build_anchors().to_vec();
+    assert_eq!(anchors.len(), 1);
+    assert_eq!((anchors[0].0.origin, anchors[0].1), (origin, 6));
 
     let definitions = app.world().resource::<Definitions>().clone();
     let plant = definitions.building_kind("power_plant").unwrap();
     produce(&mut app, ProductionItem::Building(plant));
-    // The first 2x2 site within the reach of Futa that is free.
-    let grid = app.world().resource::<Grid>().clone();
-    let state = human(&app).clone();
-    let site = (-6..=4)
-        .flat_map(|dy| (-6..=4).map(move |dx| (dx, dy)))
-        .map(|(dx, dy)| CellPos::new(cell.x + dx, cell.y + dy))
-        .find(|&origin| {
-            sim::check_placement(
-                &grid,
-                &definitions,
-                &state,
-                std::iter::empty(),
-                plant,
-                origin,
-            )
-            .is_ok()
-        })
+    let near = |app: &App| {
+        (-8..=9)
+            .flat_map(|dy| (-8..=9).map(move |dx| (dx, dy)))
+            .map(|(dx, dy)| CellPos::new(origin.x + dx, origin.y + dy))
+            .map(|site| {
+                let grid = app.world().resource::<Grid>();
+                let state = app.world().resource::<Players>().get(HUMAN).unwrap();
+                (
+                    site,
+                    check_placement(grid, &definitions, state, std::iter::empty(), plant, site),
+                )
+            })
+            .collect::<Vec<_>>()
+    };
+    let site = near(&app)
+        .into_iter()
+        .find_map(|(site, check)| check.is_ok().then_some(site))
         .expect("a site near Futa");
     let events = tick(
         &mut app,
@@ -438,86 +427,38 @@ fn buildings_may_be_placed_near_futa_far_from_the_base() {
     );
 
     // Once Futa is destroyed the ground around it is too far from every building again.
-    let futa_kind = definitions.unit_kind("futa").unwrap();
-    let entity = {
-        let mut query = app
-            .world_mut()
-            .query::<(bevy_ecs::entity::Entity, &Unit, &Owner)>();
-        query
-            .iter(app.world())
-            .find(|(_, unit, owner)| unit.kind == futa_kind && owner.0 == HUMAN)
-            .map(|(entity, _, _)| entity)
-            .expect("Futa")
-    };
-    app.world_mut()
-        .get_mut::<Health>(entity)
-        .unwrap()
-        .hit_points = 0;
-    tick(&mut app, Vec::new());
+    destroy(&mut app, id);
     produce(&mut app, ProductionItem::Building(plant));
-    tick(&mut app, Vec::new());
     assert!(human(&app).build_anchors().is_empty());
-    let grid = app.world().resource::<Grid>().clone();
-    let state = human(&app).clone();
-    let refused = (-6..=4)
-        .flat_map(|dy| (-6..=4).map(move |dx| (dx, dy)))
-        .map(|(dx, dy)| CellPos::new(cell.x + dx, cell.y + dy))
-        .filter_map(|origin| {
-            sim::check_placement(
-                &grid,
-                &definitions,
-                &state,
-                std::iter::empty(),
-                plant,
-                origin,
-            )
-            .err()
-        })
-        .any(|reason| {
-            matches!(
-                reason,
-                RejectReason::Placement(PlacementError::TooFar { .. })
-            )
-        });
+    let refused = near(&app).into_iter().any(|(_, check)| {
+        matches!(
+            check,
+            Err(RejectReason::Placement(PlacementError::TooFar { .. }))
+        )
+    });
     assert!(refused);
 }
 
 #[test]
-fn futa_fires_at_units_on_the_ground_and_in_the_air() {
+fn futas_light_strikes_units_on_the_ground_and_in_the_air_far_away() {
     let mut app = game(true);
     tick(&mut app, Vec::new());
-    let cell = far_cell(&mut app);
-    let id = place_futa(&mut app, cell);
-    let tank = spawn_unit(
-        app.world_mut(),
-        AI,
-        "rhino",
-        CellPos::new(cell.x + 3, cell.y),
-    )
-    .or_else(|_| {
-        spawn_unit(
-            app.world_mut(),
-            AI,
-            "rhino",
-            CellPos::new(cell.x - 3, cell.y),
-        )
-    })
-    .expect("room for a tank");
-    let kirov = spawn_unit(
-        app.world_mut(),
-        AI,
-        "kirov",
-        CellPos::new(cell.x, cell.y + 3),
-    )
-    .or_else(|_| {
-        spawn_unit(
-            app.world_mut(),
-            AI,
-            "kirov",
-            CellPos::new(cell.x, cell.y - 3),
-        )
-    })
-    .expect("room for an airship");
+    let (id, origin) = place_futa(&mut app);
+    // Twelve cells out: beyond the reach of a Prism Tower (8) and of the targets' own weapons.
+    let centre = CellPos::new(origin.x + 1, origin.y + 1);
+    let spawn = |app: &mut App, unit: &str, reach: i32, skip: usize| {
+        (-reach..=reach)
+            .flat_map(|dy| (-reach..=reach).map(move |dx| (dx, dy)))
+            .filter(|(dx, dy)| dx.abs().max(dy.abs()) == reach)
+            .skip(skip)
+            .find_map(|(dx, dy)| {
+                let cell = CellPos::new(centre.x + dx, centre.y + dy);
+                spawn_unit(app.world_mut(), AI, unit, cell).ok()
+            })
+            .unwrap_or_else(|| panic!("room for a {unit}"))
+    };
+    let tank = spawn(&mut app, "rhino", 12, 0);
+    let kirov = spawn(&mut app, "kirov", 11, 40);
     let definitions = app.world().resource::<Definitions>().clone();
     let (mut ground, mut air) = (false, false);
     for _ in 0..400 {
@@ -529,15 +470,9 @@ fn futa_fires_at_units_on_the_ground_and_in_the_air() {
             } = event
                 && attacker == id
             {
-                let weapon = definitions.weapon(weapon).unwrap();
-                if target == tank {
-                    assert!(weapon.anti_ground, "{}", weapon.id);
-                    ground = true;
-                }
-                if target == kirov {
-                    assert!(weapon.anti_air, "{}", weapon.id);
-                    air = true;
-                }
+                assert_eq!(definitions.weapon(weapon).unwrap().id, "futa_beam");
+                ground |= target == tank;
+                air |= target == kirov;
             }
         }
         if ground && air {

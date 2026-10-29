@@ -878,13 +878,16 @@ your units move up to 4 times faster; it is separate from the game speed, which 
 everyone. Cancel returns only credits actually spent. Restart retains
 the choices; a new normal game uses the original balance data. AI players cannot receive the bonus.
 
-With Super Me on you may also build **Futa**, a unit of this game's own (not part of Red Alert 2)
-that no one else can build: a hovering bath towel with a 120 mm gun for ground targets and a
-missile pod for aircraft. Its card is among the vehicles of the Construction Yard; when it is
-ready, click the card and then any free cell of the map, however far from your base. Build as
-many as you like. While at least one Futa stands you have unlimited power (`Power  n /
-Unlimited`) and may place buildings within 6 cells of it. Its data is `assets/data/super_me.ron`
-(docs/DECISIONS.md R218).
+With Super Me on you may also build **Futa**, a defence of this game's own (not part of Red
+Alert 2) that no one else can build: a giant bath towel on a steel towel stand. Its beam of light,
+the Prism Tank's, strikes enemy units on the ground and in the air up to 16 cells away (twice a
+Prism Tower's reach) for 300 damage every 1.5 seconds, and with 10,000 hit points of concrete
+armour it is very hard to destroy; it cannot be captured, entered by a spy, or blown up with C4 or
+an Ivan bomb. Its card is in the Armory tab of the Construction Yard; when it is ready, click it
+and place it on any free ground of the map, however far from your base. Build as many as you like.
+While at least one Futa stands you have unlimited power (`Power  n / Unlimited`) and may place
+buildings within 6 cells of it. Its data is `assets/data/super_me.ron` (docs/DECISIONS.md R218,
+R220).
 
 Team paint uses blue, red, gold, green, purple, cyan, orange, pink, lime or ivory; computer player n receives the
 n-th color after yours, so every player of a match has its own color. Unit/building faction accents, production icons and radar markers use

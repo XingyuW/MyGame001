@@ -43,7 +43,7 @@ mod rng;
 mod rules;
 mod schedule;
 mod skirmish_defs;
-mod super_me_units;
+mod super_me_buildings;
 mod unit;
 mod veterancy;
 mod visibility;
@@ -100,9 +100,9 @@ pub use economy::{
     repair_step_cost,
 };
 pub use economy_commands::{
-    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, check_unit_placement,
-    extends_base, missing_prerequisite, missing_prerequisite_for, placement_reach, produces,
-    produces_for, super_me_counterparts, super_me_owned,
+    SHIPYARD_PLACEMENT_DISTANCE, check_buildable, check_placement, extends_base,
+    missing_prerequisite, missing_prerequisite_for, placement_reach, produces, produces_for,
+    super_me_counterparts, super_me_owned,
 };
 pub use economy_defs::{
     BuildingDef, BuildingKind, ECONOMY_SCHEMA_VERSION, HarvesterDef, MAX_BUILD_TIME,
@@ -156,8 +156,8 @@ pub use skirmish_defs::{
     SKIRMISH_SCHEMA_VERSION, SideStart, SkirmishDefinitions, StartProblem, StartingBuilding,
     StartingGroup, check_map_starts, country_tree, load_skirmish, map_asset_path, start_problem,
 };
-pub use super_me_units::{
-    MAX_BUILD_RADIUS, MAX_SUPER_ME_UNITS, SUPER_ME_UNITS_SCHEMA_VERSION, SuperMeUnit,
+pub use super_me_buildings::{
+    MAX_BUILD_RADIUS, MAX_SUPER_ME_ENTRIES, SUPER_ME_SCHEMA_VERSION, SuperMeBuilding,
 };
 pub use unit::{
     DIAGONAL_STEP, Direction, Facing, Mobile, MoveOrder, ORTHOGONAL_STEP, Orders, Owner, PathState,

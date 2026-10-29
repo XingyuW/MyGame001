@@ -60,11 +60,7 @@ impl Cue {
 }
 pub fn event_cue(e: &SimEvent) -> Option<Cue> {
     match e {
-        SimEvent::UnitSpawned { player, .. } | SimEvent::UnitPlaced { player, .. }
-            if *player == HUMAN =>
-        {
-            Some(Cue::UnitReady)
-        }
+        SimEvent::UnitSpawned { player, .. } if *player == HUMAN => Some(Cue::UnitReady),
         SimEvent::ProductionComplete {
             player,
             item: ProductionItem::Building(_),
@@ -73,8 +69,7 @@ pub fn event_cue(e: &SimEvent) -> Option<Cue> {
         SimEvent::BuildingDestroyed { player, .. } if *player == HUMAN => Some(Cue::BaseAttack),
         SimEvent::CommandRejected {
             player,
-            command:
-                Command::Deploy { .. } | Command::PlaceBuilding { .. } | Command::PlaceUnit { .. },
+            command: Command::Deploy { .. } | Command::PlaceBuilding { .. },
             ..
         } if *player == HUMAN => Some(Cue::CannotDeploy),
         SimEvent::SuperweaponBuilt { .. } => Some(Cue::SuperweaponBuilt),

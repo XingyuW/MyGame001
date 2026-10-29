@@ -12903,3 +12903,72 @@ is mapped to `"placed"`, which no RA2 item can have, so the comparison would fai
 packet `ff5db8d6f1745a74a08892341ae146c56e4ada4cbe1786063f1af1f883f3d25f`, verification
 `ROOT_REBIND_R219_D_FUTA_02_FACTUAL_2026_10_29_014354`, 2,016 factual cell deltas, no family
 change, and a readback pass.
+
+### R220. Futa becomes a building: a towel that strikes ground and air with light
+
+The user said (2026-10-28), after R218: Futa "is not a vehicle, but rather it should be a
+building", very powerful, attacking ground and air units at a wide range "using light just like
+the prism tank", with very strong defence so that the enemy cannot easily destroy it, and looking
+like a towel. Its two powers of R218 (unlimited power, building near it) and placing it anywhere
+are kept.
+
+1. **Data.** `assets/data/super_me.ron`, schema version 2 (`crates/sim/src/super_me_buildings.rs`,
+   replacing `super_me_units.rs`), holds Super Me **buildings** and their own **weapons**.
+   `load_game_ruleset` appends them after the arsenal; `load_ruleset` stays the RA2 ruleset. Futa
+   copies the Pillbox's arsenal entry (a defence: the Armory tab and the Construction Yard's lane
+   of defences) and combat terms, with a 2 x 2 footprint, 10,000 hit points (a Pillbox has 400,
+   the strongest RA2 building 2,000) of `concrete` armour, sight 16, and no side, owner
+   sides, countries, prerequisites, prerequisite groups or power use. It cannot be captured,
+   entered by a spy, or given C4 or an Ivan bomb (`capturable`, `spyable`, `can_c4`, `bombable`
+   off), and it fires whatever its owner's power (`powered` off).
+2. **Weapon.** `futa_beam`: an instant beam on `prism_warhead` (the Prism Tank's and Prism
+   Tower's light, full damage to the `light` armour of aircraft), 300 damage, range 4,096 subcells
+   (16 cells; a Prism Tower's is 8), reload 30 ticks, `anti_air` and `anti_ground`. The game
+   draws and sounds it as a prism beam (`weapon_fx::shipped_class`).
+3. **Placement.** `check_placement_site` skips the visibility and distance checks for a Super Me
+   building with `anywhere`; the footprint must still be buildable and free. A building within
+   the `build_radius` (6) of its owner's Super Me building needs no other anchor
+   (`PlayerState::build_anchors`, now footprints).
+4. **Powers.** As R218 point 5, from the building (`update_power`).
+5. **Removed.** Everything R218 added only for a placed unit: `Command::PlaceUnit`,
+   `RejectReason::UnitNotReady`, `SimEvent::UnitPlaced`, `Lane::Placed`, `check_unit_placement`,
+   the `produces_units` exception, the unit placement mode and ghost, the hover sway, and the
+   towel vehicle model and its sprite. `command.rs`, `event.rs`, `arsenal.rs` and the game's
+   `announcer`, `audio`, `construction` and `hover_info` are byte-equal to before R218 again.
+6. **Art.** `futa` in `scripts/hd_buildings_c.py`: a 12 m terry bath towel hung over the steel
+   rail of a towel stand on a poured plinth, falling in soft folds to a fringed hem, with
+   team-coloured woven stripe bands and cut-crystal finials glowing on the posts.
+
+`crates/sim/tests/super_me_futa.rs` proves on the shipped data: the RA2 ruleset is unchanged
+without the file; Super Me alone may build Futa; it is placed far beyond any base reach and as
+often as wanted; it grants unlimited power and the build radius while it stands and not after; and
+its `futa_beam` strikes a Rhino and a Kirov 11 to 12 cells away. Not yet checked in a live match.
+
+### R221. Rebind the RA9 source scope to the Futa building, with PlaceUnit removed again
+
+R220 removed `Command::PlaceUnit`, so the observed model surface lost it again. The user approved
+(2026-10-28) removing it from the approved surface and running the rebind. The R219 controller
+scripts were copied to `docs/validation/ra2-parity/rebind-r221/controller-sources/` (directory
+and the `ROOT_REBIND_R221_` prefix changed) with R219's surface extension reversed: propagation
+and readback accept a surface change only if `PlaceUnit` is removed and nothing else, and only if
+the result has the SHA-256 of the surface approved before R219 (`97cbecb23fef...`). R217's
+deleted soak example stays the one allowed deletion. The two files R220 deleted were removed from
+the Git index first (`git ls-files` lists the inputs). The `code_guard` pins are again those
+before R218, since `command.rs` and `arsenal.rs` are byte-equal to before R218.
+
+Phase `D-futa-building-01`: producer exit 0; only `model_census_sha256` and
+`model_surface_sha256` moved, the latter back to its value before R219; packet SHA-256
+`1a6a951c4aad03122ac984cdc69eba2d1314d711e21e1a1649e8fe9976081d39` (725 source files);
+verification `ROOT_REBIND_R221_D_FUTA_BUILDING_01_FACTUAL_2026_10_29_032739`; propagation 3,384
+cell deltas in 14 of 15 outputs; readback passed with every policy cell byte-equal. The approved
+and observed surfaces are byte-equal to those before R218.
+
+**Policy reconsideration.** Against the bytes before R218, the pinned files that still differ are
+`economy.rs` (branch and completion), `economy_commands.rs` and the game's `units.rs`
+(completion). `economy.rs` only adds the unlimited power and build anchors of a Super Me
+building, granted to a Super Me owner alone; `economy_commands.rs` only refuses Super Me buildings
+to players without Super Me and relaxes placement for, and near, a Super Me building of a Super
+Me player; `units.rs` only loads `super_me.ron` after the RA2 ruleset. No computer player has
+Super Me and the RA2 ruleset holds no Super Me building, so every recorded AI, power, ore, repair
+and completion policy reads nothing that changed and stands. The 51 pending user checks are
+untouched.

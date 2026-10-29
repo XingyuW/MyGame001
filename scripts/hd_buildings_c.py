@@ -769,5 +769,76 @@ def fortress_walls(k, w, d):
     for x0, y0, x1, y1 in [(.2, 5.0, 2.0, 5.0), (8.0, 5.0, 9.8, 5.0), (5.0, .2, 5.0, 2.0), (5.0, 8.0, 5.0, 9.8)]:
         k.box(min(x0, x1) - .04, min(y0, y1) - .04, z, abs(x1 - x0) + .08, abs(y1 - y0) + .08, .012, rgb(58, 58, 56, 'concrete'))  # deck joints
 
+def futa(k, w, d):
+    # Futa, the game's own Super Me defence (docs/DECISIONS.md R220): a giant terry bath towel,
+    # 12 m wide, hung over the heavy steel rail of a towel stand on a poured plinth. Woven stripe
+    # bands near both hems carry the owner's colour as dyed bands do on real towels; the light it
+    # strikes with gathers in the cut-crystal finials on the stand's posts.
+    terry = rgb(224, 216, 196, 'cloth'); border = rgb(200, 190, 168, 'cloth')
+    shade = rgb(170, 162, 144, 'cloth'); crystal = C((206, 238, 255), 'emit')
+    cx, cy = 10.0, 10.0
+    ground(k, cx, cy, 9.6, GRAVEL_DARK, 11)
+    # The plinth: a low poured slab with a chamfered step.
+    k.stack(cx, cy, [(0, 17.0, 17.0, 1.2), (.45, 17.0, 17.0, 1.2), (.45, 15.6, 15.6, 1.0),
+                     (.8, 15.6, 15.6, 1.0)], CONCRETE, smooth=False)
+    zbar, r_bar, y0, y1 = 13.0, .38, 2.6, 17.4
+    # The stand: a splayed pair of legs at each end, a footing under each, the rail between.
+    for y in (y0, y1):
+        for dx in (-2.6, 2.6):
+            k.cbox(cx + dx, y, .8, 1.3, 1.3, .5, CONC_DARK)
+            k.tube((cx + dx, y, 1.3), (cx, y, zbar), .3, STEEL, n=12)
+        k.tube((cx - 1.6, y, 5.0), (cx + 1.6, y, 5.0), .16, STEEL, n=8)
+        k.ball(cx, y, zbar, .62, GALV, n=14, k=7)
+        with k.at(cx, y, zbar + .55):
+            k.ball(0, 0, .75, .55, crystal, rz=1.0, n=6, k=3)       # cut-crystal finial
+            k.cyl(0, 0, 0, .3, .25, GALV, n=10)
+    k.rev((cx, y0, zbar), 'y', [(0, r_bar), (y1 - y0, r_bar)], GALV, n=14)
+    # The towel: a cloth sheet hanging from the rail down both sides, in soft vertical folds.
+    ta, tb = 4.0, 16.0                        # its edges along the rail
+    T = .16                                   # thickness of heavy terry
+    def drape(side, length, nu=18, nv=12):
+        def point(u, v, off=0.0):
+            y = ta + (tb - ta) * u
+            fold = .32 * sin(u * 7 * pi + .6) * v ** .8      # folds open towards the hem
+            lean = .55 * v ** 1.6                              # the hem stands off the stand
+            x = cx + side * (r_bar + .04 + lean + fold + off)
+            z = zbar - v * length
+            return (x, y, z)
+        def colour(v0, v1):
+            m = (v0 + v1) / 2 * length
+            if length - 2.4 < m < length - 1.6: return TEAM     # the dyed stripe band
+            if length - 1.2 < m < length - .9: return TEAM
+            if m > length - .5 or length - 1.6 < m < length - 1.2: return border
+            return terry
+        us = [i / nu for i in range(nu + 1)]; vs = [j / nv for j in range(nv + 1)]
+        with k.grp(smooth=True):
+            for i in range(nu):
+                for j in range(nv):
+                    q = [(us[i], vs[j]), (us[i + 1], vs[j]), (us[i + 1], vs[j + 1]), (us[i], vs[j + 1])]
+                    outer = [point(u, v, T / 2) for u, v in q]
+                    inner = [point(u, v, -T / 2) for u, v in q]
+                    k.poly(outer if side > 0 else outer[::-1], colour(vs[j], vs[j + 1]))
+                    k.poly(inner[::-1] if side > 0 else inner, shade)
+        # Hemmed side edges and the bottom hem.
+        for u in (0.0, 1.0):
+            for j in range(nv):
+                a, b = vs[j], vs[j + 1]
+                pts = [point(u, a, T / 2), point(u, b, T / 2), point(u, b, -T / 2), point(u, a, -T / 2)]
+                k.plate(pts if (u > 0) == (side > 0) else pts[::-1], border)
+        for i in range(nu):
+            a, b = us[i], us[i + 1]
+            pts = [point(a, 1, T / 2), point(b, 1, T / 2), point(b, 1, -T / 2), point(a, 1, -T / 2)]
+            k.plate(pts if side < 0 else pts[::-1], border)
+        # Fringe tassels along the hem.
+        for i in range(25):
+            u = .02 + i * .96 / 24
+            x, y, z = point(u, 1)
+            k.tube((x, y, z), (x + side * .05, y + .05 * sin(i * 1.9), z - .55), .05, border, n=4, r2=.025)
+        return point
+    drape(+1, 10.6)                           # the front fall, to just above the plinth
+    drape(-1, 8.2)                            # the back fall, shorter
+    # Where it folds over the rail: a soft roll of cloth round the bar.
+    k.rev((cx, ta, zbar), 'y', [(0, r_bar + .2), (tb - ta, r_bar + .2)], terry, n=16)
+
 MODELS = {f.__name__: f for f in [rocket_tower, pillbox, sentry_gun, patriot, flak_cannon, prism_tower, tesla_coil,
-                                  grand_cannon, fortress_walls]}
+                                  grand_cannon, fortress_walls, futa]}

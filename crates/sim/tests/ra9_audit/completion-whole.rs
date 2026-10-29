@@ -96,12 +96,12 @@ fn code_guard() -> AuditResult<()> {
         (
             "crates/sim/src/command.rs",
             include_str!("../../src/command.rs"),
-            0x5d0136b20793c1ebu64,
+            0x7db5befc95cc8e34u64,
         ),
         (
             "crates/sim/src/arsenal.rs",
             include_str!("../../src/arsenal.rs"),
-            0x7c975bada43c6287u64,
+            0x40d7f3082d74ff37u64,
         ),
         (
             "crates/sim/src/economy_defs.rs",
