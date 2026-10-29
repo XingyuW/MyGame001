@@ -12986,3 +12986,58 @@ is the first-floor frieze and the flag. Footprint, data, weapon, powers and ever
 are unchanged. No Rust source changes, so the RA9 census, surface and every pinned file stay as
 R221 left them and the audit needs no rebind; as after R217, the scope packet's record of the
 two changed non-Rust inputs (the script and the sprite) is refreshed by the next rebind round.
+
+### R223. Buildings rise, vehicles drive out of the War Factory, soldiers walk out of a training centre
+
+The user asked (2026-10-29) that nothing pop into existence: a new building should rise "from
+ground up, and being scale up", a vehicle should drive out of the War Factory through a door
+the factory is redesigned to show, and the Barracks should be redesigned as a training centre,
+with a flag on its roof, that soldiers walk out of. `crates/game/src/arrival.rs` does this from
+the events the sim already sends (`BuildingPlaced`, `UnitSpawned`); the sim, its rules and its
+events are unchanged, and every unit can be ordered from the tick it is built.
+
+* **Rising.** A placed or deployed building is cropped from its foot and grows from 88 percent
+  to full size about its footprint centre in 0.9 s + 0.2 s per cell of width and height,
+  dusty at first, in a ring of dust round its foundation.
+* **Doors.** `scripts/hd_buildings.py` models a door on the War Factory (one 8 m sectional
+  roll-up door between hazard jambs, beacons, a marked drive lane) and on the Barracks (glazed
+  double doors under a canopy). Each is rendered closed and in three open frames
+  (`<art>_door1..3.png`), the doorway a Blender holdout, so it is transparent in the sprite.
+  `arrival::DOORS` places each door in the model's metres; a test reads those numbers back from
+  the script and another samples the cut-out in the shipped frames.
+* **Driving out.** The door opens in 0.4 s; the vehicle, drawn behind the building over a dark
+  hall sprite, brightens as it reaches the doorway, drives to the apron facing south and on to
+  its cell, and is drawn in front once past the wall. The door closes 0.2 s after the last one.
+* **Walking out.** Soldiers are drawn about three times the scale of buildings, too large for a
+  true doorway, so a soldier fades in on the threshold in front of the open doors and walks to
+  its cell. Units of buildings without a door (and aircraft) step out of the side.
+* **Training centre.** The Barracks art (both sides) becomes a two-storey block with a crest
+  and a star, a flagpole on the roof, a rappelling tower, a parade square and an obstacle
+  course; footprint and every rule are unchanged.
+
+`MYGAME_ARRIVAL_REVIEW=<dir>` captures all three. Not yet checked in a live match by the user.
+
+### R224. Rebind the RA9 source scope to the arrivals
+
+R223 changed `crates/game/src/{buildings,main,skirmish,units,visual_review}.rs` and added
+`arrival.rs`; the user asked (2026-10-29) for the rebind. No sim source, model surface or
+`code_guard` file changed, so this is a plain factual round as R216: the R221 `prepare` and
+`verify` (with R217's one recorded deletion) and the R216 `propagate` and `readback` (no surface
+change accepted) were copied to `docs/validation/ra2-parity/rebind-r224/controller-sources/`,
+with the directory and the `ROOT_REBIND_R224_` prefix changed. Finder `.DS_Store` files were moved
+out of `assets/` and `crates/` for the run and restored.
+
+Phase `D-arrivals-01`: producer exit 0; the census changed exactly the six files above and only
+`model_census_sha256` moved (`6920a14b...` to `ccc2fbe9...`); surface `97cbecb2...`, closure,
+special and original hashes unchanged; no legacy branch file changed. Packet SHA-256
+`1f73e45bf9355de22e428c462c67576ff936a04117192fa888a1e56888076809` (732 source files, which
+also refreshes the record of R222's script and sprite); verification
+`ROOT_REBIND_R224_D_ARRIVALS_01_FACTUAL_2026_10_29_213506`; propagation 3,383 cell deltas in 13
+of 15 outputs, 72 completion rows proved; readback passed with every policy cell byte-equal.
+`ra9_data_parity` passes 185/185 (debug, 1,398 s).
+
+**Policy reconsideration.** No legacy family names a changed file. The only pinned one is the
+game's `units.rs` (completion), whose change is presentation only: while a unit arrives its
+sprite takes the position, facing, depth and tint of the arrival instead of its sim cell. No
+recorded AI, power, ore, repair or completion policy reads anything that changed, so all stand.
+The 51 pending user checks are untouched.
