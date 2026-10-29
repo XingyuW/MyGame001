@@ -1,41 +1,48 @@
-// The game's own Super Me units, schema version 1 (crates/sim/src/super_me_units.rs;
-// docs/DECISIONS.md R218). No part of the Red Alert 2 ruleset: only a human player with Super Me
-// may build them, and the data parity audit does not read this file.
+// The game's own Super Me buildings and their weapons, schema version 2
+// (crates/sim/src/super_me_buildings.rs; docs/DECISIONS.md R218, R220). No part of the Red Alert 2
+// ruleset: only a human player with Super Me may build them, and the data parity audit does not
+// read this file.
 //
-// template:        a unit of arsenal.ron whose traits and combat terms the type copies
-// speed:           subcells per tick (256 per cell, 20 ticks per second)
-// sprite:          the legacy placeholder sheet of units.ron; the HD art is sprites/hd/units/<id>.png
-// cost, build_time, producer: production terms (build_time in ticks); no prerequisites
-// hit_points, armour, sight, weapons, elite_weapons: combat terms (weapons of combat.ron,
-//                  primary first; Futa's primary fires at the ground, its secondary at aircraft)
-// build_radius:    cells around the unit within which its owner may place buildings
-// unlimited_power: 1: while one stands its owner is never low on power
-// placed:          1: when complete it is placed on any free cell of the map, like a building
-// hover:           1: drawn floating above the ground
+// weapons:   beams (no projectile): damage, range in subcells (256 per cell), reload in ticks
+//            (20 per second), a warhead of combat.ron, and whether they engage aircraft
+//            (anti_air) and what is on the ground or at sea (anti_ground)
+// buildings: template, a building of arsenal.ron whose traits it copies; sprite, the legacy
+//            placeholder sheet of economy.ron for its footprint (the HD art is
+//            sprites/hd/buildings/<id>.png); footprint, production terms (no prerequisites);
+//            combat terms with one weapon, fired at the ground and the air alike;
+//            build_radius, the cells around it within which its owner may place buildings;
+//            unlimited_power 1: while one stands its owner is never low on power; anywhere 1:
+//            it may be placed on any free ground of the map
+//
+// Futa's beam is the Prism Tank's light (prism_warhead): 300 damage every 1.5 s at 16 cells,
+// against units on the ground and in the air; a Prism Tower deals 120 every 4 s at 8 cells.
+// Futa has 10,000 hit points of concrete armour (a Pillbox 400 of steel).
 //
 // Written by hand; not generated.
 (
-    schema_version: 1,
-    units: [
+    schema_version: 2,
+    weapons: [
+        (id: "futa_beam", damage: 300, range: 4096, reload: 30, warhead: "prism_warhead", anti_air: 1, anti_ground: 1),
+    ],
+    buildings: [
         (
             id: "futa",
-            template: "apocalypse",
+            template: "pillbox",
             label: "Futa",
-            description: "Super Me only. Place it anywhere. Fires at ground and air; while it stands you have unlimited power and may build near it.",
-            speed: 13,
-            sprite: "heavy_tank",
-            cost: 2000,
-            build_time: 600,
+            description: "Super Me only. Place it anywhere. Its light strikes ground and air far away; while it stands you have unlimited power and may build near it.",
+            sprite: "power_plant",
+            width: 2,
+            height: 2,
+            cost: 5000,
+            build_time: 1500,
             producer: "construction_yard",
-            hit_points: 1200,
-            armour: "heavy",
-            sight: 10,
-            weapons: ["gun_120mmx", "mammoth_tusk"],
-            elite_weapons: ["gun_120mmx_e", "mammoth_tusk"],
+            hit_points: 10000,
+            armour: "concrete",
+            sight: 16,
+            weapon: "futa_beam",
             build_radius: 6,
             unlimited_power: 1,
-            placed: 1,
-            hover: 1,
+            anywhere: 1,
         ),
     ],
 )

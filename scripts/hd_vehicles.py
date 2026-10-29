@@ -842,63 +842,10 @@ def terror_drone(k):
             k.tube((kx, ky, .78), (fx, fy, 0), .035, c, n=6, r2=.012)
         for s in (-1, 1): k.tube((.25, s * .08, .44), (.46, s * .14, .34), .02, STEEL, n=4, r2=.005)
 
-def futa(k):
-    # Futa, the game's own Super Me unit (docs/DECISIONS.md R218): a hovering bath towel, a heavy
-    # terry towel of about 6 x 3.6 m (drawn larger than any real one) floating 1.2 m up, its
-    # front rolled over the barrel of a 120 mm gun and an anti-air missile pod on its rear fold.
-    # Woven stripe bands near both ends carry the owner's colour, as dyed bands do on real towels.
-    terry = rgb(222, 214, 194, 'cloth'); border = rgb(198, 188, 166, 'cloth')
-    under = rgb(176, 168, 150, 'cloth')
-    H, L, W, T = 1.2, 2.9, 1.8, .1          # hover height, half length, half width, thickness
-    nx, ny = 14, 8
-    def z(x, y):
-        # A slow ripple runs along the cloth, the free corners droop a little.
-        return (H + .2 * sin(1.5 * x + .6) + .05 * sin(2.4 * y)
-                - .18 * (abs(y) / W) ** 3 - .1 * ((x + L) / (2 * L)) ** 4 * (abs(y) / W))
-    def colour(x0, x1):
-        m = (x0 + x1) / 2
-        if 1.75 < abs(m) < 2.15: return TEAM          # the dyed stripe bands
-        if 1.55 < abs(m) < 1.75 or abs(m) > 2.6: return border
-        return terry
-    xs = [-L + 2 * L * i / nx for i in range(nx + 1)]
-    ys = [-W + 2 * W * j / ny for j in range(ny + 1)]
-    with k.grp(smooth=True):
-        for i in range(nx):
-            for j in range(ny):
-                x0, x1, y0, y1 = xs[i], xs[i + 1], ys[j], ys[j + 1]
-                q = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
-                k.poly([(x, y, z(x, y)) for x, y in q], colour(x0, x1))
-                k.poly([(x, y, z(x, y) - T) for x, y in q[::-1]], under)
-    # The hemmed edges along both sides and the rear end.
-    for y in (-W, W):
-        for i in range(nx):
-            x0, x1 = xs[i], xs[i + 1]
-            pts = [(x0, y, z(x0, y)), (x1, y, z(x1, y)), (x1, y, z(x1, y) - T), (x0, y, z(x0, y) - T)]
-            k.plate(pts if y > 0 else pts[::-1], border)
-    for j in range(ny):
-        y0, y1 = ys[j], ys[j + 1]
-        k.plate([(-L, y1, z(-L, y1)), (-L, y0, z(-L, y0)), (-L, y0, z(-L, y0) - T),
-                 (-L, y1, z(-L, y1) - T)], border)
-    # The rolled front end, wound round the gun's cradle.
-    zr = z(L, 0) + .02
-    k.rev((L - .05, -W + .05, zr), 'y', [(0, .34), (2 * W - .1, .34)], terry, n=16)
-    gun(k, L - .3, zr + .02, 3.2, .1, evac=.45)
-    # The anti-air pod on the rear fold: two launch tubes, raised to the sky.
-    with k.at(-1.9, 0, z(-1.9, 0), pitch=-35):
-        for y in (-.22, .22):
-            k.tube((-.4, y, .25), (.7, y, .25), .12, GUN, n=10)
-            k.cyl(.7, y, .13, .09, .02, DARK, n=10)
-        k.box(-.45, -.36, .02, .5, .72, .2, IRON)
-    # Fringe tassels on the rear end, stirred by the air beneath.
-    for j in range(13):
-        y = -W + .1 + j * (2 * W - .2) / 12
-        z0 = z(-L, y) - T / 2
-        k.tube((-L, y, z0), (-L - .32, y + .04 * sin(j * 1.7), z0 - .22), .025, border, n=4, r2=.012)
-
 MODELS = {f.__name__: f for f in [grizzly, light_tank, rhino, heavy_tank, apocalypse, tank_destroyer, artillery,
                                     mirage_tank, prism_tank, tesla_tank, scout, raider, ifv, flak_track,
                                     rocket_launcher, demolition_truck, v3_launcher, mcv, harvester,
-                                    chrono_miner, war_miner, terror_drone, futa]}
+                                    chrono_miner, war_miner, terror_drone]}
 
 def build(m, ident):
     MODELS[ident](Kit(m, U))

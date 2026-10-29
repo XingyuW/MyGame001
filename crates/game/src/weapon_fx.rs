@@ -111,7 +111,8 @@ pub fn shipped_class(id: &str) -> Option<WeaponClass> {
         | "flak_track_aa_gun_e"
         | "flak_guy_aa_gun"
         | "flak_guy_aa_gun_e" => Flak,
-        "prism_shot" | "prism_support" | "comet" | "super_comet" => Prism,
+        // The beam of the game's own Super Me building Futa is the same light (R220).
+        "prism_shot" | "prism_support" | "comet" | "super_comet" | "futa_beam" => Prism,
         "coil_bolt" | "op_coil_bolt" | "tank_bolt" | "tank_bolt_e" | "electric_bolt"
         | "electric_bolt_e" | "cr_electric_bolt" | "assault_bolt" => Tesla,
         "rad_beam_weapon" | "rad_beam_weapon_e" | "rad_eruption_weapon" | "cr_rad_beam_weapon" => {

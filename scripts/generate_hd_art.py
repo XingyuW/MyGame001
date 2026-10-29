@@ -356,10 +356,11 @@ def main():
     (out/'buildings').mkdir(parents=True,exist_ok=True);(out/'units').mkdir(exist_ok=True)
     economy=(ROOT/'assets/data/economy.ron').read_text().split('    units:')[0]
     defs=re.findall(r'id: "([^"]+)".*?width: (\d+),\s*height: (\d+)',economy,re.S)
+    super_me=(ROOT/'assets/data/super_me.ron').read_text().split('    buildings:')[1]  # R220
+    defs+=re.findall(r'id: "([^"]+)".*?width: (\d+),\s*height: (\d+)',super_me,re.S)
     for ident,w,h in defs:
         building(ident,int(w),int(h)).save(out/'buildings'/f'{ident}.png')
     units=re.findall(r'id: "([^"]+)"',(ROOT/'assets/data/units.ron').read_text())
-    units+=re.findall(r'id: "([^"]+)"',(ROOT/'assets/data/super_me.ron').read_text())  # R218
     for ident in units:
         sheet=Image.new('RGBA',(96*S*8,96*S))
         for facing in range(8):sheet.alpha_composite(unit(ident,facing),(96*S*facing,0))

@@ -91,13 +91,6 @@ pub enum SimEvent {
         unit: SimId,
         building: SimId,
     },
-    /// A ready placed Super Me unit was put on the map (`Command::PlaceUnit`, docs/DECISIONS.md
-    /// R218).
-    UnitPlaced {
-        player: PlayerId,
-        unit: SimId,
-        kind: crate::UnitKind,
-    },
     /// A ready building was placed.
     BuildingPlaced {
         player: PlayerId,

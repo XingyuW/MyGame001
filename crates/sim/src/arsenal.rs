@@ -1496,10 +1496,6 @@ impl Definitions {
     /// arsenal's category `armory` (the ini's `BuildCat=Combat`) is in the defence lane; every
     /// other item, and every item of a world without a rules file, in the main lane.
     pub fn lane(&self, item: ProductionItem) -> crate::Lane {
-        // A placed Super Me unit waits in a lane of its own (docs/DECISIONS.md R218).
-        if matches!(item, ProductionItem::Unit(_)) && self.placed_on_completion(item) {
-            return crate::Lane::Placed;
-        }
         let defence = self.rules().is_some()
             && matches!(item, ProductionItem::Building(_))
             && self

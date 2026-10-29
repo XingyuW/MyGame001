@@ -211,8 +211,7 @@ pub fn item_status(
         .first()
         .filter(|head| head.item == item)
         .map(|head| (head.progress, terms.build_time));
-    // A complete building, or a placed Super Me unit (R218), waits to be placed.
-    let ready = definitions.placed_on_completion(item)
+    let ready = matches!(item, ProductionItem::Building(_))
         && progress.is_some_and(|(done, total)| done >= total);
     ItemStatus {
         available,
@@ -254,15 +253,11 @@ pub fn button_effect(
             let Some(index) = menu.iter().position(|&entry| entry == item) else {
                 return SidebarEffect::Nothing;
             };
-            if left && status.ready {
-                match item {
-                    ProductionItem::Building(kind) => {
-                        return SidebarEffect::Mode(InterfaceMode::Place(kind));
-                    }
-                    ProductionItem::Unit(kind) => {
-                        return SidebarEffect::Mode(InterfaceMode::PlaceUnit(kind));
-                    }
-                }
+            if left
+                && status.ready
+                && let ProductionItem::Building(kind) = item
+            {
+                return SidebarEffect::Mode(InterfaceMode::Place(kind));
             }
             // A full queue takes nothing (RA2: the lane of a building in production).
             let command = if left && status.available && !status.full {
@@ -511,7 +506,7 @@ pub fn credits_text(state: Option<&PlayerState>) -> String {
 }
 
 /// The power line, e.g. `Power  40 / 120` (used / produced), `LOW` under low power, and
-/// `Power  40 / Unlimited` while a Super Me unit gives unlimited power (R218).
+/// `Power  40 / Unlimited` while a Super Me building gives unlimited power (R220).
 pub fn power_text(state: Option<&PlayerState>) -> String {
     let Some(state) = state else {
         return "Power  0 / 0".into();
@@ -549,12 +544,6 @@ pub fn mode_text(mode: InterfaceMode, paused: bool, definitions: Option<&Definit
                 .and_then(|definitions| definitions.building(kind))
                 .map_or("building".to_string(), |def| def.id.replace('_', " "));
             format!("Place {name}: left click on green\nRight click or Esc: cancel")
-        }
-        InterfaceMode::PlaceUnit(kind) => {
-            let name = definitions
-                .and_then(|definitions| definitions.metadata(ProductionItem::Unit(kind)))
-                .map_or("unit".to_string(), |entry| entry.label.clone());
-            format!("Place {name} anywhere: left click on green\nRight click or Esc: cancel")
         }
         InterfaceMode::Sell => "Sell: left click on a building\nRight click or Esc: done".into(),
         InterfaceMode::Repair => {
