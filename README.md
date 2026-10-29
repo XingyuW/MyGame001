@@ -879,7 +879,7 @@ everyone. Cancel returns only credits actually spent. Restart retains
 the choices; a new normal game uses the original balance data. AI players cannot receive the bonus.
 
 With Super Me on you may also build **Futa**, a defence of this game's own (not part of Red
-Alert 2) that no one else can build: a giant bath towel on a steel towel stand. Its beam of light,
+Alert 2) that no one else can build: a wrought-iron Eiffel Tower in miniature. Its beam of light,
 the Prism Tank's, strikes enemy units on the ground and in the air up to 16 cells away (twice a
 Prism Tower's reach) for 300 damage every 1.5 seconds, and with 10,000 hit points of concrete
 armour it is very hard to destroy; it cannot be captured, entered by a spy, or blown up with C4 or
