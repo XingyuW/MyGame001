@@ -244,7 +244,10 @@ fn announce(
                 AudioPlayer(handle.clone()),
                 PlaybackSettings::DESPAWN
                     .with_volume(Volume::Linear(volume.gain(Channel::Effects))),
-                SoundEffect { expires: now + 1.6 },
+                SoundEffect {
+                    expires: now + 1.6,
+                    at: None,
+                },
             ));
         }
     }

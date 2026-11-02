@@ -21,6 +21,14 @@
 //! ([`Sfx::Crush`], RA3) instead of the bang of a destruction. A promotion of one of the human
 //! player's units pings ([`Sfx::Promotion`], RA4).
 //!
+//! The sounds of the battlefield fade with distance (R225): a shot, an impact, a crushing or a
+//! destruction is heard at full volume while it is in the part of the map on screen, and ever
+//! more quietly the further beyond the edge of the screen it is, until at [`FADE_DISTANCE`] it
+//! is not heard at all. A sound that is playing fades as the camera moves away from it.
+//! The interface sounds (acknowledgements, production, sales, credits, promotions, alerts) are
+//! not on the map and are always heard in full. The nearest sounds are started first, so far
+//! ones never take the places of near ones under [`MAX_ACTIVE_EFFECTS`].
+//!
 //! At most [`MAX_ACTIVE_EFFECTS`] effects play at once, the same effect at most once per
 //! [`MIN_REPEAT_SECS`], and every effect entity is removed when its sound has ended, also when
 //! the machine has no audio device (Bevy then never starts the sound), so effects cannot
@@ -32,10 +40,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use bevy::audio::{AddAudioSource, ChannelCount, Sample, SampleRate, Source, Volume};
+use bevy::ecs::system::SystemParam;
 use bevy::prelude::*;
-use sim::{SimEvent, SimId, WeaponKind};
+use sim::{CellPos, SUBCELLS_PER_CELL, SimEvent, SimId, SubPos, WeaponKind};
 
 use crate::buildings::{BuildingView, BuildingViews};
+use crate::map::MapView;
+use crate::projection::{cell_centre, to_world};
 use crate::sim_host::{CommandSink, SimHost};
 use crate::units::{HUMAN, UnitView, UnitViews};
 use crate::weapon_fx::{ImpactSounds, WeaponClass};
@@ -51,6 +62,10 @@ pub const MAX_ACTIVE_EFFECTS: usize = 14;
 /// Shortest time between two starts of the same effect, in seconds.
 pub const MIN_REPEAT_SECS: f64 = 0.08;
 
+/// How far beyond the edge of the screen a sound of the battlefield is still heard, in world
+/// units across the screen (one cell is 64 across); see [`distance_gain`].
+pub const FADE_DISTANCE: f32 = 2000.0;
+
 /// Volume levels run from 0 (silent) to this (full).
 pub const VOLUME_STEPS: u8 = 10;
 
@@ -64,7 +79,12 @@ impl Plugin for GameAudioPlugin {
             .add_systems(Startup, setup_audio.after(crate::skirmish::load_catalogue))
             .add_systems(
                 Update,
-                (play_effects, expire_effects, apply_music_volume)
+                (
+                    play_effects,
+                    fade_with_distance,
+                    expire_effects,
+                    apply_music_volume,
+                )
                     .chain()
                     // The views' registries, which tell whether a destroyed enemy was shown.
                     .after(crate::units::spawn_unit_views)
@@ -2188,6 +2208,48 @@ pub fn event_sound(event: &SimEvent, context: &SoundContext) -> Option<Sfx> {
     }
 }
 
+/// Where the sound of an event comes from.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Place {
+    /// The interface: heard in full wherever the camera is.
+    Interface,
+    /// A unit or building, or, when it has no view, the second one.
+    Entity(SimId, Option<SimId>),
+    /// The centre of a cell.
+    Cell(CellPos),
+    /// A point on the ground.
+    Point(SubPos),
+}
+
+/// Where the sound [`event_sound`] gives `event` comes from.
+pub fn event_place(event: &SimEvent) -> Place {
+    match event {
+        SimEvent::WeaponFired {
+            attacker, target, ..
+        } => Place::Entity(*attacker, Some(*target)),
+        SimEvent::UnitCrushed { at, .. } => Place::Point(*at),
+        SimEvent::UnitDestroyed { unit, .. } => Place::Entity(*unit, None),
+        SimEvent::BuildingDestroyed { building, .. } => Place::Entity(*building, None),
+        SimEvent::PropDestroyed { cell, .. } => Place::Cell(*cell),
+        SimEvent::StrategicActivated { target, .. } => Place::Cell(*target),
+        SimEvent::BridgeChanged { cells, .. } => {
+            cells.first().map_or(Place::Interface, |c| Place::Cell(*c))
+        }
+        // The player's own economy, production and alerts, and events without a sound.
+        _ => Place::Interface,
+    }
+}
+
+/// How loud (0 to 1) a sound at `at` is heard with the part of the map in `view` on screen: in
+/// full inside it, and beyond its edge falling as the square of what is left of
+/// [`FADE_DISTANCE`], to nothing. Up and down the screen a distance counts twice, as the
+/// ground is seen at a slant (a cell is half as tall on screen as it is wide).
+pub fn distance_gain(view: Rect, at: Vec2) -> f32 {
+    let beyond = (view.min - at).max(at - view.max).max(Vec2::ZERO) * Vec2::new(1.0, 2.0);
+    let left = (1.0 - beyond.length() / FADE_DISTANCE).clamp(0.0, 1.0);
+    left * left
+}
+
 /// Whether an effect last started at `last` (seconds) may start at `now` with `active` effects
 /// playing.
 pub fn may_play(last: Option<f64>, now: f64, active: usize) -> bool {
@@ -2206,10 +2268,12 @@ pub struct SoundBank {
 #[derive(Component, Debug)]
 pub struct MusicPlayer;
 
-/// An effect being played; removed at `expires` (seconds) at the latest.
+/// An effect being played; removed at `expires` (seconds) at the latest. `at` is where on the
+/// map (world position) it comes from; `None` for the interface.
 #[derive(Component, Debug)]
 pub struct SoundEffect {
     pub expires: f64,
+    pub at: Option<Vec2>,
 }
 
 /// When each effect last started, and the command counters already answered with a sound.
@@ -2271,6 +2335,71 @@ fn seen_entities(host: &SimHost) -> BTreeMap<SimId, bool> {
         .collect()
 }
 
+/// Who hears: the camera, with what it needs to place a sound on the map.
+#[derive(SystemParam)]
+pub(crate) struct Listener<'w, 's> {
+    camera: Query<
+        'w,
+        's,
+        (
+            &'static Camera,
+            &'static Projection,
+            &'static GlobalTransform,
+        ),
+        With<Camera2d>,
+    >,
+    map: Option<Res<'w, MapView>>,
+    views: ViewPlaces<'w, 's>,
+}
+
+/// Where the unit and building views are.
+type ViewPlaces<'w, 's> =
+    Query<'w, 's, &'static GlobalTransform, Or<(With<UnitView>, With<BuildingView>)>>;
+
+impl Listener<'_, '_> {
+    /// The part of the map on screen beside the sidebar, in world units; `None` without a
+    /// camera, when every sound is heard in full.
+    fn view(&self) -> Option<Rect> {
+        let (camera, projection, transform) = self.camera.single().ok()?;
+        let Projection::Orthographic(ortho) = projection else {
+            return None;
+        };
+        let viewport = camera.logical_viewport_size()?;
+        // As `crate::camera::clamp_camera`: the sidebar covers the right of the view.
+        let inset = crate::sidebar::SIDEBAR_WIDTH.clamp(0.0, viewport.x);
+        let size = Vec2::new(viewport.x - inset, viewport.y) * ortho.scale;
+        let centre = transform.translation().truncate() - Vec2::new(inset * ortho.scale / 2.0, 0.0);
+        Some(Rect::from_center_size(centre, size))
+    }
+
+    /// Where on the map `place` is; `None` for the interface or a place that cannot be found.
+    fn locate(
+        &self,
+        place: Place,
+        unit_views: &UnitViews,
+        building_views: &BuildingViews,
+    ) -> Option<Vec2> {
+        let view = |id: SimId| {
+            unit_views
+                .0
+                .get(&id)
+                .or_else(|| building_views.0.get(&id))
+                .and_then(|&view| self.views.get(view).ok())
+                .map(|transform| transform.translation().truncate())
+        };
+        let tile = || self.map.as_ref().map(|map| map.tile);
+        match place {
+            Place::Interface => None,
+            Place::Entity(id, other) => view(id).or_else(|| other.and_then(view)),
+            Place::Cell(cell) => tile().map(|tile| cell_centre(cell, tile)),
+            Place::Point(at) => tile().map(|tile| {
+                let scale = SUBCELLS_PER_CELL as f32;
+                to_world(at.x as f32 / scale, at.y as f32 / scale, tile)
+            }),
+        }
+    }
+}
+
 /// The visibility of the unit and building views.
 type ViewVisibility<'w, 's> =
     Query<'w, 's, &'static Visibility, Or<(With<UnitView>, With<BuildingView>)>>;
@@ -2290,18 +2419,19 @@ pub(crate) fn play_effects(
     views: ViewVisibility,
     active: Query<(), With<SoundEffect>>,
     mut impacts: ResMut<ImpactSounds>,
+    listener: Listener,
 ) {
     let Some(bank) = bank else {
         events.clear();
-        impacts.0 = 0;
+        impacts.0.clear();
         return;
     };
-    let mut wanted = Vec::new();
+    let mut wanted: Vec<(Sfx, Option<Vec2>)> = Vec::new();
     if sink.accepted() > state.accepted {
-        wanted.push(Sfx::Acknowledge);
+        wanted.push((Sfx::Acknowledge, None));
     }
     if sink.refused() > state.refused {
-        wanted.push(Sfx::Error);
+        wanted.push((Sfx::Error, None));
     }
     state.accepted = sink.accepted();
     state.refused = sink.refused();
@@ -2348,19 +2478,36 @@ pub(crate) fn play_effects(
         cell_visible: &cell_visible,
         crushed: &crushed,
     };
-    wanted.extend(
-        events
-            .into_iter()
-            .filter_map(|event| event_sound(event, &context)),
-    );
-    // Shells the player saw land (`crate::weapon_fx` counts them as they burst).
-    if std::mem::take(&mut impacts.0) > 0 {
-        wanted.push(Sfx::Impact);
+    wanted.extend(events.into_iter().filter_map(|event| {
+        event_sound(event, &context).map(|sfx| {
+            let place = event_place(event);
+            (sfx, listener.locate(place, &unit_views, &building_views))
+        })
+    }));
+    let view = listener.view();
+    let heard = |at: Option<Vec2>| {
+        view.zip(at)
+            .map_or(1.0, |(view, at)| distance_gain(view, at))
+    };
+    // Shells the player saw land (`crate::weapon_fx` records where they burst): one sound, from
+    // the nearest.
+    if let Some(at) = std::mem::take(&mut impacts.0)
+        .into_iter()
+        .max_by(|a, b| heard(Some(*a)).total_cmp(&heard(Some(*b))))
+    {
+        wanted.push((Sfx::Impact, Some(at)));
     }
+    // Out of hearing, nothing; the nearest first (the sort keeps the order of equals).
+    let mut wanted: Vec<(Sfx, Option<Vec2>, f32)> = wanted
+        .into_iter()
+        .map(|(sfx, at)| (sfx, at, heard(at)))
+        .filter(|&(.., near)| near > 0.0)
+        .collect();
+    wanted.sort_by(|a, b| b.2.total_cmp(&a.2));
     let now = time.elapsed_secs_f64();
     let mut playing = active.iter().count();
     let gain = volume.gain(Channel::Effects);
-    for sfx in wanted {
+    for (sfx, at, near) in wanted {
         if gain <= 0.0 || !may_play(state.last.get(&sfx).copied(), now, playing) {
             continue;
         }
@@ -2369,14 +2516,33 @@ pub(crate) fn play_effects(
         };
         commands.spawn((
             AudioPlayer(handle.clone()),
-            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(gain)),
+            PlaybackSettings::DESPAWN.with_volume(Volume::Linear(gain * near)),
             SoundEffect {
                 expires: now + duration.as_secs_f64() + 1.0,
+                at,
             },
         ));
         state.last.insert(sfx, now);
         state.started = state.started.saturating_add(1);
         playing += 1;
+    }
+}
+
+/// Fades the effects of the battlefield that are playing as the camera moves away from where
+/// they come from (and back in as it returns).
+fn fade_with_distance(
+    volume: Res<VolumeSettings>,
+    listener: Listener,
+    mut effects: Query<(&SoundEffect, &mut AudioSink)>,
+) {
+    let Some(view) = listener.view() else {
+        return;
+    };
+    let gain = volume.gain(Channel::Effects);
+    for (effect, mut sink) in &mut effects {
+        if let Some(at) = effect.at {
+            sink.set_volume(Volume::Linear(gain * distance_gain(view, at)));
+        }
     }
 }
 
@@ -2604,6 +2770,81 @@ mod tests {
         assert!(
             seam <= typical,
             "seam step {seam}, 99th percentile {typical}"
+        );
+    }
+
+    #[test]
+    fn battle_sounds_fade_with_distance_beyond_the_screen_to_nothing() {
+        let view = Rect::new(-500.0, -300.0, 500.0, 300.0);
+        // On screen, in full; at its edge too.
+        assert_eq!(distance_gain(view, Vec2::ZERO), 1.0);
+        assert_eq!(distance_gain(view, Vec2::new(500.0, -300.0)), 1.0);
+        // Beyond it, ever quieter, and silent from the fade distance on.
+        let gains: Vec<f32> = [0.1, 0.25, 0.5, 0.75, 0.99, 1.0, 2.0]
+            .iter()
+            .map(|f| distance_gain(view, Vec2::new(500.0 + f * FADE_DISTANCE, 0.0)))
+            .collect();
+        assert!(
+            gains
+                .windows(2)
+                .all(|pair| pair[1] < pair[0] || pair[1] == 0.0)
+        );
+        assert!(gains[0] > 0.75 && gains[2] == 0.25 && gains[4] > 0.0);
+        assert_eq!(&gains[5..], &[0.0, 0.0]);
+        // Up the screen, half the distance is as far (the ground is seen at a slant).
+        assert_eq!(
+            distance_gain(view, Vec2::new(0.0, 300.0 + FADE_DISTANCE / 4.0)),
+            distance_gain(view, Vec2::new(500.0 + FADE_DISTANCE / 2.0, 0.0)),
+        );
+    }
+
+    #[test]
+    fn battle_sounds_come_from_the_map_and_the_interface_from_nowhere() {
+        let (a, b) = (SimId(1), SimId(2));
+        let cell = sim::CellPos::new(3, 4);
+        assert_eq!(
+            event_place(&SimEvent::WeaponFired {
+                attacker: a,
+                target: b,
+                weapon: WeaponKind(0)
+            }),
+            Place::Entity(a, Some(b))
+        );
+        assert_eq!(
+            event_place(&SimEvent::UnitDestroyed {
+                player: HUMAN,
+                unit: a
+            }),
+            Place::Entity(a, None)
+        );
+        assert_eq!(
+            event_place(&SimEvent::UnitCrushed {
+                player: HUMAN,
+                unit: a,
+                crusher: b,
+                by: PlayerId(1),
+                at: sim::SubPos::new(5, 6)
+            }),
+            Place::Point(sim::SubPos::new(5, 6))
+        );
+        assert_eq!(
+            event_place(&SimEvent::BridgeChanged {
+                bridge: a,
+                cells: vec![cell],
+                intact: true
+            }),
+            Place::Cell(cell)
+        );
+        assert_eq!(
+            event_place(&SimEvent::OreDelivered {
+                player: HUMAN,
+                harvester: a,
+                refinery: b,
+                ore: 1,
+                gems: 0,
+                credits: 25
+            }),
+            Place::Interface
         );
     }
 

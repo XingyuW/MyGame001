@@ -209,9 +209,10 @@ pub fn class_of(definitions: &sim::Definitions, weapon: WeaponKind) -> WeaponCla
         })
 }
 
-/// Impacts the human player saw this frame, for `crate::audio` to give a sound.
+/// Where (world position) the impacts the human player saw this frame burst, for
+/// `crate::audio` to give a sound that fades with distance.
 #[derive(Resource, Debug, Default)]
-pub struct ImpactSounds(pub u32);
+pub struct ImpactSounds(pub Vec<Vec2>);
 
 /// The textures of the effects, drawn once at startup.
 #[derive(Resource)]
@@ -1141,7 +1142,7 @@ fn fire(
         painter.explosion(ground + Vec2::Y * lift, impact_size(spread), cell, seed);
         // A burst on the ground is heard (`crate::audio`); flak in the air has its own sound.
         if !air {
-            sounds.0 = sounds.0.saturating_add(1);
+            sounds.0.push(ground);
         }
     }
     // RA4: the shot of a launcher launches a missile or an aircraft, which is a unit with a
@@ -1850,7 +1851,7 @@ fn fly_shells(
                     }
                     _ => painter.explosion(at - Vec2::Y * 6.0, 19.0, cell, seed),
                 }
-                sounds.0 = sounds.0.saturating_add(1);
+                sounds.0.push(ground);
             }
             landed.push(entity);
             continue;

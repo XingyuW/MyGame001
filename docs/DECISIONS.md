@@ -13041,3 +13041,32 @@ game's `units.rs` (completion), whose change is presentation only: while a unit 
 sprite takes the position, facing, depth and tint of the arrival instead of its sim cell. No
 recorded AI, power, ore, repair or completion policy reads anything that changed, so all stand.
 The 51 pending user checks are untouched.
+
+### R225. The sounds of the battlefield fade with distance
+
+The user asked (2026-11-01) that, on moving away from a place, the sound of battle "gradually
+fade out until leaving nothing", for a sense of distance. `crates/game/src/audio.rs` now places
+every sound of the battlefield on the map and hears it from the camera; which events sound, and
+for whom (D38, D31, D33), is unchanged.
+
+* **Where a sound comes from** (`audio::event_place`). A shot from its attacker's view (or its
+  target's, when the attacker has none), a destruction from the destroyed unit's or building's
+  view, a crushing from where the soldier stood, a prop or bridge from its cell, a strategic
+  strike from its target cell, and a landing shell from where `crate::weapon_fx` drew it burst
+  (`ImpactSounds` now records those positions instead of counting them). The interface sounds
+  (acknowledgements, errors, production, placement, sales, credits, crates, promotions,
+  superweapon alerts) are not on the map and are always heard in full.
+* **How loud** (`audio::distance_gain`). In full inside the part of the map on screen beside
+  the sidebar; beyond its edge the volume is the square of what is left of `FADE_DISTANCE`
+  (2000 world units, about two screens at scale 1), so a battle just off screen is still
+  clearly heard, one a screen away faintly, and one beyond that not at all. Up and down the
+  screen a distance counts twice, as a cell is half as tall on screen as it is wide.
+* **While playing.** `fade_with_distance` sets the volume of every placed effect each frame,
+  so a sound fades as the camera pans away from it and returns as it comes back.
+* **Priority.** Sounds out of hearing are not started; the rest start nearest first, so far
+  sounds never take the places of near ones under `MAX_ACTIVE_EFFECTS` or `MIN_REPEAT_SECS`.
+
+Checked with a native smoke match: positions and the view resolve, and with the listener moved
+1.2 screens from the fighting the battle sounds started at 1 to 9 percent while the interface
+sounds stayed full. Not yet heard by the user. The game's `audio.rs`, `weapon_fx.rs` and
+`announcer.rs` changed, so the RA9 source scope needs a rebind round.
