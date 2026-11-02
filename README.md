@@ -396,6 +396,12 @@ and send tracers, machine guns fire bursts, tank guns boom with a muzzle blast, 
 dust ring, shells and rockets fly (rockets on a smoke trail, artillery on an arc) and burst
 where they land with a sound of their own.
 
+The battle is heard from where the camera is (`crates/game/src/audio.rs`, R225). Shots,
+impacts and destructions on screen play in full; beyond the edge of the screen they grow
+quieter with distance and fall silent about two screens away, and a sound that is playing
+fades as the view moves away from it. Interface sounds (orders, production, sales, credits,
+alerts) are always heard in full.
+
 Nothing pops into existence (`crates/game/src/arrival.rs`). A new or deployed building rises
 from its foundation in about a second, revealed from the ground up and growing to full size in
 a ring of dust. The War Factory has one wide roll-up door: it opens, a new vehicle waits in the

@@ -13070,3 +13070,35 @@ Checked with a native smoke match: positions and the view resolve, and with the 
 1.2 screens from the fighting the battle sounds started at 1 to 9 percent while the interface
 sounds stayed full. Not yet heard by the user. The game's `audio.rs`, `weapon_fx.rs` and
 `announcer.rs` changed, so the RA9 source scope needs a rebind round.
+
+### R226. Rebind the RA9 source scope to the distance fade
+
+R225 changed `crates/game/src/{audio,weapon_fx,announcer}.rs`; the user asked (2026-11-02) for
+the rebind. No sim source, model surface or `code_guard` file changed, so this is a plain
+factual round as R224: the R224 `prepare`, `verify`, `propagate` and `readback` were copied to
+`docs/validation/ra2-parity/rebind-r226/controller-sources/`, with the directory and the
+`ROOT_REBIND_R226_` prefix changed, and with one further change below.
+
+* **History.** This checkout is a fresh clone of the GitHub history, which was rewritten after
+  R224: the RA8 closure `8f1b1dc` (R192), with which `prepare` and `verify` compare the two
+  historical prompts, is `6e58b9f` here ("RA8: close checkpoint18 ...", 2026-10-21), and R224's
+  packet head `5603d11` (the R223 commit) is `c75dd7d`. Both prompts are byte-equal at `6e58b9f`, and their
+  SHA-256 values equal those R224's packet recorded, so the two copies compare with `6e58b9f`.
+* **Reference cache.** The RA2 reference cache had been cleared again; with the user's
+  permission `rules.ini` and `art.ini` were downloaded again from the recorded commit of R2
+  (SHA-256 `adc869ca...` and `d732bfc8...`, equal to the recorded hashes; never committed). No
+  Finder `.DS_Store` file was present under `assets/` or `crates/`.
+
+Phase `D-sound-fade-01`: producer exit 0; the census changed exactly the three files above and
+only `model_census_sha256` moved (`ccc2fbe9...` to `7e8ab0ad...`); surface `97cbecb2...`,
+closure, special and original hashes unchanged; no legacy branch or completion-local file
+changed. Packet SHA-256
+`2f145e7d9adbd58593e3c98b6abe517f9d864b5dcae1efe35189703126e909e6` (732 source files, 107 core,
+64 authority spans); verification `ROOT_REBIND_R226_D_SOUND_FADE_01_FACTUAL_2026_11_02_051919`;
+propagation 3,311 cell deltas in 13 of 15 outputs, 72 completion rows proved; readback passed
+with every policy cell byte-equal. `ra9_data_parity` passes 185/185 (debug, 457 s).
+
+**Policy reconsideration.** No legacy family or pinned completion file names a changed file;
+the change is presentation only (the volume of sounds), and no recorded AI, power, ore, repair
+or completion policy reads anything that changed, so all stand. The 51 pending user checks are
+untouched.
