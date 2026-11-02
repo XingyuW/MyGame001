@@ -199,6 +199,7 @@ pub(crate) fn spawn_building_views(
     sprites: Option<Res<BuildingSprites>>,
     host: Res<SimHost>,
     mut paint: crate::presentation::TeamPaint,
+    terrain: Option<Res<crate::map::MapTerrain>>,
 ) {
     let (Some(map), Some(sprites)) = (map, sprites) else {
         return;
@@ -220,7 +221,9 @@ pub(crate) fn spawn_building_views(
             continue;
         };
         let image = &paint.sprite(owner.0, human, enemy);
-        let position = crate::hd_art::building_position(component.footprint, map.tile);
+        // On raised ground a building stands on the highest cell under it.
+        let position = crate::hd_art::building_position(component.footprint, map.tile)
+            + Vec2::Y * crate::relief::footprint_lift(terrain.as_deref(), component.footprint);
         let view = commands
             .spawn((
                 BuildingView { building, id: *id },

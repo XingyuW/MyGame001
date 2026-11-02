@@ -106,3 +106,44 @@ pub fn decode(look: u8) -> Option<(Ground, Feature)> {
     let feature = *FEATURES.get(usize::from(look >> 4))?;
     Some((ground, feature))
 }
+
+/// Decorations: the characters of the optional map property `decor` (`sim::Grid::decor`), one
+/// per cell, which the renderer draws on a cell (docs/DECISIONS.md, "Maps with relief"). They
+/// are presentation only, except that the simulation counts a house whose decoration is
+/// [`decor::VEHICLE`] as a parked vehicle (`sim::PropKind::Vehicle`). A "tall" decoration
+/// stands in for the scenery top of an impassable cell; the others lie on open ground or water
+/// beside what is drawn there. The renderer picks the variant from the cell.
+pub mod decor {
+    /// A supertall tower instead of a city tower.
+    pub const SKYSCRAPER: u8 = b'S';
+    /// A landmark (cathedral, TV tower, ferris wheel, ...) instead of a city block.
+    pub const LANDMARK: u8 = b'L';
+    /// A water tower or radio mast instead of a city block.
+    pub const URBAN_TALL: u8 = b'U';
+    /// Fountains, statues, kiosks, market stalls on a plaza.
+    pub const URBAN: u8 = b'u';
+    /// A crag on a mountain cell: grey, snowy or sandstone after its ground.
+    pub const CRAG: u8 = b'c';
+    /// A parked civilian vehicle: the cell is a house prop the simulation counts as a vehicle.
+    pub const VEHICLE: u8 = b'v';
+    /// Bushes, flowers and stones on open grass or earth.
+    pub const CLUTTER: u8 = b'b';
+    /// Hay, fences, beehives in the fields.
+    pub const RURAL: u8 = b'r';
+    /// A windmill, silo or wind turbine instead of a farmhouse.
+    pub const RURAL_TALL: u8 = b'R';
+    /// Cacti, dead trees, barrels in the desert.
+    pub const ARID: u8 = b'd';
+    /// A desert tent instead of an adobe house.
+    pub const ARID_TALL: u8 = b'D';
+    /// Snowy rocks, ice blocks, saplings, drifts on snow.
+    pub const COLD: u8 = b'f';
+    /// An igloo or research hut instead of a snowy cottage.
+    pub const COLD_TALL: u8 = b'F';
+    /// Boats, buoys, rocks and islets on water near a shore.
+    pub const SEA: u8 = b'w';
+    /// Umbrellas, crab pots, driftwood on a beach.
+    pub const BEACH: u8 = b'p';
+    /// A beach hut, lifeguard tower or lighthouse instead of a house by the sea.
+    pub const COAST_TALL: u8 = b'P';
+}

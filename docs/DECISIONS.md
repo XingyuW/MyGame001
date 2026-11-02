@@ -13102,3 +13102,50 @@ with every policy cell byte-equal. `ra9_data_parity` passes 185/185 (debug, 457 
 the change is presentation only (the volume of sounds), and no recorded AI, power, ore, repair
 or completion policy reads anything that changed, so all stand. The 51 pending user checks are
 untouched.
+
+### R227. Maps with relief
+
+The user asked (2026-11-02) to redesign most maps because they are "so boring": more
+skyscrapers, buildings, mountains, oceans, trees, animals, people and units, and heights that
+differ from place to place. Asked how far that should go, the user chose height that is drawn
+and has a light effect on play, ambient life plus neutral targets plus larger starting armies,
+and all 38 large maps (the three small maps that the tests are built on stay flat and bare).
+
+* **Map format.** Two optional map properties (`sim::map`): `elevation`, one hexadecimal digit
+  per cell (0 to `MAX_ELEVATION` = 15 steps), and `decor`, one printable ASCII character per
+  cell (`.` for none). A map without them is flat and bare and hashes as before; `Grid` keeps
+  both (`elevation`, `decor`, `set_relief`), and `enlarged_map` shows them like the terrain and
+  levels every made start position at its yard's height.
+* **Play.** High ground sees farther: a unit or building gets one cell of sight per
+  `ELEVATION_PER_SIGHT` = 3 steps of the cell it stands on (`Grid::sight_bonus`, used by
+  `update_visibility`). Movement, paths and weapons are unchanged: the generator keeps every
+  walkable slope to one step per cell, so heights never change where units can go.
+* **Parked vehicles.** A house prop whose decoration is `v` (`VEHICLE_DECOR`) is a
+  `PropKind::Vehicle` ("Civilian vehicle", 150 hit points, not garrisonable). The new tile
+  `parked car` (blocked, pavement, house feature) carries it on plazas beside streets and on
+  driveways beside country houses.
+* **Starting army.** `MatchOptions::army_scale` multiplies the starting-unit budget of the unit
+  count; the lobby's new "Starting army" row offers STANDARD, LARGE and HUGE (1x, 2x, 3x) and
+  starts at LARGE. `MenuSelection::default` (the reference lobby) keeps 1x.
+* **Generator.** `art/relief.rs`: `Painter::enrich` grows downtown towers, scatters copses,
+  crags and hamlets where the country is open all around, and parks vehicles; then `relief`
+  gives heights (sea level, shores rising a step a cell, rolling hills by map theme, level
+  towns, mountains rising from the foot of rock, flat-topped mesas, level pads under every base,
+  then a lower envelope that keeps walkable land within one step per cell) and decorations
+  (`looks::decor`: skyscrapers in downtowns, landmarks and masts among city blocks, crags on
+  high rock, props on plazas, beaches, fields, snow and desert, boats near shores, windmills,
+  tents, igloos, lighthouses in place of some houses). The large maps get eight neutral
+  buildings to capture (two of each kind) instead of four where they have room.
+  `gen_maps relief <dir> [id ...]` draws a shaded height picture of each map.
+* **Renderer.** `crates/game/src/relief.rs`: a cell rises `STEP_PX` = 8 px per step; ground is
+  interpolated across walkable slopes and not across cliffs; picking finds the raised cell in
+  front. Terrain is drawn in height bands (`battlefield::terrain_depth`), with cliff faces made
+  in code (`battlefield::faces`, strips of rock, earth, sand, snowy rock, concrete, ash and
+  sandstone, with the lip of the ground on top); trees, houses, rock tops and decorations sort
+  with the units. Units, buildings, the placement preview, weapon effects, markers and crates
+  stand on the raised ground. Decorations come from the atlases `terrain/26.png` to `35.png`
+  and ambient life (`crates/game/src/ambient.rs`) from `sprites/hd/ambient`; each is drawn only
+  where its art is installed. Ambient figures are presentation only, wander their habitat,
+  avoid what stands in the match, and are shown only on cells the player sees now.
+
+Not yet checked by the user in a live match.

@@ -50,6 +50,23 @@ pub const MAX_TILESET_IMAGE_SIDE_PX: u32 = 8192;
 /// flip flags needs about 0.75 MB.
 pub const MAX_MAP_FILE_BYTES: u64 = 4 * 1024 * 1024;
 
+/// Highest elevation of a cell, in steps (map property `elevation`: one hexadecimal digit per
+/// cell, `0` to `f`).
+pub const MAX_ELEVATION: u8 = 15;
+
+/// Elevation steps per cell of extra sight on high ground ([`Grid::sight_bonus`]).
+pub const ELEVATION_PER_SIGHT: u8 = 3;
+
+/// The map property that holds every cell's height, row-major, one hexadecimal digit per cell.
+pub const ELEVATION_PROPERTY: &str = "elevation";
+
+/// The map property that holds every cell's decoration, row-major, one printable ASCII
+/// character per cell; [`NO_DECOR`] is a cell without any.
+pub const DECOR_PROPERTY: &str = "decor";
+
+/// The character of a cell without decoration in the map property `decor`.
+pub const NO_DECOR: u8 = b'.';
+
 /// A map cell. Cell (0, 0) is the top corner of the isometric diamond; +x runs down-right and +y
 /// runs down-left on screen.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -197,6 +214,15 @@ pub struct Grid {
     /// The row-major indices of the cells a harvester emptied and that hold no ore now (RA5):
     /// ground ore may spread onto again, though a map's ore ground is no building ground.
     mined: BTreeSet<u32>,
+    /// Row-major, as `cells`: the height of every cell in elevation steps (0 to
+    /// [`MAX_ELEVATION`]), from the optional map property `elevation`. Empty on a flat map,
+    /// which is hashed and played as before elevation existed. High ground sees farther
+    /// ([`Grid::sight_bonus`]); the renderer raises the cell by its height.
+    elevation: Vec<u8>,
+    /// Row-major, as `cells`: the decoration of every cell (0: none), from the optional map
+    /// property `decor`. Presentation data the simulation never reads: props, crags, parked
+    /// vehicles and the like that the renderer draws on a cell. Empty on a map without it.
+    decor: Vec<u8>,
 }
 
 impl Grid {
@@ -224,7 +250,67 @@ impl Grid {
             world_features: BTreeMap::new(),
             mined: BTreeSet::new(),
             cells,
+            elevation: Vec::new(),
+            decor: Vec::new(),
         })
+    }
+
+    /// The height of `cell` in elevation steps (0 on a flat map and outside the map).
+    pub fn elevation(&self, cell: CellPos) -> u8 {
+        self.index(cell)
+            .and_then(|index| self.elevation.get(index))
+            .copied()
+            .unwrap_or(0)
+    }
+
+    /// Every cell's height, row-major; empty on a flat map.
+    pub fn elevations(&self) -> &[u8] {
+        &self.elevation
+    }
+
+    /// The decoration of `cell` (0: none, also outside the map). Presentation data.
+    pub fn decor(&self, cell: CellPos) -> u8 {
+        self.index(cell)
+            .and_then(|index| self.decor.get(index))
+            .copied()
+            .unwrap_or(0)
+    }
+
+    /// Every cell's decoration, row-major; empty on a map without any.
+    pub fn decors(&self) -> &[u8] {
+        &self.decor
+    }
+
+    /// Scenario setup: the heights and decorations of every cell, row-major. Each list is
+    /// either empty or holds exactly one entry per cell; heights above [`MAX_ELEVATION`] are
+    /// clamped. `false` (and nothing changed) for a list of another length.
+    pub fn set_relief(&mut self, elevation: Vec<u8>, decor: Vec<u8>) -> bool {
+        let count = self.cells.len();
+        if !(elevation.is_empty() || elevation.len() == count)
+            || !(decor.is_empty() || decor.len() == count)
+        {
+            return false;
+        }
+        self.elevation = if elevation.iter().all(|&h| h == 0) {
+            Vec::new()
+        } else {
+            elevation
+                .into_iter()
+                .map(|h| h.min(MAX_ELEVATION))
+                .collect()
+        };
+        self.decor = if decor.iter().all(|&d| d == 0) {
+            Vec::new()
+        } else {
+            decor
+        };
+        true
+    }
+
+    /// Cells of sight a unit or building standing on `cell` gains from its height: one per
+    /// [`ELEVATION_PER_SIGHT`] steps (docs/DECISIONS.md, "Maps with relief"). 0 on a flat map.
+    pub fn sight_bonus(&self, cell: CellPos) -> u32 {
+        u32::from(self.elevation(cell) / ELEVATION_PER_SIGHT)
     }
 
     pub fn width(&self) -> u32 {
@@ -845,6 +931,11 @@ impl Grid {
         for id in &self.foot {
             hasher.write_u32(id.0);
         }
+        // Relief: under a tag and only if the map has any, so that a flat map hashes as before.
+        if !self.elevation.is_empty() {
+            hasher.write(b"elevation");
+            hasher.write(&self.elevation);
+        }
         if !self.world_features.is_empty() {
             hasher.write(b"world_features");
             hasher.write_u64(self.world_features.len() as u64);
@@ -1207,10 +1298,14 @@ fn validate(path: &Path, map: &tiled::Map) -> Result<LoadedMap, MapError> {
         gems: BTreeSet::new(),
         world_features: BTreeMap::new(),
         mined: BTreeSet::new(),
+        elevation: Vec::new(),
+        decor: Vec::new(),
     };
     // RA5: the one look the simulation reads from a map file, as it reads the ore amounts.
     grid.mark_gems(&looks);
     grid.mark_world_features(&looks);
+    let (elevation, decor) = relief(&map.properties, grid.cells.len()).map_err(in_map)?;
+    grid.set_relief(elevation, decor);
     Ok(LoadedMap {
         grid,
         tile_width: map.tile_width,
@@ -1345,13 +1440,90 @@ fn check_map_properties(properties: &Properties) -> Result<(), Issue> {
             ));
         }
     }
-    match sorted_names(properties)
-        .into_iter()
-        .find(|name| *name != "schema_version")
-    {
+    match sorted_names(properties).into_iter().find(|name| {
+        !matches!(
+            name.as_str(),
+            "schema_version" | ELEVATION_PROPERTY | DECOR_PROPERTY
+        )
+    }) {
         Some(unknown) => Err((field(unknown), MapErrorKind::UnknownProperty)),
         None => Ok(()),
     }
+}
+
+/// The optional relief of a map of `count` cells: the heights of the map property `elevation`
+/// (one hexadecimal digit per cell) and the decorations of `decor` (one printable ASCII
+/// character per cell, [`NO_DECOR`] for none, read as 0), each empty when the map lacks it.
+fn relief(properties: &Properties, count: usize) -> Result<(Vec<u8>, Vec<u8>), Issue> {
+    let text = |name: &str| -> Result<Option<&str>, Issue> {
+        match properties.get(name) {
+            None => Ok(None),
+            Some(PropertyValue::StringValue(value)) => {
+                if value.len() != count {
+                    return Err((
+                        format!("map property {name:?}"),
+                        MapErrorKind::InvalidValue {
+                            found: format!("{} characters", value.len()),
+                            expected: format!("one character per cell ({count})"),
+                        },
+                    ));
+                }
+                Ok(Some(value))
+            }
+            Some(other) => Err((
+                format!("map property {name:?}"),
+                MapErrorKind::WrongPropertyType {
+                    expected: "string",
+                    found: type_name(other),
+                },
+            )),
+        }
+    };
+    let invalid = |name: &str, index: usize, found: char, expected: &str| {
+        (
+            format!("map property {name:?} character {index}"),
+            MapErrorKind::InvalidValue {
+                found: found.to_string(),
+                expected: expected.into(),
+            },
+        )
+    };
+    let mut elevation = Vec::new();
+    if let Some(value) = text(ELEVATION_PROPERTY)? {
+        elevation.reserve(count);
+        for (index, c) in value.chars().enumerate() {
+            match c.to_digit(16) {
+                Some(height) if !c.is_ascii_uppercase() => elevation.push(height as u8),
+                _ => {
+                    return Err(invalid(
+                        ELEVATION_PROPERTY,
+                        index,
+                        c,
+                        "a hexadecimal digit 0-9 or a-f",
+                    ));
+                }
+            }
+        }
+    }
+    let mut decor = Vec::new();
+    if let Some(value) = text(DECOR_PROPERTY)? {
+        decor.reserve(count);
+        for (index, c) in value.chars().enumerate() {
+            match u8::try_from(c) {
+                Ok(NO_DECOR) => decor.push(0),
+                Ok(byte) if byte.is_ascii_graphic() => decor.push(byte),
+                _ => {
+                    return Err(invalid(
+                        DECOR_PROPERTY,
+                        index,
+                        c,
+                        "a printable ASCII character",
+                    ));
+                }
+            }
+        }
+    }
+    Ok((elevation, decor))
 }
 
 /// Terrain and look of every tile defined in the map's tilesets, keyed by (tileset index, tile

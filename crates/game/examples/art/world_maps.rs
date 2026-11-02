@@ -31,6 +31,8 @@ pub mod cold_maps;
 mod frontier_maps;
 #[path = "green_maps.rs"]
 pub mod green_maps;
+#[path = "relief.rs"]
+pub mod relief;
 #[path = "rugged_maps.rs"]
 pub mod rugged_maps;
 #[path = "water_maps.rs"]

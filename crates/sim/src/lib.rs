@@ -116,10 +116,11 @@ pub use harvest::{HarvestState, Harvester, MAX_HARVEST_ATTEMPTS};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
 pub use map::{
-    CELL_ROOM, Cell, CellPos, CheckedFile, Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_MAP_FILE_BYTES,
-    MAX_MAP_SIDE, MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError, MapErrorKind,
-    SPOT_OFFSETS, SPOTS_PER_CELL, SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX,
-    TILE_WIDTH_PX, TilesetImage, load_map, load_map_with_files,
+    CELL_ROOM, Cell, CellPos, CheckedFile, DECOR_PROPERTY, ELEVATION_PER_SIGHT, ELEVATION_PROPERTY,
+    Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_ELEVATION, MAX_MAP_FILE_BYTES, MAX_MAP_SIDE,
+    MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError, MapErrorKind, NO_DECOR, SPOT_OFFSETS,
+    SPOTS_PER_CELL, SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX,
+    TilesetImage, load_map, load_map_with_files,
 };
 pub use map_scale::{
     APRON_RADIUS, CORE_RADIUS, DEFAULT_ORE, EDGE_MARGIN, EnlargedMap, LOOK_FEATURE_BRIDGE,
@@ -131,15 +132,15 @@ pub use map_scale::{
 pub use match_setup::{
     AI_TEAM, Controller, MAX_UNIT_SPEED_PERCENT, MatchOptions, MatchOutcome, MatchRules,
     MatchSetupError, MatchStart, MatchState, PlayerSetup, STARTING_UNIT_DISTANCE, StartError,
-    plan_starting_units, setup_match, setup_match_configured, setup_match_with_options,
-    setup_match_with_super_me, starting_units,
+    army_unit_count, plan_starting_units, setup_match, setup_match_configured,
+    setup_match_with_options, setup_match_with_super_me, starting_units,
 };
 pub use movement::{MAX_PATHS_WITHOUT_PROGRESS, MAX_STALLED_TICKS, REPATH_AFTER_BLOCKED_TICKS};
 pub use pathfinding::{
     DIAGONAL_COST, ORTHOGONAL_COST, PATH_REQUESTS_PER_TICK, Path, destination_cells, find_path,
     nearest_reachable, octile_distance,
 };
-pub use props::{PROP_ID_BASE, Prop, PropKind, Props};
+pub use props::{PROP_ID_BASE, Prop, PropKind, Props, VEHICLE_DECOR};
 pub use rng::SimRng;
 pub use rules::{
     CombatRules, Country, CountryId, CrateRules, CrewRules, DialogRules, DifficultyRules,

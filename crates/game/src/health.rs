@@ -265,8 +265,10 @@ fn draw_health_bars(
         {
             for dock in 0..docks.min(u32::from(u8::MAX)) as u8 {
                 let cell = sim::dock_cell(building.footprint, dock);
-                let at = crate::units::ground_point(
-                    Vec2::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5),
+                let at = crate::relief::grid_ground(
+                    world.get_resource::<sim::Grid>(),
+                    cell.x as f32 + 0.5,
+                    cell.y as f32 + 0.5,
                     map.tile,
                 );
                 let colour = if taken.contains(&(view.id, dock)) {

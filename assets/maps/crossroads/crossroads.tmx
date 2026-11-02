@@ -4,8 +4,8 @@
  <properties>
   <property name="schema_version" type="int" value="2"/>
  </properties>
- <tileset firstgid="1" name="crossroads_tiles" tilewidth="64" tileheight="32" tilecount="57" columns="57">
-  <image source="crossroads_tiles.png" width="3648" height="32"/>
+ <tileset firstgid="1" name="crossroads_tiles" tilewidth="64" tileheight="32" tilecount="58" columns="58">
+  <image source="crossroads_tiles.png" width="3712" height="32"/>
   <!-- grass -->
   <tile id="0">
    <properties>
@@ -519,6 +519,15 @@
     <property name="buildable" type="bool" value="false"/>
     <property name="ore" type="int" value="0"/>
     <property name="look" type="int" value="246"/>
+   </properties>
+  </tile>
+  <!-- parked car -->
+  <tile id="57">
+   <properties>
+    <property name="passable" type="bool" value="false"/>
+    <property name="buildable" type="bool" value="false"/>
+    <property name="ore" type="int" value="0"/>
+    <property name="look" type="int" value="85"/>
    </properties>
   </tile>
  </tileset>

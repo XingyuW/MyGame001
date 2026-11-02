@@ -33,7 +33,7 @@ use sim::{
 use crate::buildings::{BuildingSprites, BuildingView, own_building_at};
 use crate::hotkeys::{Hotkey, pressed_hotkeys};
 use crate::map::{HoveredCell, MapView};
-use crate::projection::{cell_corners, to_world};
+use crate::projection::to_world;
 use crate::sim_host::{CommandSink, SimHost};
 use crate::units::{HUMAN, UnitView};
 
@@ -507,6 +507,7 @@ fn draw_placement_preview(
     mode: Res<InterfaceMode>,
     host: Res<SimHost>,
     mut gizmos: Gizmos,
+    terrain: Option<Res<crate::map::MapTerrain>>,
 ) {
     let (Some(cell), Some(view), InterfaceMode::Place(kind)) = (hovered.0, view, *mode) else {
         return;
@@ -517,22 +518,26 @@ fn draw_placement_preview(
     let colour = preview_colour(check.is_ok()).with_alpha(1.0);
     let (x, y) = (footprint.origin.x as f32, footprint.origin.y as f32);
     let (w, h) = (f32::from(footprint.width), f32::from(footprint.height));
+    // On raised ground the outline lies where the building would stand.
+    let raise = Vec2::Y * crate::relief::footprint_lift(terrain.as_deref(), footprint);
     let corners = [
-        to_world(x, y, view.tile),
-        to_world(x + w, y, view.tile),
-        to_world(x + w, y + h, view.tile),
-        to_world(x, y + h, view.tile),
+        to_world(x, y, view.tile) + raise,
+        to_world(x + w, y, view.tile) + raise,
+        to_world(x + w, y + h, view.tile) + raise,
+        to_world(x, y + h, view.tile) + raise,
     ];
     gizmos.linestrip_2d(
         [corners[0], corners[1], corners[2], corners[3], corners[0]],
         colour,
     );
     for inner in footprint.cells() {
-        let [top, right, bottom, left] = cell_corners(inner, view.tile);
+        let [top, right, bottom, left] =
+            crate::relief::cell_corners(terrain.as_deref(), inner, view.tile);
         gizmos.linestrip_2d([top, right, bottom, left, top], colour.with_alpha(0.4));
     }
     if let Some(problem) = check.as_ref().err().and_then(problem_cell) {
-        let [top, right, bottom, left] = cell_corners(problem, view.tile);
+        let [top, right, bottom, left] =
+            crate::relief::cell_corners(terrain.as_deref(), problem, view.tile);
         gizmos.linestrip_2d([top, right, bottom, left, top], Color::srgb(1.0, 0.1, 0.1));
         gizmos.line_2d(top, bottom, Color::srgb(1.0, 0.1, 0.1));
         gizmos.line_2d(left, right, Color::srgb(1.0, 0.1, 0.1));
@@ -564,6 +569,7 @@ pub(crate) fn update_placement_ghost(
             Without<BuildingView>,
         ),
     >,
+    terrain: Option<Res<crate::map::MapTerrain>>,
 ) {
     for (mut sprite, mut transform, mut visibility) in &mut ghost {
         let shown = match (hovered.0, view.as_deref(), *mode, sprites.as_deref()) {
@@ -590,7 +596,9 @@ pub(crate) fn update_placement_ghost(
             footprint.width,
             footprint.height,
         ));
-        transform.translation = crate::hd_art::building_position(footprint, tile).extend(3.0);
+        transform.translation = (crate::hd_art::building_position(footprint, tile)
+            + Vec2::Y * crate::relief::footprint_lift(terrain.as_deref(), footprint))
+        .extend(3.0);
         if *visibility != Visibility::Inherited {
             *visibility = Visibility::Inherited;
         }

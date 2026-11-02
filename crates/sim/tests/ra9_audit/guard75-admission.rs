@@ -711,6 +711,7 @@ fn option_surface(o: sim::MatchOptions) {
         random_countries: _,
         starting_credits: _,
         unit_count: _,
+        army_scale: _,
         mcv_start: _,
         short_game: _,
         superweapons: _,

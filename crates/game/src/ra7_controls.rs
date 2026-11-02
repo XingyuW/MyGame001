@@ -252,9 +252,17 @@ fn psychic_lines(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizm
         return;
     }
     for order in sim::psychic_orders(host.world(), HUMAN) {
+        let at = |cell: sim::CellPos| {
+            crate::relief::grid_ground(
+                host.grid(),
+                cell.x as f32 + 0.5,
+                cell.y as f32 + 0.5,
+                map.tile,
+            )
+        };
         gizmos.line_2d(
-            crate::projection::cell_centre(order.from, map.tile),
-            crate::projection::cell_centre(order.target, map.tile),
+            at(order.from),
+            at(order.target),
             Color::srgba(0.7, 0.25, 1.0, 0.65),
         );
     }
