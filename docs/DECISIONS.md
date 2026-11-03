@@ -13193,3 +13193,40 @@ families) and `match_setup.rs` (2), and one pinned completion file, the game's `
 
 Every recorded AI, power, ore, repair and completion policy stands. The 51 pending user checks
 are untouched.
+
+### R229. A continued sweep searches stale ore fields first
+
+After R227 shipped without the sight bonus, the M6 sweep (`m6_production_matches`) still ended
+one match without a winner: nile_valley, Russia brutal against Libya brutal, at its limit of
+288,000 ticks. The user chose (2026-11-03) to fix the AI endgame rather than accept it. A
+replay showed Libya's production gone by tick 204,000 and its last Kirov destroying Russia's
+main base; Russia kept a refinery and a tech outpost at (185, 72) beside an ore field and two
+V3 launchers firing at Libya's base, whose flak shot down every rocket. Russia could not win
+and Libya did not know where Russia's last buildings were, so the Kirov swept. Its continued
+sweep ranked waypoints by five-minute era of last sight and then by distance: it crossed the
+map to whichever patch was seen an era earlier, and with only distance it combed the empty
+corners of the 256-by-256 map (from (2, 7) to (19, 154) over 60,000 ticks) and never came near
+(185, 72).
+
+* **Rule.** In a continued sweep (after an observed scouting leg, R14), every waypoint not seen
+  within the last `SWEEP_ERA_TICKS` counts as equally stale, and among them the waypoints whose
+  block held ore when the match began (`Waypoint::ore`) come before open ground; then the
+  nearest. Refineries stand beside ore, so a beaten player's last buildings are most likely
+  there. The ore flag is read from the map's terrain at match start, as the waypoint layout
+  already reads passability; the AI still sees only what its units see. The first leg of a
+  sweep is unchanged: by era, then near the enemy starts, then by distance.
+* **Effect.** The same nile_valley match is won at tick 250,569 (Libya's Kirov reaches the ore
+  field and the refinery). `ai::tests` covers the continued order: the nearest stale waypoint
+  before one seen an era earlier, ground seen within the last era last, a stale ore field
+  before nearer open ground.
+* The V3 launchers' futile attack (an `Attack` order whose launched rockets never land keeps the
+  units busy and the attack job never fails) is noted but not changed: it did not keep the
+  match from ending.
+* **Test.** With the new sweeps every match of the M6 sweep was won, but tundra_steppe, Korea
+  medium against France medium, stopped on a rejected `SellBuilding` at tick 74,241 ("Target
+  is being erased"). The computer player decides in the `Ai` stage and its commands are applied
+  in the next tick's `Commands` stage; it never sells a building it sees being erased
+  (`erased_buildings`), and a replay showed this one was not being erased when the sale was
+  decided: a Chrono Legionnaire began erasing it later in that tick. `m6_production_matches`
+  now explains that rejection as it explains a unit lost in the tick before (D43): a sale of a
+  building that was not being erased when the computer players last decided.

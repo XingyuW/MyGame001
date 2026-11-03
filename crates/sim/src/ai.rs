@@ -130,12 +130,14 @@ pub struct KnownBuilding {
 }
 
 /// A cell an attack wave sweeps, and when the computer player last saw it (the tick index plus
-/// one; 0 if never). `priority` marks an enemy start position.
+/// one; 0 if never). `priority` marks an enemy start position, `ore` a block that held ore when
+/// the match began, where refineries are built.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Waypoint {
     pub cell: CellPos,
     pub seen: u64,
     pub priority: bool,
+    pub ore: bool,
 }
 
 /// The attack wave's target.
@@ -337,6 +339,7 @@ impl AiController {
                 cell,
                 seen: 0,
                 priority: true,
+                ore: false,
             })
             .collect();
         let mut y0 = 0;
@@ -346,8 +349,11 @@ impl AiController {
                 let x1 = (x0 + spacing - 1).min(width - 1);
                 let y1 = (y0 + spacing - 1).min(height - 1);
                 let centre = CellPos::new((x0 + x1) / 2, (y0 + y1) / 2);
-                let cell = (y0..=y1)
-                    .flat_map(|y| (x0..=x1).map(move |x| CellPos::new(x, y)))
+                let block = (y0..=y1).flat_map(|y| (x0..=x1).map(move |x| CellPos::new(x, y)));
+                let ore = block
+                    .clone()
+                    .any(|cell| grid.cell(cell).is_some_and(|terrain| terrain.ore > 0));
+                let cell = block
                     .filter(|&cell| grid.cell(cell).is_some_and(|terrain| terrain.passable))
                     .min_by_key(|&cell| (chebyshev(cell, centre), cell.y, cell.x));
                 if let Some(cell) = cell {
@@ -355,6 +361,7 @@ impl AiController {
                         cell,
                         seen: 0,
                         priority: false,
+                        ore,
                     });
                 }
                 x0 += spacing;
@@ -461,7 +468,7 @@ impl AiController {
         for waypoint in &self.waypoints {
             write_cell(hasher, waypoint.cell);
             hasher.write_u64(waypoint.seen);
-            hasher.write(&[u8::from(waypoint.priority)]);
+            hasher.write(&[u8::from(waypoint.priority), u8::from(waypoint.ore)]);
         }
         hasher.write_u64(self.known.len() as u64);
         for (id, known) in &self.known {
@@ -3682,7 +3689,8 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
                 _ => {}
             }
         }
-        controller.target = choose_target_with_sweep(controller, centroid, observed_scout);
+        controller.target =
+            choose_target_with_sweep(controller, centroid, observed_scout, view.tick);
         if let Some(cell) = target_cell(controller, centroid) {
             commands.push(Command::AttackMove {
                 units: members.iter().map(|unit| unit.id).collect(),
@@ -3782,13 +3790,15 @@ fn centroid(units: &[&UnitSnap], fallback: CellPos) -> CellPos {
 /// nearest enemy start position never seen; else begin a sweep near an enemy start. An
 /// actually observed scouting leg continues to the nearest stale waypoint below.
 fn choose_target(controller: &AiController, from: CellPos) -> Option<WaveTarget> {
-    choose_target_with_sweep(controller, from, false)
+    choose_target_with_sweep(controller, from, false, 0)
 }
 
+/// As [`choose_target`]; `continuing_sweep` after an observed scouting leg, at tick `now`.
 fn choose_target_with_sweep(
     controller: &AiController,
     from: CellPos,
     continuing_sweep: bool,
+    now: u64,
 ) -> Option<WaveTarget> {
     let building = controller
         .known
@@ -3835,13 +3845,22 @@ fn choose_target_with_sweep(
     // actually observed, continue through nearby unseen ground instead of crossing the same
     // expanding ring repeatedly. A failed/unobserved land approach is not an observation:
     // a later aircraft must still search the original enemy area before wandering elsewhere.
+    // A continued sweep takes every waypoint not seen within the last era as equally stale, and
+    // searches the ore fields, where the enemy's refineries stand, before open ground: ranked
+    // by era and distance alone, a lone slow unit combed the empty corners of a large map until
+    // the match ran out (docs/DECISIONS.md R229).
     controller
         .waypoints
         .iter()
         .enumerate()
         .min_by_key(|(_, waypoint)| {
             (
-                waypoint.seen / SWEEP_ERA_TICKS,
+                if continuing_sweep {
+                    u64::from(now.saturating_sub(waypoint.seen) < SWEEP_ERA_TICKS)
+                } else {
+                    waypoint.seen / SWEEP_ERA_TICKS
+                },
+                continuing_sweep && !waypoint.ore,
                 if continuing_sweep {
                     0
                 } else {
@@ -4776,6 +4795,7 @@ mod tests {
             cell: CellPos::new(x, y),
             seen: 100,
             priority,
+            ore: false,
         };
         controller.known.clear();
         controller.waypoints = vec![
@@ -4809,6 +4829,29 @@ mod tests {
         assert_eq!(
             choose_target(&controller, own),
             Some(WaveTarget::Waypoint(4))
+        );
+        // A continued sweep goes to the nearest waypoint not seen within the last era, not
+        // across the map to one seen an era earlier (R229).
+        controller.waypoints[4].seen = 100 + SWEEP_ERA_TICKS;
+        controller.waypoints[0].seen = 100;
+        controller.waypoints[2].seen = 100 + SWEEP_ERA_TICKS;
+        let now = 100 + 3 * SWEEP_ERA_TICKS;
+        assert_eq!(
+            choose_target_with_sweep(&controller, CellPos::new(48, 50), true, now),
+            Some(WaveTarget::Waypoint(3)),
+            "the nearest stale waypoint"
+        );
+        // Ground seen within the last era waits until the rest is searched.
+        controller.waypoints[3].seen = now - 1;
+        assert_eq!(
+            choose_target_with_sweep(&controller, CellPos::new(48, 50), true, now),
+            Some(WaveTarget::Waypoint(4))
+        );
+        // A stale ore field comes before nearer open ground.
+        controller.waypoints[2].ore = true;
+        assert_eq!(
+            choose_target_with_sweep(&controller, CellPos::new(48, 50), true, now),
+            Some(WaveTarget::Waypoint(2))
         );
     }
 

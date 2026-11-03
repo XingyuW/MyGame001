@@ -216,7 +216,16 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
     let trace_ra5 = std::env::var_os("RA5_TRACE").is_some() && name.contains("coral_archipelago");
     let trace_liberty =
         std::env::var_os("RA9_LIBERTY_TRACE").is_some() && name.starts_with("liberty_bay:");
+    // The buildings being erased when the computer players last decided: their commands are
+    // applied in the next tick's `Commands` stage, before that tick's `Ai` stage.
+    let mut erasing_at_decision = BTreeSet::new();
     for at in 0..limit {
+        let erasing: BTreeSet<SimId> = world
+            .resource::<sim::SpecialState>()
+            .erasures
+            .keys()
+            .copied()
+            .collect();
         world.run_schedule(SimSchedule);
         if trace_liberty && at % 10_000 == 0 {
             for (player, state) in world.resource::<sim::Players>().iter() {
@@ -344,6 +353,14 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
                         RejectReason::MissingPrerequisite { .. }
                         | RejectReason::NoProducer { .. }
                         | RejectReason::Placement(_) => lost.is_some_and(|lost| !lost.is_empty()),
+                        // The computer player never sells a building it sees being erased; a
+                        // Chrono Legionnaire began erasing this one after the sale was decided
+                        // (docs/DECISIONS.md R229).
+                        RejectReason::AbilityUnavailable("Target is being erased") => matches!(
+                            command,
+                            sim::Command::SellBuilding { building }
+                                if !erasing_at_decision.contains(&building)
+                        ),
                         _ => false,
                     };
                     assert!(
@@ -368,6 +385,7 @@ fn run(world: &mut World, name: &str, limit: u64) -> Option<MatchOutcome> {
                 _ => {}
             }
         }
+        erasing_at_decision = erasing;
         // The computer players push a bounded number of commands per turn.
         assert!(
             world.resource::<CommandQueue>().len() <= 32,
