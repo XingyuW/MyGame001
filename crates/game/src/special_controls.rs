@@ -455,8 +455,12 @@ fn feedback_and_effects(
         return;
     };
     for cell in sim::nuclear_marks(host.world(), HUMAN) {
-        let center =
-            crate::projection::to_world(cell.x as f32 + 0.5, cell.y as f32 + 0.5, view.tile);
+        let center = crate::relief::grid_ground(
+            host.grid(),
+            cell.x as f32 + 0.5,
+            cell.y as f32 + 0.5,
+            view.tile,
+        );
         gizmos.circle_2d(
             Isometry2d::from_translation(center),
             12.0,
@@ -464,8 +468,12 @@ fn feedback_and_effects(
         );
     }
     for &(cell, role, radius, t) in &effects.0 {
-        let center =
-            crate::projection::to_world(cell.x as f32 + 0.5, cell.y as f32 + 0.5, view.tile);
+        let center = crate::relief::grid_ground(
+            host.grid(),
+            cell.x as f32 + 0.5,
+            cell.y as f32 + 0.5,
+            view.tile,
+        );
         let color = match role {
             sim::Role::Nuke => Color::srgba(1.0, 0.5, 0.1, t / 3.0),
             sim::Role::Storm => Color::srgba(0.65, 0.8, 1.0, t / 3.0),
@@ -500,7 +508,8 @@ fn feedback_and_effects(
                 .and_then(|p| p.get(HUMAN))
                 .is_some_and(|p| p.vision().is_visible(zone.cell))
             {
-                let c = crate::projection::to_world(
+                let c = crate::relief::grid_ground(
+                    host.grid(),
                     zone.cell.x as f32 + 0.5,
                     zone.cell.y as f32 + 0.5,
                     view.tile,

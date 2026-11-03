@@ -36,7 +36,13 @@ pub enum PropKind {
     CityBlock,
     Tower,
     Bridge,
+    /// A parked civilian vehicle: a house cell whose map decoration is
+    /// [`VEHICLE_DECOR`] (docs/DECISIONS.md, "Maps with relief").
+    Vehicle,
 }
+
+/// The map decoration (`Grid::decor`) that makes a house cell a parked vehicle.
+pub const VEHICLE_DECOR: u8 = b'v';
 
 impl PropKind {
     /// The kind of the scenery feature of `look`, if it is destructible scenery.
@@ -59,6 +65,7 @@ impl PropKind {
             Self::CityBlock => 600,
             Self::Tower => 1_000,
             Self::Bridge => 1_500,
+            Self::Vehicle => 150,
         }
     }
 
@@ -69,6 +76,7 @@ impl PropKind {
             Self::CityBlock => "City block",
             Self::Tower => "Tower",
             Self::Bridge => "Bridge",
+            Self::Vehicle => "Civilian vehicle",
         }
     }
 
@@ -121,6 +129,11 @@ impl Props {
             };
             let Some(cell) = cell_at(width, index) else {
                 continue;
+            };
+            let kind = if kind == PropKind::House && grid.decor(cell) == VEHICLE_DECOR {
+                PropKind::Vehicle
+            } else {
+                kind
             };
             if grid.cell(cell).is_some_and(|c| {
                 (!c.passable && !c.water) || (kind == PropKind::Bridge && c.passable)
@@ -446,5 +459,27 @@ mod tests {
         props.hurt(cell, i64::MAX);
         assert_eq!(props.at(cell).unwrap().hit_points, 0);
         assert!(props.dying.contains(&cell));
+    }
+
+    #[test]
+    fn a_house_decorated_as_a_vehicle_is_a_parked_vehicle() {
+        let blocked = crate::map::Cell {
+            passable: false,
+            water: false,
+            buildable: false,
+            ore: 0,
+        };
+        let mut grid = Grid::from_cells(3, 1, vec![blocked; 3]).expect("a grid");
+        assert!(grid.set_relief(Vec::new(), vec![0, VEHICLE_DECOR, VEHICLE_DECOR]));
+        // A house, a house with the vehicle decoration, and trees with it (still trees).
+        let looks = [5 << 4, 5 << 4, 4 << 4];
+        let props = Props::from_looks(&grid, &looks, ArmourClass::default());
+        let kind = |x: i32| props.at(CellPos::new(x, 0)).map(|prop| prop.kind);
+        assert_eq!(kind(0), Some(PropKind::House));
+        assert_eq!(kind(1), Some(PropKind::Vehicle));
+        assert_eq!(kind(2), Some(PropKind::Trees));
+        let vehicle = props.at(CellPos::new(1, 0)).expect("a vehicle");
+        assert_eq!(vehicle.hit_points, PropKind::Vehicle.hit_points());
+        assert_eq!(PropKind::Vehicle.name(), "Civilian vehicle");
     }
 }

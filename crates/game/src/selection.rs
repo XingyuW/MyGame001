@@ -1215,7 +1215,12 @@ pub(crate) fn draw_selection(
     if time.elapsed_secs_f64() < feedback.until
         && let Some(cell) = feedback.cell
     {
-        let centre = crate::projection::cell_centre(cell, map.tile);
+        let centre = crate::relief::grid_ground(
+            host.grid(),
+            cell.x as f32 + 0.5,
+            cell.y as f32 + 0.5,
+            map.tile,
+        );
         let r = 8.0 + (feedback.until - time.elapsed_secs_f64()) as f32 * 14.0;
         gizmos.linestrip_2d(
             [
@@ -1252,8 +1257,17 @@ pub(crate) fn draw_selection(
 }
 
 /// The corners of a footprint on the ground, clockwise from its top corner on screen.
-fn footprint_outline(footprint: sim::Footprint, map: &MapView) -> [Vec2; 4] {
-    let corner = |x: i32, y: i32| crate::projection::to_world(x as f32, y as f32, map.tile);
+fn footprint_outline(footprint: sim::Footprint, map: &MapView, host: &SimHost) -> [Vec2; 4] {
+    // On raised ground: as high as the building stands.
+    let raise = host.grid().map_or(0.0, |grid| {
+        footprint
+            .cells()
+            .map(|cell| crate::relief::cell_lift(grid, cell))
+            .fold(0.0, f32::max)
+    });
+    let corner = |x: i32, y: i32| {
+        crate::projection::to_world(x as f32, y as f32, map.tile) + Vec2::Y * raise
+    };
     let (x0, y0) = (footprint.origin.x, footprint.origin.y);
     let (x1, y1) = (
         x0 + i32::from(footprint.width),
@@ -1320,6 +1334,7 @@ fn draw_selected_building(
                 height: 1,
             },
             map,
+            host,
         );
         for i in 0..4 {
             gizmos.line_2d(outline[i], outline[(i + 1) % 4], Color::srgb(0.3, 1.0, 0.3));
@@ -1338,7 +1353,7 @@ fn draw_selected_building(
     else {
         return;
     };
-    let outline = footprint_outline(building.footprint, map);
+    let outline = footprint_outline(building.footprint, map, host);
     let centre = outline.iter().copied().sum::<Vec2>() / 4.0;
     let green = Color::srgb(0.3, 1.0, 0.3);
     // Corner brackets, as around a selected unit, a little outside the walls.
@@ -1352,7 +1367,12 @@ fn draw_selected_building(
     let Some(rally) = producer.and_then(|producer| producer.rally) else {
         return;
     };
-    let flag = crate::projection::cell_centre(rally, map.tile);
+    let flag = crate::relief::grid_ground(
+        host.grid(),
+        rally.x as f32 + 0.5,
+        rally.y as f32 + 0.5,
+        map.tile,
+    );
     // A dashed line that runs from the building to the flag.
     let length = centre.distance(flag);
     let direction = (flag - centre).normalize_or_zero();

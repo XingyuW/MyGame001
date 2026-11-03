@@ -15,7 +15,12 @@
 //! checked bytes (`crate::checked_assets`).
 
 /// Original procedural foliage; hidden Mirage identities never gain a sprite, label or selection target.
-fn draw_mirage_trees(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: Gizmos) {
+fn draw_mirage_trees(
+    host: Res<SimHost>,
+    map: Option<Res<MapView>>,
+    terrain: Option<Res<crate::map::MapTerrain>>,
+    mut gizmos: Gizmos,
+) {
     let Some(map) = map else {
         return;
     };
@@ -38,10 +43,7 @@ fn draw_mirage_trees(host: Res<SimHost>, map: Option<Res<MapView>>, mut gizmos: 
         {
             continue;
         }
-        let p = ground_point(
-            Vec2::new(m.cell.x as f32 + 0.5, m.cell.y as f32 + 0.5),
-            map.tile,
-        );
+        let p = crate::relief::cell_point(terrain.as_deref(), m.cell, map.tile);
         gizmos.line_2d(p, p + Vec2::Y * 25.0, Color::srgb(0.30, 0.19, 0.09));
         let green = Color::srgb(0.12 + f32::from(v) * 0.025, 0.32, 0.13);
         for (offset, r) in [
@@ -625,6 +627,7 @@ fn place_unit_views(
             Without<crate::construction::PlacementGhost>,
         ),
     >,
+    terrain: Option<Res<crate::map::MapTerrain>>,
 ) {
     let (Some(map), Some(players)) = (map, host.players()) else {
         return;
@@ -751,7 +754,9 @@ fn place_unit_views(
         if *visibility != shown {
             *visibility = shown;
         }
-        let mut ground = ground_point(cell, map.tile);
+        // On raised ground the unit stands as high as the ground under it.
+        let mut ground = ground_point(cell, map.tile)
+            + Vec2::Y * crate::relief::lift(terrain.as_deref(), cell.x, cell.y);
         let infantry = world
             .get::<Unit>(view.unit)
             .and_then(|u| {
@@ -1321,7 +1326,10 @@ mod tests {
         let catalogue = crate::skirmish::tests::production_catalogue();
         let selection = crate::skirmish::MenuSelection::versus(&catalogue);
         let rules = catalogue.definitions.rules().expect("rules");
-        let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
+        let unit_count = sim::army_unit_count(
+            u32::try_from(rules.dialog.unit_count).expect("unit count"),
+            selection.options().army_scale,
+        );
         for mcv_start in [false, true] {
             let host = if mcv_start {
                 crate::sim_host::tests::menu_host()

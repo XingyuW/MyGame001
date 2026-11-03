@@ -990,7 +990,8 @@ fn spots(host: &SimHost, map: &MapView, altitudes: &Altitudes) -> BTreeMap<SimId
                             == sim::Category::Infantry
                     });
                     Spot {
-                        ground: to_world(
+                        ground: crate::relief::grid_ground(
+                            host.grid(),
                             position.0.x as f32 / scale,
                             position.0.y as f32 / scale,
                             map.tile,
@@ -1007,7 +1008,14 @@ fn spots(host: &SimHost, map: &MapView, altitudes: &Altitudes) -> BTreeMap<SimId
                         footprint.origin.y as f32 + f32::from(footprint.height) * 0.5,
                     );
                     Spot {
-                        ground: to_world(centre.0, centre.1, map.tile),
+                        ground: to_world(centre.0, centre.1, map.tile)
+                            + Vec2::Y
+                                * host.grid().map_or(0.0, |grid| {
+                                    footprint
+                                        .cells()
+                                        .map(|cell| crate::relief::cell_lift(grid, cell))
+                                        .fold(0.0, f32::max)
+                                }),
                         // A defence's weapon is at the top of it.
                         lift: 30.0,
                         cell: CellPos::new(centre.0 as i32, centre.1 as i32),
@@ -1031,7 +1039,12 @@ fn spot_of(
     spots.get(&id).copied().or_else(|| {
         let (cell, _) = host.props()?.get(id)?;
         Some(Spot {
-            ground: crate::projection::cell_centre(cell, map.tile),
+            ground: crate::relief::grid_ground(
+                host.grid(),
+                cell.x as f32 + 0.5,
+                cell.y as f32 + 0.5,
+                map.tile,
+            ),
             lift: GROUND_OFFSET_PX,
             cell,
             reach: 0.0,
@@ -1118,7 +1131,12 @@ fn fire(
             continue;
         }
         let scale = SUBCELLS_PER_CELL as f32;
-        let ground = to_world(at.x as f32 / scale, at.y as f32 / scale, map.tile);
+        let ground = crate::relief::grid_ground(
+            host.grid(),
+            at.x as f32 / scale,
+            at.y as f32 / scale,
+            map.tile,
+        );
         let seed = (host.tick() as u32).wrapping_mul(0x9E37) ^ unit.0;
         painter.crush(ground, cell, seed);
     }
@@ -1128,7 +1146,12 @@ fn fire(
             continue;
         }
         let scale = SUBCELLS_PER_CELL as f32;
-        let ground = to_world(at.x as f32 / scale, at.y as f32 / scale, map.tile);
+        let ground = crate::relief::grid_ground(
+            host.grid(),
+            at.x as f32 / scale,
+            at.y as f32 / scale,
+            map.tile,
+        );
         let lift = GROUND_OFFSET_PX
             + if air {
                 crate::units::flight_altitude(false, false)

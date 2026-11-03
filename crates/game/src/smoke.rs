@@ -833,7 +833,10 @@ fn match_problems(
         "the human player did not start with the chosen credits",
     );
     // What the players started with: by the unit count and the MCV start.
-    let unit_count = choice.unit_count.unwrap_or(lobby.unit_count);
+    let unit_count = sim::army_unit_count(
+        choice.unit_count.unwrap_or(lobby.unit_count),
+        choice.options().army_scale,
+    );
     check(
         spawned == starting_totals(catalogue, played.factions(), unit_count, choice.mcv_start),
         "the players did not start with the units and buildings of the unit count and MCV start",
@@ -1636,9 +1639,12 @@ fn count_frames(
         (Some(catalogue), Some(selection), Some(played)) => starting_totals(
             catalogue,
             played.factions(),
-            selection
-                .unit_count
-                .unwrap_or(MenuCounts::of(catalogue).lobby.unit_count),
+            sim::army_unit_count(
+                selection
+                    .unit_count
+                    .unwrap_or(MenuCounts::of(catalogue).lobby.unit_count),
+                selection.options().army_scale,
+            ),
             selection.mcv_start,
         ),
         _ => (0, 0),
@@ -2422,7 +2428,10 @@ mod tests {
         let factions = &catalogue.skirmish.factions;
         let players = selection.players();
         let rules = catalogue.definitions.rules().expect("rules");
-        let unit_count = u32::try_from(rules.dialog.unit_count).expect("unit count");
+        let unit_count = sim::army_unit_count(
+            u32::try_from(rules.dialog.unit_count).expect("unit count"),
+            selection.options().army_scale,
+        );
         let expected: usize = players
             .iter()
             .map(|setup| {
@@ -2733,8 +2742,8 @@ mod tests {
         smoke.problem(format!("something {}", "else"));
         assert_eq!(smoke.flow_problems, 2);
         assert_eq!(
-            MENU_BUTTONS, 79,
-            "19 rows, 10 countries, 9 difficulties, 3 buttons"
+            MENU_BUTTONS, 81,
+            "20 rows, 10 countries, 9 difficulties, 3 buttons"
         );
     }
 
@@ -2856,6 +2865,7 @@ mod tests {
                 random_countries: vec![sim::PlayerId(3), sim::PlayerId(4)],
                 starting_credits: Some(lobby.min_credits),
                 unit_count: Some(lobby.min_unit_count),
+                army_scale: crate::skirmish::ARMY_SIZES[first.army].1,
                 mcv_start: true,
                 short_game: false,
                 superweapons: false,
@@ -3010,6 +3020,7 @@ mod tests {
                 starting_credits: Some(lobby.credits),
                 unit_count: Some(lobby.unit_count),
                 unit_speed_percent: 100,
+                army_scale: crate::skirmish::ARMY_SIZES[crate::skirmish::DEFAULT_ARMY].1,
                 ..sim::MatchOptions::default()
             }
         );

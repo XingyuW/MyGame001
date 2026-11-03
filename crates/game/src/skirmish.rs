@@ -508,9 +508,12 @@ pub fn selection_totals(catalogue: &Catalogue, selection: MenuSelection) -> Opti
     Some(starting_totals(
         catalogue,
         factions?,
-        selection
-            .unit_count
-            .unwrap_or(Lobby::of(catalogue).unit_count),
+        sim::army_unit_count(
+            selection
+                .unit_count
+                .unwrap_or(Lobby::of(catalogue).unit_count),
+            selection.options().army_scale,
+        ),
         selection.mcv_start,
     ))
 }
@@ -798,6 +801,9 @@ pub enum Row {
     Credits,
     /// The lobby's unit count, from which the starting units follow (`sim::starting_units`).
     UnitCount,
+    /// How large every player's starting army is: the unit count's army, or a multiple of it
+    /// ([`ARMY_SIZES`]).
+    StartingArmy,
     /// On: every player starts with the base unit of its side. Off: with its Construction Yard.
     McvStart,
     /// On: a player without buildings and base unit is defeated. Off: without buildings and
@@ -823,6 +829,14 @@ pub enum Row {
     Difficulty(usize),
 }
 
+/// The starting armies the lobby offers: the label of the row and how many times the unit
+/// count's army every player gets (`sim::MatchOptions::army_scale`).
+pub const ARMY_SIZES: [(&str, u32); 3] = [("STANDARD", 1), ("LARGE", 2), ("HUGE", 3)];
+
+/// Index into [`ARMY_SIZES`] of the menu's first selection: larger armies than the reference's
+/// (docs/DECISIONS.md, "Maps with relief").
+pub const DEFAULT_ARMY: usize = 1;
+
 /// The unit speeds the Super Me player may choose, in percent of every unit type's speed.
 pub const UNIT_SPEEDS: [u16; 5] = [100, 150, 200, 300, 400];
 
@@ -832,7 +846,7 @@ pub const DEFAULT_UNIT_SPEED: usize = 3;
 
 impl Row {
     /// The rows of the menu's first column: the match.
-    pub const MATCH: [Row; 8] = [
+    pub const MATCH: [Row; 9] = [
         Row::Map,
         Row::Enemies,
         Row::TeamMode,
@@ -841,6 +855,7 @@ impl Row {
         Row::Color,
         Row::Credits,
         Row::UnitCount,
+        Row::StartingArmy,
     ];
 
     /// The rows of the menu's second column: the lobby options of Red Alert 2, then this game's
@@ -889,6 +904,7 @@ impl Row {
             Row::Color => "Team color",
             Row::Credits => "Credits",
             Row::UnitCount => "Unit count",
+            Row::StartingArmy => "Starting army",
             Row::McvStart => "MCV start",
             Row::ShortGame => "Short game",
             Row::Superweapons => "Superweapons",
@@ -930,6 +946,8 @@ pub struct MenuSelection {
     /// The lobby's unit count; `None` for the default of the rules file
     /// (`sim::MatchOptions::unit_count`).
     pub unit_count: Option<u32>,
+    /// Index into [`ARMY_SIZES`].
+    pub army: usize,
     pub mcv_start: bool,
     pub short_game: bool,
     pub superweapons: bool,
@@ -968,6 +986,7 @@ impl Default for MenuSelection {
             difficulties: [0; sim::MAX_MATCH_PLAYERS],
             credits: lobby.starting_credits,
             unit_count: lobby.unit_count,
+            army: 0,
             mcv_start: lobby.mcv_start,
             short_game: lobby.short_game,
             superweapons: lobby.superweapons,
@@ -1106,6 +1125,7 @@ impl MenuSelection {
     pub fn initial(catalogue: &Catalogue) -> Self {
         let selection = Self {
             difficulties: [catalogue.ai.difficulties.len() / 2; sim::MAX_MATCH_PLAYERS],
+            army: DEFAULT_ARMY,
             ..Self::default()
         };
         if catalogue.skirmish.countries().is_empty() {
@@ -1198,6 +1218,7 @@ impl MenuSelection {
                     .map_or(usize::MAX, |above| above as usize),
                 lobby.unit_counts(),
             ),
+            Row::StartingArmy => (self.army, ARMY_SIZES.len()),
             Row::McvStart => switch(self.mcv_start),
             Row::ShortGame => switch(self.short_game),
             Row::Superweapons => switch(self.superweapons),
@@ -1253,6 +1274,7 @@ impl MenuSelection {
                         .saturating_add(u32::try_from(index).unwrap_or(0)),
                 );
             }
+            Row::StartingArmy => self.army = index,
             Row::McvStart => self.mcv_start = index != 0,
             Row::ShortGame => self.short_game = index != 0,
             Row::Superweapons => self.superweapons = index != 0,
@@ -1352,6 +1374,7 @@ impl MenuSelection {
                 .collect(),
             starting_credits: self.credits,
             unit_count: self.unit_count,
+            army_scale: ARMY_SIZES.get(self.army).map_or(1, |&(_, scale)| scale),
             mcv_start: self.mcv_start,
             short_game: self.short_game,
             superweapons: self.superweapons,
@@ -1497,6 +1520,9 @@ pub fn row_text(row: Row, selection: MenuSelection, catalogue: &Catalogue) -> St
             .unit_count
             .unwrap_or(counts.lobby.unit_count)
             .to_string(),
+        Row::StartingArmy => ARMY_SIZES
+            .get(selection.army)
+            .map_or_else(|| "-".to_owned(), |&(label, _)| label.to_owned()),
         Row::McvStart => switch(selection.mcv_start),
         Row::ShortGame => switch(selection.short_game),
         Row::Superweapons => switch(selection.superweapons),
@@ -2735,7 +2761,9 @@ pub(crate) mod tests {
             } else {
                 // The terrain atlases battlefield.rs loads, and the particle textures.
                 (0..crate::battlefield::ATLASES)
+                    .chain(crate::battlefield::DECORATION_ATLASES)
                     .any(|i| file == Path::new(&format!("hd/terrain/{i}.png")))
+                    || crate::ambient::sprite_files().iter().any(|p| file == p)
                     || ["hd/glow.png", "hd/smoke.png", "hd/ring.png", "hd/crate.png"]
                         .iter()
                         .any(|p| file == Path::new(p))
@@ -3537,13 +3565,14 @@ pub(crate) mod tests {
         let selection = MenuSelection::initial(&catalogue);
         assert!(selection.valid(counts));
         // What the simulation is set up from: its own default options, with the one computer
-        // player's country to be drawn.
+        // player's country to be drawn, and this game's larger starting army (R227).
         assert_eq!(
             selection.options(),
             sim::MatchOptions {
                 random_countries: vec![PlayerId(1)],
                 // (The default's 0 means 100 too: nobody's units are faster.)
                 unit_speed_percent: 100,
+                army_scale: ARMY_SIZES[DEFAULT_ARMY].1,
                 ..sim::MatchOptions::default()
             }
         );
@@ -3621,7 +3650,7 @@ pub(crate) mod tests {
             starting_totals(
                 &catalogue,
                 played.factions(),
-                dialog.unit_count as u32,
+                sim::army_unit_count(dialog.unit_count as u32, selection.options().army_scale),
                 true
             )
         );
@@ -3774,7 +3803,12 @@ pub(crate) mod tests {
             let (_, start, played) = set_up(&catalogue, choice, 0);
             assert_eq!(
                 (start.units, start.buildings),
-                starting_totals(&catalogue, played.factions(), count, true),
+                starting_totals(
+                    &catalogue,
+                    played.factions(),
+                    sim::army_unit_count(count, choice.options().army_scale),
+                    true
+                ),
                 "unit count {count}"
             );
             assert_eq!(
@@ -4185,7 +4219,7 @@ pub(crate) mod tests {
                 starting_totals(
                     &catalogue,
                     played.factions(),
-                    dialog.unit_count as u32,
+                    sim::army_unit_count(dialog.unit_count as u32, selection.options().army_scale),
                     true
                 )
             );
@@ -4368,9 +4402,9 @@ pub(crate) mod tests {
         let size = menu_size();
         assert!(size.x <= MENU_FIT.x && size.y <= MENU_FIT.y, "{size}");
         assert!(size.x > 1000.0 && size.y > 400.0, "{size}");
-        assert_eq!(Row::MATCH.len() + Row::RULES.len(), 19);
+        assert_eq!(Row::MATCH.len() + Row::RULES.len(), 20);
         let rows: BTreeSet<Row> = Row::MATCH.into_iter().chain(Row::RULES).collect();
-        assert_eq!(rows.len(), 19, "every row once");
+        assert_eq!(rows.len(), 20, "every row once");
         // Every text a row can show fits its place. The interface font is FiraMono, in which
         // every character is 0.6 of the font size wide.
         let width = |text: &str, font: f32| text.chars().count() as f32 * 0.6 * font;

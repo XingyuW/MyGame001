@@ -6,6 +6,7 @@
 
 #![forbid(unsafe_code)]
 
+mod ambient;
 mod announcer;
 mod arrival;
 mod audio;
@@ -30,6 +31,7 @@ mod presentation;
 mod privacy_native;
 mod projection;
 mod ra7_controls;
+mod relief;
 mod selection;
 mod sidebar;
 mod sim_host;
@@ -99,6 +101,7 @@ fn main() -> AppExit {
         ra7_controls::Ra7ControlsPlugin,
         weapon_fx::WeaponFxPlugin,
         arrival::ArrivalPlugin,
+        ambient::AmbientPlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never
     // reads or changes the player's settings (docs/DECISIONS.md D52).

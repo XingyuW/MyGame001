@@ -130,7 +130,7 @@ const WAY: (bool, bool, i32) = (true, false, 0);
 const BLOCKED: (bool, bool, i32) = (false, false, 0);
 
 /// The tileset, indexed by tile id.
-pub const TILES: [TileKind; 57] = [
+pub const TILES: [TileKind; 58] = [
     kind("grass", [74, 132, 58], OPEN, G::Grass, F::None),
     kind("ore", [196, 158, 44], ORE_FIELD, G::Grass, F::Ore),
     kind("water", [38, 86, 160], BLOCKED, G::Water, F::None),
@@ -230,6 +230,9 @@ pub const TILES: [TileKind; 57] = [
         G::Water,
         F::BridgeHut,
     ),
+    // A parked civilian vehicle: a house prop on pavement whose decoration (`looks::decor::
+    // VEHICLE`) makes it a vehicle to the simulation and the renderer.
+    kind("parked car", [140, 60, 56], BLOCKED, G::Pavement, F::House),
 ];
 
 pub const GRASS: u32 = 0;
@@ -283,6 +286,7 @@ pub const DESERT_GEMS: u32 = 47;
 pub const SNOW_GEMS: u32 = 48;
 pub const ASH_GEMS: u32 = 49;
 pub const MARSH_GEMS: u32 = 50;
+pub const PARKED_CAR: u32 = 57;
 
 /// How a map's terrain is made: a rule per cell (the M7 maps), or a painted recipe
 /// (`world_maps::RECIPES`, looked up by the map's id).
@@ -509,9 +513,15 @@ fn neutral_sites(spec: &MapSpec, tiles: &mut [u32]) {
         neighbors.iter().all(|p| seen.contains(p))
     };
     let mut placed: Vec<(i32, i32)> = Vec::new();
-    for n in 0..4 {
-        let tx = w * (2 + n % 2) / 5;
-        let ty = h * (1 + n / 2) / 5;
+    // Two of each kind on the large maps (docs/DECISIONS.md, "Maps with relief"): more neutral
+    // buildings to capture or destroy across the open country.
+    let sites = if spec.width >= 192 { 8 } else { 4 };
+    for n in 0..sites {
+        let (tx, ty) = if n < 4 {
+            (w * (2 + n % 2) / 5, h * (1 + n / 2) / 5)
+        } else {
+            (w * (1 + 3 * (n % 2)) / 5, h * (1 + 2 * ((n - 4) / 2)) / 10)
+        };
         let choice = (2..h - 2)
             .flat_map(|y| (2..w - 2).map(move |x| (x, y)))
             .filter(|&(x, y)| {
@@ -536,12 +546,14 @@ fn neutral_sites(spec: &MapSpec, tiles: &mut [u32]) {
             })
             .min_by_key(|&(x, y)| ((x - tx).pow(2) + (y - ty).pow(2), y, x));
         let Some((x, y)) = choice else {
-            panic!("{} has no neutral site {}", spec.id, n)
+            // The second of each kind is where the map has room for it.
+            assert!(n >= 4, "{} has no neutral site {}", spec.id, n);
+            continue;
         };
         let i = index(x, y);
         let j = mirror(i);
-        tiles[i] = 51 + n as u32;
-        tiles[j] = 51 + n as u32;
+        tiles[i] = 51 + n as u32 % 4;
+        tiles[j] = 51 + n as u32 % 4;
         placed.extend([(x, y), (w - 1 - x, h - 1 - y)]);
     }
     // A repair hut at each end of each connected deck run, off the traffic lane.
@@ -654,28 +666,54 @@ fn neutral_sites(spec: &MapSpec, tiles: &mut [u32]) {
     }
 }
 
-/// A painted map's tiles (row-major; empty for rule maps), painted once and only when asked
+/// A painted map: its tiles (row-major) and relief.
+struct Painted {
+    tiles: Vec<u32>,
+    relief: world_maps::relief::Relief,
+}
+
+/// A painted map's tiles and relief (`None` for rule maps), painted once and only when asked
 /// for, so that `gen_maps preview <dir> <id>` or `check <id>` paints that map alone.
-fn painted(index: usize) -> &'static [u32] {
-    static PAINTED: [std::sync::OnceLock<Vec<u32>>; MAPS.len()] =
+fn painted(index: usize) -> Option<&'static Painted> {
+    static PAINTED: [std::sync::OnceLock<Option<Painted>>; MAPS.len()] =
         [const { std::sync::OnceLock::new() }; MAPS.len()];
-    PAINTED[index].get_or_init(|| {
-        let spec = &MAPS[index];
-        match spec.terrain {
-            Terrain::Rule(_) => Vec::new(),
-            Terrain::Painted => {
-                let (_, biome, recipe) = world_maps::RECIPES
-                    .iter()
-                    .find(|(id, _, _)| *id == spec.id)
-                    .unwrap_or_else(|| panic!("no recipe for {}", spec.id));
-                let mut painter =
-                    world_maps::Painter::new(spec.width, spec.height, &spec.starts(), *biome);
-                recipe(&mut painter);
-                neutral_sites(spec, &mut painter.tiles);
-                painter.tiles
+    PAINTED[index]
+        .get_or_init(|| {
+            let spec = &MAPS[index];
+            match spec.terrain {
+                Terrain::Rule(_) => None,
+                Terrain::Painted => {
+                    let (_, biome, recipe) = world_maps::RECIPES
+                        .iter()
+                        .find(|(id, _, _)| *id == spec.id)
+                        .unwrap_or_else(|| panic!("no recipe for {}", spec.id));
+                    let mut painter =
+                        world_maps::Painter::new(spec.width, spec.height, &spec.starts(), *biome);
+                    recipe(&mut painter);
+                    // Relief (docs/DECISIONS.md, "Maps with relief"): more scenery, then heights
+                    // and decorations on the finished terrain.
+                    painter.enrich(0x5ce7 ^ index as u32);
+                    neutral_sites(spec, &mut painter.tiles);
+                    let starts: Vec<(i32, i32)> = spec
+                        .starts()
+                        .iter()
+                        .map(|&(x, y)| (x as i32, y as i32))
+                        .collect();
+                    let relief = world_maps::relief::relief(
+                        spec.id,
+                        spec.width as i32,
+                        spec.height as i32,
+                        &painter.tiles,
+                        &starts,
+                    );
+                    Some(Painted {
+                        tiles: painter.tiles,
+                        relief,
+                    })
+                }
             }
-        }
-    })
+        })
+        .as_ref()
 }
 
 impl MapSpec {
@@ -699,6 +737,13 @@ impl MapSpec {
             .collect()
     }
 
+    /// The heights and decorations of a painted map, row-major; `None` for a rule map, which is
+    /// flat and bare.
+    pub fn relief(&self) -> Option<(&'static [u8], &'static [u8])> {
+        let index = MAPS.iter().position(|spec| spec.id == self.id)?;
+        painted(index).map(|p| (p.relief.elevation.as_slice(), p.relief.decor.as_slice()))
+    }
+
     /// The tile id of cell (x, y).
     pub fn tile_at(&self, x: u32, y: u32) -> u32 {
         let rule = match self.terrain {
@@ -708,7 +753,7 @@ impl MapSpec {
                     .iter()
                     .position(|spec| spec.id == self.id)
                     .expect("a shipped map");
-                return painted(index)[(y * self.width + x) as usize];
+                return painted(index).expect("a painted map").tiles[(y * self.width + x) as usize];
             }
         };
         // Point symmetry: the second half of the cells takes the terrain of its mirror cell, so
@@ -1005,6 +1050,18 @@ pub fn map_tmx(spec: &MapSpec) -> String {
         r#"<map version="1.10" tiledversion="1.11.2" orientation="isometric" renderorder="right-down" width="{width}" height="{height}" tilewidth="{TILE_WIDTH}" tileheight="{TILE_HEIGHT}" infinite="0" nextlayerid="2" nextobjectid="1">"#
     );
     let _ = writeln!(tmx, " <properties>");
+    if let Some((elevation, decor)) = spec.relief() {
+        let digits: String = elevation
+            .iter()
+            .map(|&h| char::from_digit(u32::from(h), 16).unwrap_or('0'))
+            .collect();
+        let decor: String = decor
+            .iter()
+            .map(|&d| if d == 0 { '.' } else { char::from(d) })
+            .collect();
+        let _ = writeln!(tmx, r#"  <property name="decor" value="{decor}"/>"#);
+        let _ = writeln!(tmx, r#"  <property name="elevation" value="{digits}"/>"#);
+    }
     let _ = writeln!(
         tmx,
         r#"  <property name="schema_version" type="int" value="2"/>"#
@@ -1113,6 +1170,51 @@ fn main() -> std::io::Result<()> {
                 }
                 let path = dir.join(format!("{}.png", spec.id));
                 std::fs::write(&path, preview_png(spec, 3))?;
+                println!("wrote {}", path.display());
+            }
+            return Ok(());
+        }
+        Some("relief") => {
+            // Pictures of the heights (shaded, water blue) and decorations (dots) of the maps.
+            let dir = PathBuf::from(arguments.get(1).map_or(".", String::as_str));
+            std::fs::create_dir_all(&dir)?;
+            for spec in &MAPS {
+                if arguments.len() > 2 && !arguments[2..].iter().any(|id| id == spec.id) {
+                    continue;
+                }
+                let Some((elevation, decor)) = spec.relief() else {
+                    continue;
+                };
+                let (w, h) = (spec.width, spec.height);
+                let scale = 3;
+                let mut pixels = Vec::new();
+                for py in 0..h * scale {
+                    for px in 0..w * scale {
+                        let (x, y) = (px / scale, py / scale);
+                        let i = (y * w + x) as usize;
+                        let e = i32::from(elevation[i]);
+                        // Light from the upper left: a cell above its lower-right neighbour is lit.
+                        let next = if x + 1 < w && y + 1 < h {
+                            i32::from(elevation[((y + 1) * w + x + 1) as usize])
+                        } else {
+                            e
+                        };
+                        let shade = 60 + e * 12 + (e - next) * 18;
+                        let mut c = TILES[spec.tile_at(x, y) as usize].colour.map(|v| {
+                            (i32::from(v) * shade.clamp(20, 255) / 160).clamp(0, 255) as u8
+                        });
+                        if decor[i] != 0 && px % scale == 1 && py % scale == 1 {
+                            c = [255, 40, 200];
+                        }
+                        pixels.extend_from_slice(&c);
+                        pixels.push(255);
+                    }
+                }
+                let path = dir.join(format!("{}-relief.png", spec.id));
+                std::fs::write(
+                    &path,
+                    spike_tileset::encode_png(w * scale, h * scale, &pixels),
+                )?;
                 println!("wrote {}", path.display());
             }
             return Ok(());

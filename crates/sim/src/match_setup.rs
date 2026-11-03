@@ -541,6 +541,10 @@ pub struct MatchOptions {
     /// ([`starting_units`]); `None` for the default of the rules file. It must lie in the
     /// range of the rules file.
     pub unit_count: Option<u32>,
+    /// How many times the starting army of the unit count every player gets: the budget of
+    /// [`starting_units`] is multiplied by it (at least 1; the game's "Starting army" row,
+    /// docs/DECISIONS.md "Maps with relief"). 1 is the reference's starting army.
+    pub army_scale: u32,
     /// A country's player starts with the base unit of its side; off: with the Construction
     /// Yard it deploys into, standing at the start position.
     pub mcv_start: bool,
@@ -566,6 +570,7 @@ impl Default for MatchOptions {
             random_countries: Vec::new(),
             starting_credits: None,
             unit_count: None,
+            army_scale: 1,
             mcv_start: true,
             short_game: rules.short_game,
             superweapons: rules.superweapons,
@@ -576,6 +581,16 @@ impl Default for MatchOptions {
             fog_of_war: rules.fog_of_war,
         }
     }
+}
+
+/// The unit count whose starting army is `army_scale` (at least 1) times that of the lobby's
+/// unit count `unit_count` ([`MatchOptions::army_scale`]): its budget in [`starting_units`] is
+/// that many times as large.
+pub fn army_unit_count(unit_count: u32, army_scale: u32) -> u32 {
+    unit_count
+        .saturating_sub(1)
+        .saturating_mul(army_scale.max(1))
+        .saturating_add(u32::from(unit_count > 0))
 }
 
 /// The starting units of a player of `side` in a match with the lobby's unit count `unit_count`
@@ -1026,7 +1041,7 @@ pub fn setup_match_configured(
             skirmish,
             &definitions,
             side,
-            unit_count,
+            army_unit_count(unit_count, options.army_scale),
             &mut world.resource_mut::<SimRng>(),
         );
         let cells = {

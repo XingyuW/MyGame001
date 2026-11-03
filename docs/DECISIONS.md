@@ -13102,3 +13102,161 @@ with every policy cell byte-equal. `ra9_data_parity` passes 185/185 (debug, 457 
 the change is presentation only (the volume of sounds), and no recorded AI, power, ore, repair
 or completion policy reads anything that changed, so all stand. The 51 pending user checks are
 untouched.
+
+### R227. Maps with relief
+
+The user asked (2026-11-02) to redesign most maps because they are "so boring": more
+skyscrapers, buildings, mountains, oceans, trees, animals, people and units, and heights that
+differ from place to place. Asked how far that should go, the user chose height that is drawn
+and has a light effect on play, ambient life plus neutral targets plus larger starting armies,
+and all 38 large maps (the three small maps that the tests are built on stay flat and bare).
+
+* **Map format.** Two optional map properties (`sim::map`): `elevation`, one hexadecimal digit
+  per cell (0 to `MAX_ELEVATION` = 15 steps), and `decor`, one printable ASCII character per
+  cell (`.` for none). A map without them is flat and bare and hashes as before; `Grid` keeps
+  both (`elevation`, `decor`, `set_relief`), and `enlarged_map` shows them like the terrain and
+  levels every made start position at its yard's height.
+* **Play.** Heights are drawn and change no rule of play: movement, paths, weapons and sight
+  are unchanged, and the generator keeps every walkable slope to one step per cell, so heights
+  never change where units can go. A first version gave high ground one cell of sight per
+  3 steps. With it, the required M6 sweep (`m6_production_matches`) ended three of its 756
+  matches without a winner at their limits (steel_harbor Russia/Libya medium, arctic_floes
+  Iraq/Cuba brutal, oil_fields Cuba/Russia brutal): each stalled with one side down to towers
+  and no factory and the other holding its army back. Replayed with that bonus removed and
+  everything else the same, all three were won (ticks 85,545, 67,037 and 137,433). The user
+  chose to ship without it; a sight bonus can come back with AI that finishes such bases.
+* **Parked vehicles.** A house prop whose decoration is `v` (`VEHICLE_DECOR`) is a
+  `PropKind::Vehicle` ("Civilian vehicle", 150 hit points, not garrisonable). The new tile
+  `parked car` (blocked, pavement, house feature) carries it on plazas beside streets and on
+  driveways beside country houses.
+* **Starting army.** `MatchOptions::army_scale` multiplies the starting-unit budget of the unit
+  count; the lobby's new "Starting army" row offers STANDARD, LARGE and HUGE (1x, 2x, 3x) and
+  starts at LARGE. `MenuSelection::default` (the reference lobby) keeps 1x.
+* **Generator.** `art/relief.rs`: `Painter::enrich` grows downtown towers, scatters copses,
+  crags and hamlets where the country is open all around, and parks vehicles; then `relief`
+  gives heights (sea level, shores rising a step a cell, rolling hills by map theme, level
+  towns, mountains rising from the foot of rock, flat-topped mesas, level pads under every base,
+  then a lower envelope that keeps walkable land within one step per cell) and decorations
+  (`looks::decor`: skyscrapers in downtowns, landmarks and masts among city blocks, crags on
+  high rock, props on plazas, beaches, fields, snow and desert, boats near shores, windmills,
+  tents, igloos, lighthouses in place of some houses). The large maps get eight neutral
+  buildings to capture (two of each kind) instead of four where they have room.
+  `gen_maps relief <dir> [id ...]` draws a shaded height picture of each map.
+* **Renderer.** `crates/game/src/relief.rs`: a cell rises `STEP_PX` = 8 px per step; ground is
+  interpolated across walkable slopes and not across cliffs; picking finds the raised cell in
+  front. Terrain is drawn in height bands (`battlefield::terrain_depth`), with cliff faces made
+  in code (`battlefield::faces`, strips of rock, earth, sand, snowy rock, concrete, ash and
+  sandstone, with the lip of the ground on top); trees, houses, rock tops and decorations sort
+  with the units. Units, buildings, the placement preview, weapon effects, markers and crates
+  stand on the raised ground. Decorations come from the atlases `terrain/26.png` to `35.png`
+  and ambient life (`crates/game/src/ambient.rs`) from `sprites/hd/ambient`; each is drawn only
+  where its art is installed. Ambient figures are presentation only, wander their habitat,
+  avoid what stands in the match, and are shown only on cells the player sees now.
+
+Not yet checked by the user in a live match.
+
+### R228. Rebind the RA9 source scope to the maps with relief
+
+R227 changed the sim's `map.rs`, `map_scale.rs`, `match_setup.rs`, `props.rs` and `lib.rs`, the
+game's renderer, all 41 map files and their tilesets, and added the relief art and ambient
+sprites; the user asked (2026-11-02) for the RA9 audit before merging. The model surface did
+not change (no command, domain, role, effect, crate, world object or `setup_match*` entrypoint
+was added; the new `army_unit_count` is a helper of the existing setup), and no `code_guard`
+file changed, so this is a factual round as R226: the R226 `prepare`, `verify`, `propagate` and
+`readback` were copied to `docs/validation/ra2-parity/rebind-r228/controller-sources/`, with
+the directory and the `ROOT_REBIND_R228_` prefix changed. The reference cache was present and
+no Finder `.DS_Store` file was under `assets/` or `crates/`.
+
+Phase `D-relief-maps-01`, on `203ed84` (R227 with the sight bonus removed): producer exit 0;
+38 added and 50 newly changed files since the R195 base, all from R227; only
+`model_census_sha256` moved (`7e8ab0ad...` to `56d41420...`); surface `97cbecb2...`, closure,
+special and original hashes unchanged; no unaccounted candidate. Packet SHA-256
+`ded8bd8ae68d8ec9b506ce56ca83ace4f965f82d6eb0f4d6d995a16026c8de39` (770 source files, 109 core,
+64 authority spans); verification `ROOT_REBIND_R228_D_RELIEF_MAPS_01_FACTUAL_2026_11_03_032432`;
+propagation 3,383 cell deltas in 13 of 15 outputs, 30 legacy families' branch FNV moved, 72
+completion rows proved; readback passed with every policy cell byte-equal.
+`ra9_data_parity` passes 185/185 (release, 717 s).
+
+**Policy reconsideration.** Two legacy branch files changed, `crates/sim/src/map.rs` (28
+families) and `match_setup.rs` (2), and one pinned completion file, the game's `units.rs`.
+* `map.rs` only adds the `elevation` and `decor` properties, their storage and their hash.
+  The `Cell` flags are unchanged and no rule reads either property, so the terrain speed,
+  buildability and domain families (F014, F016, F017, F084-F091), the path and ore families
+  (F028, F045, F060, F061, F068, F069, F075, F094, F141, F208, F274, F275), F012 and F111 read
+  nothing that changed. F183 (no cliff-back impassability) and F205 (no slope speed) say the
+  grid has no altitude that plays: the grid now stores a height, but only the renderer reads
+  it (R227 removed the sight bonus), and cliffs are the ordinary impassable rock cells they
+  were. Both stand as worded about play.
+* `match_setup.rs` only adds `army_scale`, which multiplies the starting units (default 1x, as
+  before) and no money, so F180 (no campaign money deltas) and F059 (teams) stand.
+* `units.rs` is presentation: units are drawn on raised ground.
+
+Every recorded AI, power, ore, repair and completion policy stands. The 51 pending user checks
+are untouched.
+
+### R229. A continued sweep searches stale ore fields first
+
+After R227 shipped without the sight bonus, the M6 sweep (`m6_production_matches`) still ended
+one match without a winner: nile_valley, Russia brutal against Libya brutal, at its limit of
+288,000 ticks. The user chose (2026-11-03) to fix the AI endgame rather than accept it. A
+replay showed Libya's production gone by tick 204,000 and its last Kirov destroying Russia's
+main base; Russia kept a refinery and a tech outpost at (185, 72) beside an ore field and two
+V3 launchers firing at Libya's base, whose flak shot down every rocket. Russia could not win
+and Libya did not know where Russia's last buildings were, so the Kirov swept. Its continued
+sweep ranked waypoints by five-minute era of last sight and then by distance: it crossed the
+map to whichever patch was seen an era earlier, and with only distance it combed the empty
+corners of the 256-by-256 map (from (2, 7) to (19, 154) over 60,000 ticks) and never came near
+(185, 72).
+
+* **Rule.** In a continued sweep (after an observed scouting leg, R14), every waypoint not seen
+  within the last `SWEEP_ERA_TICKS` counts as equally stale, and among them the waypoints whose
+  block held ore when the match began (`Waypoint::ore`) come before open ground; then the
+  nearest. Refineries stand beside ore, so a beaten player's last buildings are most likely
+  there. The ore flag is read from the map's terrain at match start, as the waypoint layout
+  already reads passability; the AI still sees only what its units see. The first leg of a
+  sweep is unchanged: by era, then near the enemy starts, then by distance.
+* **Effect.** The same nile_valley match is won at tick 250,569 (Libya's Kirov reaches the ore
+  field and the refinery). `ai::tests` covers the continued order: the nearest stale waypoint
+  before one seen an era earlier, ground seen within the last era last, a stale ore field
+  before nearer open ground.
+* The V3 launchers' futile attack (an `Attack` order whose launched rockets never land keeps the
+  units busy and the attack job never fails) is noted but not changed: it did not keep the
+  match from ending.
+* **Test.** With the new sweeps every match of the M6 sweep was won, but tundra_steppe, Korea
+  medium against France medium, stopped on a rejected `SellBuilding` at tick 74,241 ("Target
+  is being erased"). The computer player decides in the `Ai` stage and its commands are applied
+  in the next tick's `Commands` stage; it never sells a building it sees being erased
+  (`erased_buildings`), and a replay showed this one was not being erased when the sale was
+  decided: a Chrono Legionnaire began erasing it later in that tick. `m6_production_matches`
+  now explains that rejection as it explains a unit lost in the tick before (D43): a sale of a
+  building that was not being erased when the computer players last decided.
+
+### R230. Rebind the RA9 source scope to the ore-first sweep
+
+R229 changed the sim's `ai.rs` (the continued sweep, `Waypoint::ore` and its hash) and the
+game's `m6_production_matches` test. The model surface did not change (no command, domain,
+role, effect, crate, world object or `setup_match*` entrypoint was added) and no `code_guard`
+file changed, so this is a factual round as R228: the R228 `prepare`, `verify`, `propagate`
+and `readback` were copied to `docs/validation/ra2-parity/rebind-r230/controller-sources/`,
+with the directory and the `ROOT_REBIND_R230_` prefix changed. A Finder `assets/.DS_Store`
+was present and untracked; the producer read 770 source files, as in R228, so it is outside
+the scope.
+
+Phase `D-sweep-ore-01`, on `ff336c1` (R229): producer exit 0; only `model_census_sha256` moved
+(`56d41420...` to `ee943a12...`); surface `97cbecb2...`, closure, special and original hashes
+unchanged; no unaccounted candidate. Packet SHA-256
+`a07ced23be51fbb1351700236a196c66ec89589712b8f66012f93a036ff88802` (770 source files, 109 core,
+64 authority spans); verification `ROOT_REBIND_R230_D_SWEEP_ORE_01_FACTUAL_2026_11_03_212554`;
+propagation 3,311 cell deltas in 13 of 15 outputs, 71 legacy families' branch FNV moved (all
+from `ai.rs`), 72 completion rows proved; readback passed with every policy cell byte-equal.
+`ra9_data_parity` passes 185/185 (release, 448 s), and the whole sim suite passes.
+
+**Policy reconsideration.** The 71 families (F007, F010, F015, F018-F047, F049-F071, F153,
+F155, F171, F172, F210-F220) are the original AI keys that this AI replaces
+(`INTENTIONAL_DIFFERENCE`); their branch pointer moved because `ai.rs` changed. None of their
+reasons names the sweep. F010 (observed targets by weapon reach, roles and deterministic
+distance/id ties) is about observed targets, which R229 did not change; the sweep chooses
+where to look, from what the player has seen, and stays honest. F172 (waves from first_wave,
+wave_patience, think_interval and TeamDelays) and F045 (recovery from known reachable ore)
+read nothing R229 changed. Every recorded AI, power, ore, repair and completion policy stands.
+The 51 pending user checks are untouched.

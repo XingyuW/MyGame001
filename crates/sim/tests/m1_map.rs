@@ -857,3 +857,82 @@ fn hash_covers_every_cell_attribute() {
         }
     }
 }
+
+/// The valid fixture with the relief properties (docs/DECISIONS.md R227): one hexadecimal height
+/// and one decoration character per cell, both optional.
+fn with_relief(name: &str, elevation: &str, decor: &str) -> PathBuf {
+    let extra = format!(
+        r#"{SCHEMA_PROPERTY}
+  <property name="elevation" value="{elevation}"/>
+  <property name="decor" value="{decor}"/>"#
+    );
+    variant(name, &[(SCHEMA_PROPERTY, &extra)])
+}
+
+#[test]
+fn relief_is_read_per_cell_and_a_map_without_it_is_flat() {
+    let flat = load_ok(&fixture("valid_4x3.tmx"));
+    assert!(flat.grid.elevations().is_empty() && flat.grid.decors().is_empty());
+
+    let map = load_ok(&with_relief("relief_ok", "01234567cdef", "....a.b.c..T"));
+    assert_eq!(map.grid.elevation(CellPos::new(0, 0)), 0);
+    assert_eq!(map.grid.elevation(CellPos::new(3, 0)), 3);
+    assert_eq!(map.grid.elevation(CellPos::new(3, 2)), 15);
+    assert_eq!(map.grid.elevation(CellPos::new(9, 9)), 0, "outside the map");
+    assert_eq!(map.grid.decor(CellPos::new(0, 1)), b'a');
+    assert_eq!(
+        map.grid.decor(CellPos::new(1, 1)),
+        0,
+        "'.' is no decoration"
+    );
+    assert_eq!(map.grid.decor(CellPos::new(3, 2)), b'T');
+    // Elevation is part of the hash; decoration, presentation only, is not.
+    let flat_trace = hash_trace(&mut sim_app_with_map(4, &flat), 5);
+    let trace = hash_trace(&mut sim_app_with_map(4, &map), 5);
+    assert!(flat_trace.iter().zip(&trace).all(|(a, b)| a != b));
+    let decor_only = load_ok(&with_relief(
+        "relief_decor_only",
+        "000000000000",
+        "....a.b.c..T",
+    ));
+    assert_eq!(
+        hash_trace(&mut sim_app_with_map(4, &decor_only), 5),
+        flat_trace
+    );
+}
+
+#[test]
+fn malformed_relief_is_rejected_with_the_property_and_character() {
+    assert_rejected(
+        &with_relief("relief_short", "0123", "................"),
+        "map property \"elevation\"",
+        MapErrorKind::InvalidValue {
+            found: "4 characters".into(),
+            expected: "one character per cell (12)".into(),
+        },
+    );
+    assert_rejected(
+        &with_relief("relief_digit", "0000g0000000", "............"),
+        "map property \"elevation\" character 4",
+        MapErrorKind::InvalidValue {
+            found: "g".into(),
+            expected: "a hexadecimal digit 0-9 or a-f".into(),
+        },
+    );
+    assert_rejected(
+        &with_relief("relief_upper", "00000000000A", "............"),
+        "map property \"elevation\" character 11",
+        MapErrorKind::InvalidValue {
+            found: "A".into(),
+            expected: "a hexadecimal digit 0-9 or a-f".into(),
+        },
+    );
+    assert_rejected(
+        &with_relief("relief_decor", "000000000000", "..... ......"),
+        "map property \"decor\" character 5",
+        MapErrorKind::InvalidValue {
+            found: " ".into(),
+            expected: "a printable ASCII character".into(),
+        },
+    );
+}

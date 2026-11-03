@@ -32,7 +32,7 @@ use bevy_ecs_tiled::prelude::*;
 use sim::{CellPos, Grid};
 
 use crate::checked_assets::CheckedAssets;
-use crate::projection::{TileSize, cell_centre, cell_corners, map_origin_offset, pick_cell};
+use crate::projection::{TileSize, map_origin_offset};
 use crate::tileset_image::check_tileset_image;
 
 /// The demo map, relative to the asset directory (the tests' map; the game's maps are those of
@@ -308,6 +308,7 @@ pub(crate) fn update_hovered_cell(
     window: Single<&Window, With<PrimaryWindow>>,
     camera: Single<(&Camera, &GlobalTransform)>,
     mut hovered: ResMut<HoveredCell>,
+    terrain: Option<Res<MapTerrain>>,
 ) {
     let (camera, camera_transform) = *camera;
     hovered.0 = view.and_then(|view| {
@@ -316,19 +317,36 @@ pub(crate) fn update_hovered_cell(
             .cursor_position()
             .filter(|&cursor| !crate::sidebar::over_sidebar(cursor, window.width()))?;
         let world = camera.viewport_to_world_2d(camera_transform, cursor).ok()?;
-        pick_cell(world, view.tile, view.width, view.height)
+        // On raised ground: the cell drawn under the cursor.
+        crate::relief::pick(
+            terrain.as_deref(),
+            world,
+            view.tile,
+            view.width,
+            view.height,
+        )
     });
 }
 
-fn draw_hovered_cell(hovered: Res<HoveredCell>, view: Option<Res<MapView>>, mut gizmos: Gizmos) {
+fn draw_hovered_cell(
+    hovered: Res<HoveredCell>,
+    view: Option<Res<MapView>>,
+    terrain: Option<Res<MapTerrain>>,
+    mut gizmos: Gizmos,
+) {
     let (Some(cell), Some(view)) = (hovered.0, view) else {
         return;
     };
     // The outline comes from the cell's corners and the dot from its centre; both must sit on
     // the tile under the cursor (user verification of picking).
-    let [top, right, bottom, left] = cell_corners(cell, view.tile);
+    let [top, right, bottom, left] =
+        crate::relief::cell_corners(terrain.as_deref(), cell, view.tile);
     gizmos.linestrip_2d([top, right, bottom, left, top], Color::WHITE);
-    gizmos.circle_2d(cell_centre(cell, view.tile), 2.0, Color::WHITE);
+    gizmos.circle_2d(
+        crate::relief::cell_point(terrain.as_deref(), cell, view.tile),
+        2.0,
+        Color::WHITE,
+    );
 }
 
 /// Logs the cell under a left click, so that picking can be checked by hand.

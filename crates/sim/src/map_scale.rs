@@ -722,6 +722,9 @@ pub fn enlarged_map(
     };
     let mut cells = Vec::with_capacity(columns.len() * rows.len());
     let mut shown = Vec::with_capacity(columns.len() * rows.len());
+    // Relief is shown like the terrain, from the cell of the file each cell shows.
+    let mut heights = Vec::with_capacity(columns.len() * rows.len());
+    let mut decor = Vec::with_capacity(columns.len() * rows.len());
     // The cells shown from a cell of gems (RA5).
     let mut gems = Vec::new();
     for &row in &rows {
@@ -734,6 +737,8 @@ pub fn enlarged_map(
                 gems.push(cells.len());
             }
             cells.push(grid.cell(from).copied().unwrap_or(blocked));
+            heights.push(grid.elevation(from));
+            decor.push(grid.decor(from));
             let index = u64::from(row) * u64::from(grid.width()) + u64::from(column);
             shown.push(
                 usize::try_from(index)
@@ -822,8 +827,25 @@ pub fn enlarged_map(
             }
         }
     }
+    // Ground a made start position changed loses its decoration and lies as high as the nearest
+    // yard's centre, so that every base stands on level ground.
+    for (index, (cell, look)) in canvas.cells.iter().zip(&canvas.looks).enumerate() {
+        if before.0[index] == *cell && before.1[index] == *look {
+            continue;
+        }
+        let at = (index as i32 % width, index as i32 / width);
+        decor[index] = 0;
+        if let Some(&(x, y)) = centres
+            .iter()
+            .min_by_key(|&&centre| distance_squared(centre, at))
+            && let Some(&height) = heights.get((y * width + x) as usize)
+        {
+            heights[index] = height;
+        }
+    }
     let mut grid = Grid::from_cells(size.0, size.1, canvas.cells).ok_or(too_large)?;
     grid.mark_world_features(&canvas.looks);
+    grid.set_relief(heights, decor);
 
     for index in gems {
         let index = i32::try_from(index).unwrap_or(i32::MAX);

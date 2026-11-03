@@ -19,6 +19,10 @@ pub struct BattlefieldPlugin;
 #[derive(Resource)]
 pub(crate) struct Materials {
     terrain: Vec<Handle<Image>>,
+    /// The strips of cliff faces ([`faces`]).
+    faces: Handle<Image>,
+    /// The decoration atlases ([`decorations`]), where installed.
+    decor: Vec<Option<Handle<Image>>>,
     pub(crate) glow: Handle<Image>,
     pub(crate) smoke: Handle<Image>,
     pub(crate) ring: Handle<Image>,
@@ -38,6 +42,9 @@ struct Ground {
     /// How far the sprite is drawn past its own diamond. It is shown no more revealed than any
     /// cell it covers, so it never paints over shroud or the void beyond the map edge.
     reach: Reach,
+    /// How many cells up the screen the sprite reaches because its ground is raised; it is
+    /// shown no more revealed than those cells either.
+    rise: u8,
     /// Water: cells to the nearest shore (capped), which darkens open sea.
     depth: u8,
     /// Water: edges that meet a shore (bits as in [`NEIGHBOURS`]), where foam is drawn.
@@ -56,6 +63,8 @@ enum Reach {
     Ring,
     /// Over the neighbours and the cells behind it on screen (city towers).
     Tall,
+    /// Over the neighbours and many cells behind it (skyscrapers).
+    Sky,
 }
 /// Terrain is drawn in three layers (see scripts/generate_hd_terrain.py). Bases and overlays
 /// sample world-periodic textures, so the atlas slot follows the cell lattice.
@@ -94,6 +103,10 @@ const ASH: usize = 23;
 const LAVA: usize = 24;
 const GEMS: usize = 25;
 pub(crate) const ATLASES: usize = 26;
+/// The decoration atlases (`terrain/26.png` to `35.png`), drawn where installed.
+#[cfg(test)]
+pub(crate) const DECORATION_ATLASES: std::ops::Range<usize> =
+    decorations::FIRST_ATLAS..decorations::FIRST_ATLAS + decorations::ATLASES;
 /// Neighbours as (dx, dy, bit): 1 = -y, 2 = +x, 4 = +y, 8 = -x (the road and bridge variants).
 const NEIGHBOURS: [(i32, i32, u8); 4] = [(0, -1, 1), (1, 0, 2), (0, 1, 4), (-1, 0, 8)];
 /// What the rock terrace is multiplied with on volcanic ash: black basalt with a scorched cap.
@@ -122,6 +135,8 @@ struct AtmosphereClock {
 pub(crate) fn privacy_materials(app: &mut App) {
     app.insert_resource(Materials {
         terrain: vec![Handle::default(); ATLASES],
+        faces: Handle::default(),
+        decor: vec![None; decorations::ATLASES],
         glow: Handle::default(),
         smoke: Handle::default(),
         ring: Handle::default(),
@@ -173,6 +188,18 @@ fn load(world: &mut World) {
             terrain: (0..ATLASES)
                 .map(|i| read(&format!("terrain/{i}"), TERRAIN_ATLAS))
                 .collect::<Result<_, _>>()?,
+            faces: Handle::default(),
+            // Decorations are drawn where their atlas is installed.
+            decor: (0..decorations::ATLASES)
+                .map(|i| {
+                    let name = format!("terrain/{}", decorations::FIRST_ATLAS + i);
+                    root.join("sprites/hd")
+                        .join(format!("{name}.png"))
+                        .exists()
+                        .then(|| read(&name, TERRAIN_ATLAS))
+                        .transpose()
+                })
+                .collect::<Result<_, _>>()?,
             glow: read("glow", 128)?,
             smoke: read("smoke", 128)?,
             ring: read("ring", 128)?,
@@ -180,7 +207,8 @@ fn load(world: &mut World) {
         })
     })();
     match result {
-        Ok(materials) => {
+        Ok(mut materials) => {
+            materials.faces = world.resource_mut::<Assets<Image>>().add(faces::atlas());
             world.insert_resource(materials);
         }
         Err(e) => {
@@ -228,6 +256,32 @@ fn water_depths(grid: &sim::Grid) -> Vec<u8> {
     depth.iter_mut().for_each(|d| *d = (*d).min(DEEP_WATER));
     depth
 }
+/// The depth of terrain: lower ground is drawn first, in bands of one elevation step (a raised
+/// cell covers the lower ground behind it, and its cliff faces the lower ground in front), and
+/// within a band by layer, then from the back of the map to the front. Everything stays below
+/// the aircraft shadows and the units, buildings and scenery (`crate::units::unit_depth`).
+pub(crate) fn terrain_depth(cell: CellPos, step: u8, layer: f32) -> f32 {
+    TERRAIN_Z + f32::from(step) * BAND + layer + (cell.x + cell.y) as f32 / 65536.0
+}
+/// The first terrain depth, the depth of a band, and the layers within one.
+const TERRAIN_Z: f32 = 0.05;
+const BAND: f32 = 0.05;
+const BASE_LAYER: f32 = 0.0;
+const OVERLAY_LAYER: f32 = 0.010;
+const SOIL_LAYER: f32 = 0.012;
+const LAVA_LAYER: f32 = 0.014;
+/// Ore, roads and bridge decks: flat on their ground.
+const FLAT_TOP_LAYER: f32 = 0.020;
+const FACE_LAYER: f32 = 0.030;
+/// What a cell shows besides its ground and flat tops: scenery standing on it, sorted with the
+/// units ([`object_depth`]).
+fn object_depth(cell: CellPos) -> f32 {
+    crate::units::unit_depth(Vec2::new(cell.x as f32 + 0.5, cell.y as f32 + 0.5))
+}
+/// How many cells up the screen a sprite raised by `lift` pixels reaches (for its sight).
+fn rise_of(lift: f32) -> u8 {
+    (lift / 32.0).ceil().clamp(0.0, 8.0) as u8
+}
 fn terrain(
     mut commands: Commands,
     map: Option<Res<MapView>>,
@@ -249,6 +303,15 @@ fn terrain(
         Some(resolve(t, look.unwrap_or(0)))
     };
     let depths = water_depths(grid);
+    // The height a cell's ground is drawn at: water lies at sea level whatever its relief.
+    let step_of = |cell: CellPos| -> Option<u8> {
+        let (ground, _) = look_of(cell)?;
+        Some(if ground == Soil::Water {
+            0
+        } else {
+            grid.elevation(cell)
+        })
+    };
     for y in 0..map.height {
         for x in 0..map.width {
             let cell = CellPos::new(x as i32, y as i32);
@@ -266,7 +329,11 @@ fn terrain(
             let foam = if ground == Soil::Water && feature != Feature::Bridge {
                 NEIGHBOURS.iter().fold(0, |bits, &(dx, dy, bit)| {
                     let next = neighbour(dx, dy);
+                    // Raised land in front of the water hides the shore line behind it.
+                    let hidden = (dx + dy > 0)
+                        && step_of(CellPos::new(cell.x + dx, cell.y + dy)).unwrap_or(0) > 0;
                     if next.is_some()
+                        && !hidden
                         && !is_water(next)
                         && next.map(|n| n.1) != Some(Feature::Bridge)
                     {
@@ -278,21 +345,32 @@ fn terrain(
             } else {
                 0
             };
-            let position = crate::projection::cell_centre(cell, map.tile);
-            let depth = (x + y) as f32 / 16384.0;
+            let step = step_of(cell).unwrap_or(0);
+            let ground_lift = f32::from(step) * crate::relief::STEP_PX;
+            // A bridge deck (and a pier hut) stands at its own height over the water.
+            let deck_lift = crate::relief::cell_lift(grid, cell);
+            let centre = crate::projection::cell_centre(cell, map.tile);
             let lattice = |period: u32| (x % period) + period * (y % period);
-            let mut layer = |image: usize, slot: u32, size: Vec2, z: f32, reach: Reach| {
-                // Square slots fill a row of `per_row`; tall ones are twice as high.
-                let tall = size.y > size.x * 1.5;
+            let layer = |commands: &mut Commands,
+                         image: usize,
+                         slot: u32,
+                         size: Vec2,
+                         at: Vec2,
+                         z: f32,
+                         reach: Reach,
+                         rise: u8| {
+                // Square slots fill a row of `per_row`; tall ones are twice as high, sky-high
+                // ones four times.
                 let per_row = match image {
                     GRASS | WATER | PAVEMENT => BASE_PERIOD,
                     SOIL | SAND | SNOW | ICE | CROPS | MARSH | ASH | LAVA => SOIL_PERIOD,
                     _ => 4,
                 };
                 let px = TERRAIN_ATLAS / per_row;
-                let py = if tall { px * 2 } else { px };
+                let py = px * (size.y / size.x).round().max(1.0) as u32;
                 let (left, top) = ((slot % per_row) * px, (slot / per_row) * py);
-                let lift = if tall { (size.y - size.x) / 2.0 } else { 0.0 };
+                // A tall sprite stands on its cell: the cell lies at the bottom of the canvas.
+                let lift = (size.y - size.x) / 2.0;
                 commands.spawn((
                     BattlefieldVisual,
                     Ground {
@@ -303,6 +381,7 @@ fn terrain(
                         bridge: image == BRIDGE,
                         depleted: false,
                         reach,
+                        rise,
                         depth: if image == WATER {
                             depths[(y * map.width + x) as usize]
                         } else {
@@ -346,11 +425,13 @@ fn terrain(
                         color: Color::BLACK,
                         ..default()
                     },
-                    Transform::from_translation((position + Vec2::Y * lift).extend(z)),
+                    Transform::from_translation((at + Vec2::Y * lift).extend(z)),
                 ));
             };
             let cell_size = Vec2::splat(64.4);
             let overlay_size = Vec2::splat(128.8);
+            let rise = rise_of(ground_lift);
+            let raised = centre + Vec2::Y * ground_lift;
             // Base: continuous grass, water or pavement. Bridges span water.
             let base = match ground {
                 Soil::Water => WATER,
@@ -358,11 +439,14 @@ fn terrain(
                 _ => GRASS,
             };
             layer(
+                &mut commands,
                 base,
                 lattice(BASE_PERIOD),
                 cell_size,
-                0.1 + depth,
+                raised,
+                terrain_depth(cell, step, BASE_LAYER),
                 Reach::Cell,
+                rise,
             );
             // Overlays spill past their diamond with a ragged edge: soft transitions, beaches.
             let overlay = match ground {
@@ -379,32 +463,91 @@ fn terrain(
             };
             if let Some(overlay) = overlay {
                 layer(
+                    &mut commands,
                     overlay,
                     lattice(SOIL_PERIOD),
                     overlay_size,
-                    0.3 + depth,
+                    raised,
+                    terrain_depth(cell, step, OVERLAY_LAYER),
                     Reach::Ring,
+                    rise,
                 );
             }
             // Mined ground under ore and gems, whatever the ground around it.
             if matches!(feature, Feature::Ore | Feature::Gems) {
                 layer(
+                    &mut commands,
                     SOIL,
                     lattice(SOIL_PERIOD),
                     overlay_size,
-                    0.32 + depth,
+                    raised,
+                    terrain_depth(cell, step, SOIL_LAYER),
                     Reach::Ring,
+                    rise,
                 );
             }
             // A lava flow lies on its ground like an overlay, and spills over its banks.
             if feature == Feature::Lava {
                 layer(
+                    &mut commands,
                     LAVA,
                     lattice(SOIL_PERIOD),
                     overlay_size,
-                    0.34 + depth,
+                    raised,
+                    terrain_depth(cell, step, LAVA_LAYER),
                     Reach::Ring,
+                    rise,
                 );
+            }
+            // Cliff faces: where the ground in front (down the screen) lies lower, a wall of
+            // earth or rock from this cell's edge down to it, a strip of one step at a time.
+            for (side, dx, dy) in [(0_u8, 0, 1), (1_u8, 1, 0)] {
+                let next = CellPos::new(cell.x + dx, cell.y + dy);
+                let below = step_of(next).unwrap_or(0);
+                if ground == Soil::Water || below >= step {
+                    continue;
+                }
+                for k in 0..(step - below) {
+                    let strip = faces::slot(ground, feature, side, k, x + y * 3);
+                    let (left, top) = faces::texel_origin(strip);
+                    let drop = f32::from(k) * crate::relief::STEP_PX;
+                    let offset = Vec2::new(
+                        if side == 0 { -16.0 } else { 16.0 },
+                        ground_lift - drop - (16.0 + crate::relief::STEP_PX) / 2.0,
+                    );
+                    commands.spawn((
+                        BattlefieldVisual,
+                        Ground {
+                            cell,
+                            water: false,
+                            phase: 0.0,
+                            ore: false,
+                            bridge: false,
+                            depleted: false,
+                            reach: Reach::Cell,
+                            rise,
+                            depth: 0,
+                            foam: 0,
+                            scenery: false,
+                            stain: [1.0; 3],
+                        },
+                        Sprite {
+                            image: materials.faces.clone(),
+                            rect: Some(Rect::new(
+                                left,
+                                top,
+                                left + faces::SLOT_W,
+                                top + faces::SLOT_H,
+                            )),
+                            custom_size: Some(Vec2::new(32.4, 16.0 + crate::relief::STEP_PX)),
+                            color: Color::BLACK,
+                            ..default()
+                        },
+                        Transform::from_translation(
+                            (centre + offset).extend(terrain_depth(cell, step, FACE_LAYER)),
+                        ),
+                    ));
+                }
             }
             // Tops: rendered miniatures with baked shadows.
             let connected = || {
@@ -419,7 +562,12 @@ fn terrain(
                 })
             };
             let scatter = (x.wrapping_mul(31) ^ y.wrapping_mul(71)) % 16;
+            // A decoration that stands in for the cell's top, where its art is installed.
+            let decoration = decorations::of(grid.decor(cell), ground, x, y)
+                .filter(|d| materials.decor.get(d.atlas).is_some_and(Option::is_some));
+            let replaced = decoration.is_some_and(|d| d.replaces);
             let top = match (feature, ground) {
+                _ if replaced => None,
                 (
                     Feature::None
                     | Feature::Lava
@@ -447,20 +595,90 @@ fn terrain(
                 (Feature::Tower, _) => Some((TOWER, scatter % 8)),
             };
             if let Some((image, variant)) = top {
-                if matches!(image, CITY | TOWER) {
-                    // Tall blocks sort with units and buildings, so they hide what stands
-                    // behind them.
-                    let centre = Vec2::new(x as f32 + 0.5, y as f32 + 0.5);
+                if matches!(image, ORE | GEMS | ROAD | BRIDGE) {
+                    // Flat on the ground: a bridge deck at its own height over the water.
+                    let at = if image == BRIDGE {
+                        centre + Vec2::Y * deck_lift
+                    } else {
+                        raised
+                    };
                     layer(
+                        &mut commands,
+                        image,
+                        variant,
+                        cell_size,
+                        at,
+                        terrain_depth(cell, step.max(grid.elevation(cell)), FLAT_TOP_LAYER),
+                        Reach::Cell,
+                        rise_of(deck_lift.max(ground_lift)),
+                    );
+                } else if matches!(image, CITY | TOWER) {
+                    // Tall blocks hide what stands behind them.
+                    layer(
+                        &mut commands,
                         image,
                         variant,
                         Vec2::new(64.4, 128.8),
-                        crate::units::unit_depth(centre),
+                        raised,
+                        object_depth(cell),
                         Reach::Tall,
+                        rise,
                     );
                 } else {
-                    layer(image, variant, cell_size, 0.5 + depth, Reach::Cell);
+                    // Trees, houses and rock stand among the units.
+                    layer(
+                        &mut commands,
+                        image,
+                        variant,
+                        cell_size,
+                        raised,
+                        object_depth(cell),
+                        Reach::Cell,
+                        rise,
+                    );
                 }
+            }
+            if let Some(decoration) = decoration {
+                let size = decoration.size();
+                let px = decorations::SLOT_TEXELS;
+                let (left, top) = decoration.texel_origin();
+                let canvas_lift = (size.y - size.x) / 2.0;
+                let at = if decoration.on_water { centre } else { raised };
+                commands.spawn((
+                    BattlefieldVisual,
+                    Ground {
+                        cell,
+                        water: false,
+                        phase: 0.0,
+                        ore: false,
+                        bridge: false,
+                        depleted: false,
+                        reach: decoration.reach(),
+                        rise,
+                        depth: 0,
+                        foam: 0,
+                        // A decoration in place of scenery goes with it.
+                        scenery: decoration.replaces,
+                        stain: [1.0; 3],
+                    },
+                    Sprite {
+                        image: materials.decor[decoration.atlas]
+                            .clone()
+                            .unwrap_or_default(),
+                        rect: Some(Rect::new(
+                            left,
+                            top,
+                            left + px * size.x / 64.0,
+                            top + px * size.y / 64.0,
+                        )),
+                        custom_size: Some(size * 1.006),
+                        color: Color::BLACK,
+                        ..default()
+                    },
+                    Transform::from_translation(
+                        (at + Vec2::Y * canvas_lift).extend(object_depth(cell) + 0.000_01),
+                    ),
+                ));
             }
         }
     }
@@ -583,6 +801,10 @@ fn raze_scenery(
         }
         let px = (TERRAIN_ATLAS / SOIL_PERIOD) as f32;
         let (left, top) = ((x % SOIL_PERIOD) as f32 * px, (y % SOIL_PERIOD) as f32 * px);
+        let step = terrain
+            .as_ref()
+            .map_or(0, |terrain| terrain.0.elevation(cell));
+        let lift = f32::from(step) * crate::relief::STEP_PX;
         commands.spawn((
             BattlefieldVisual,
             Ground {
@@ -593,6 +815,7 @@ fn raze_scenery(
                 bridge: false,
                 depleted: false,
                 reach: Reach::Ring,
+                rise: rise_of(lift),
                 depth: 0,
                 foam: 0,
                 scenery: false,
@@ -606,8 +829,8 @@ fn raze_scenery(
                 ..default()
             },
             Transform::from_translation(
-                crate::projection::cell_centre(cell, map.tile)
-                    .extend(0.34 + (x + y) as f32 / 16384.0),
+                (crate::projection::cell_centre(cell, map.tile) + Vec2::Y * lift)
+                    .extend(terrain_depth(cell, step, SOIL_LAYER)),
             ),
         ));
     }
@@ -640,10 +863,36 @@ fn covered(reach: Reach) -> &'static [(i32, i32)] {
         (-3, -2),
         (-2, -3),
     ];
+    const SKY: [(i32, i32); 23] = [
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (-1, 0),
+        (1, 0),
+        (-1, 1),
+        (0, 1),
+        (1, 1),
+        (-2, -2),
+        (-2, -1),
+        (-1, -2),
+        (-3, -3),
+        (-3, -2),
+        (-2, -3),
+        (-4, -4),
+        (-4, -3),
+        (-3, -4),
+        (-5, -5),
+        (-5, -4),
+        (-4, -5),
+        (-6, -6),
+        (-6, -5),
+        (-5, -6),
+    ];
     match reach {
         Reach::Cell => &[],
         Reach::Ring => &RING,
         Reach::Tall => &TALL,
+        Reach::Sky => &SKY,
     }
 }
 /// How often the simulation's grid is searched for ore that spread onto new ground, in ticks.
@@ -658,6 +907,7 @@ fn sprout_ore(
     materials: Option<Res<Materials>>,
     ground: Query<&Ground>,
     mut searched: Local<Option<u64>>,
+    terrain: Option<Res<MapTerrain>>,
 ) {
     let (Some(map), Some(materials), Some(grid)) = (map, materials, host.grid()) else {
         return;
@@ -681,7 +931,11 @@ fn sprout_ore(
             let scatter = (x.wrapping_mul(31) ^ y.wrapping_mul(71)) % 16;
             let px = TERRAIN_ATLAS / 4;
             let (left, top) = ((scatter % 4) * px, (scatter / 4) * px);
-            let position = crate::projection::cell_centre(cell, map.tile);
+            let step = terrain
+                .as_ref()
+                .map_or(0, |terrain| terrain.0.elevation(cell));
+            let lift = f32::from(step) * crate::relief::STEP_PX;
+            let position = crate::projection::cell_centre(cell, map.tile) + Vec2::Y * lift;
             commands.spawn((
                 BattlefieldVisual,
                 Ground {
@@ -693,6 +947,7 @@ fn sprout_ore(
                     // Shown once the player sees the cell.
                     depleted: true,
                     reach: Reach::Cell,
+                    rise: rise_of(lift),
                     depth: 0,
                     foam: 0,
                     scenery: false,
@@ -714,7 +969,11 @@ fn sprout_ore(
                     color: Color::NONE,
                     ..default()
                 },
-                Transform::from_translation(position.extend(0.5 + (x + y) as f32 / 16384.0)),
+                Transform::from_translation(position.extend(terrain_depth(
+                    cell,
+                    step,
+                    FLAT_TOP_LAYER,
+                ))),
             ));
         }
     }
@@ -734,6 +993,7 @@ fn show_crates(
     marks: Query<(Entity, &CrateMark)>,
     materials: Option<Res<Materials>>,
     reveal: Option<Res<crate::visual_review::RevealTerrain>>,
+    terrain: Option<Res<MapTerrain>>,
 ) {
     let seen: std::collections::BTreeSet<CellPos> = match (
         host.world().get_resource::<sim::Crates>(),
@@ -757,8 +1017,9 @@ fn show_crates(
         return;
     };
     for cell in seen.difference(&drawn) {
-        let position = crate::projection::cell_centre(*cell, map.tile);
-        let depth = 0.6 + (cell.x + cell.y) as f32 / 16384.0;
+        let position = crate::relief::cell_point(terrain.as_deref(), *cell, map.tile);
+        // Above all terrain, below the units.
+        let depth = 0.9 + (cell.x + cell.y) as f32 / 65536.0;
         // A box: its side, and a lighter lid a little above it.
         for (colour, size, lift, z) in [
             (Color::srgba(0.1, 0.1, 0.08, 0.35), CRATE_SIZE, -4.0, depth),
@@ -808,6 +1069,10 @@ fn animate_ground(
         let mut sight = crate::fog::sight_of(vision, tile.cell);
         for (dx, dy) in covered(tile.reach) {
             let next = CellPos::new(tile.cell.x + dx, tile.cell.y + dy);
+            sight = sight.min(crate::fog::sight_of(vision, next));
+        }
+        for k in 1..=i32::from(tile.rise) {
+            let next = CellPos::new(tile.cell.x - k, tile.cell.y - k);
             sight = sight.min(crate::fog::sight_of(vision, next));
         }
         if reveal.is_some() {
@@ -924,6 +1189,7 @@ fn effects(
     units: Query<(&UnitView, &Transform, &Visibility)>,
     buildings: Query<(&BuildingView, &Transform, &Visibility)>,
     particles: Query<&Particle>,
+    terrain: Option<Res<MapTerrain>>,
 ) {
     let (Some(map), Some(mat), Some(vision)) =
         (map, materials, crate::fog::human_vision(host.players()))
@@ -980,9 +1246,10 @@ fn effects(
         };
         // Scenery has no view: it burns where its cell is.
         let point = match event {
-            SimEvent::PropDestroyed { cell, .. } => {
-                Some((crate::projection::cell_centre(*cell, map.tile), *cell))
-            }
+            SimEvent::PropDestroyed { cell, .. } => Some((
+                crate::relief::cell_point(terrain.as_deref(), *cell, map.tile),
+                *cell,
+            )),
             _ => points.get(&id).copied(),
         };
         let Some((pos, cell)) = point else {
@@ -1372,6 +1639,8 @@ mod tests {
         app.world_mut().insert_resource(map);
         app.world_mut().insert_resource(Materials {
             terrain: vec![Handle::default(); ATLASES],
+            faces: Handle::default(),
+            decor: vec![None; decorations::ATLASES],
             glow: Handle::default(),
             smoke: Handle::default(),
             ring: Handle::default(),
@@ -1428,6 +1697,8 @@ mod tests {
             ]));
             app.world_mut().insert_resource(Materials {
                 terrain: vec![Handle::default(); ATLASES],
+                faces: Handle::default(),
+                decor: vec![None; decorations::ATLASES],
                 glow: Handle::default(),
                 smoke: Handle::default(),
                 ring: Handle::default(),
@@ -1454,5 +1725,329 @@ mod tests {
                 assert!(tops.iter().all(|top| top.2 == Color::NONE));
             }
         }
+    }
+}
+
+/// Cliff faces (docs/DECISIONS.md, "Maps with relief"): the walls between a raised cell and the
+/// lower ground in front of it, drawn as strips one elevation step high. The strips are made
+/// here, not painted: a strip of each material for each of the two faces the camera sees, in a
+/// few variants, and strips with the lip of each ground for the top of a wall.
+mod faces {
+    use super::{Feature, Soil};
+    use bevy::asset::RenderAssetUsages;
+    use bevy::image::ImageSampler;
+    use bevy::prelude::*;
+    use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
+
+    /// Texels per screen pixel.
+    const TEXELS: u32 = 2;
+    /// A strip: half a cell wide, its slanted top edge and one step of wall below it.
+    const STRIP_W: u32 = 32;
+    const STRIP_H: u32 = 16 + crate::relief::STEP_PX as u32;
+    pub const SLOT_W: f32 = (STRIP_W * TEXELS) as f32;
+    pub const SLOT_H: f32 = (STRIP_H * TEXELS) as f32;
+    const PER_ROW: u32 = 16;
+    const VARIANTS: u32 = 4;
+    /// Wall materials: rock, earth, sand, snowy rock, concrete, ash and banded sandstone.
+    const MATERIALS: [[f32; 3]; 7] = [
+        [118.0, 112.0, 100.0],
+        [112.0, 86.0, 60.0],
+        [176.0, 150.0, 104.0],
+        [150.0, 156.0, 168.0],
+        [150.0, 148.0, 140.0],
+        [62.0, 58.0, 58.0],
+        [168.0, 104.0, 66.0],
+    ];
+    const ROCK: u32 = 0;
+    const EARTH: u32 = 1;
+    const SAND: u32 = 2;
+    const SNOWROCK: u32 = 3;
+    const CONCRETE: u32 = 4;
+    const ASH: u32 = 5;
+    const MESA: u32 = 6;
+    /// The lips of the grounds: grass, earth, sand, snow, crops, marsh, ash, pavement.
+    const LIPS: [[f32; 3]; 8] = [
+        [86.0, 118.0, 52.0],
+        [120.0, 96.0, 66.0],
+        [196.0, 176.0, 124.0],
+        [230.0, 234.0, 240.0],
+        [180.0, 160.0, 80.0],
+        [70.0, 88.0, 56.0],
+        [80.0, 76.0, 74.0],
+        [150.0, 150.0, 150.0],
+    ];
+    const LIP_BASE: u32 = MATERIALS.len() as u32 * 2 * VARIANTS;
+    const SLOTS: u32 = LIP_BASE + LIPS.len() as u32 * 2;
+
+    /// The strip of the wall below a cell of `ground` and `feature`, on `side` (0: the face
+    /// towards +y, down-left on the screen; 1: towards +x, down-right), `k` steps below its top.
+    pub fn slot(ground: Soil, feature: Feature, side: u8, k: u8, seed: u32) -> u32 {
+        let side = u32::from(side);
+        let material = match (ground, feature) {
+            (Soil::Ash, _) => ASH,
+            (Soil::Sand, Feature::Cliff) => MESA,
+            (Soil::Snow | Soil::Ice, _) => SNOWROCK,
+            (_, Feature::Cliff) => ROCK,
+            (Soil::Pavement, _) => CONCRETE,
+            (Soil::Sand, _) => SAND,
+            // Deep cuts through soft ground show the rock beneath.
+            _ if k >= 2 => ROCK,
+            _ => EARTH,
+        };
+        let lip = match ground {
+            Soil::Grass if feature != Feature::Cliff => Some(0),
+            Soil::Dirt => Some(1),
+            Soil::Sand if feature != Feature::Cliff => Some(2),
+            Soil::Snow | Soil::Ice => Some(3),
+            Soil::Crops => Some(4),
+            Soil::Marsh => Some(5),
+            _ => None,
+        };
+        match lip {
+            Some(lip) if k == 0 => LIP_BASE + lip * 2 + side,
+            _ => (material * 2 + side) * VARIANTS + seed.wrapping_add(u32::from(k)) % VARIANTS,
+        }
+    }
+
+    /// The top-left texel of strip `slot` in the atlas.
+    pub fn texel_origin(slot: u32) -> (f32, f32) {
+        (
+            ((slot % PER_ROW) * STRIP_W * TEXELS) as f32,
+            ((slot / PER_ROW) * STRIP_H * TEXELS) as f32,
+        )
+    }
+
+    fn noise(x: u32, y: u32, seed: u32) -> f32 {
+        let mut n = x.wrapping_mul(0x85eb_ca6b)
+            ^ y.wrapping_mul(0xc2b2_ae35)
+            ^ seed.wrapping_mul(0x27d4_eb2f);
+        n ^= n >> 15;
+        n = n.wrapping_mul(0x2c1b_3c6d);
+        n ^= n >> 12;
+        (n % 1000) as f32 / 1000.0
+    }
+
+    /// The atlas of every strip.
+    pub fn atlas() -> Image {
+        let width = PER_ROW * STRIP_W * TEXELS;
+        let rows = SLOTS.div_ceil(PER_ROW);
+        let height = rows * STRIP_H * TEXELS;
+        let mut data = vec![0_u8; (width * height * 4) as usize];
+        for slot in 0..SLOTS {
+            let (ox, oy) = texel_origin(slot);
+            let (ox, oy) = (ox as u32, oy as u32);
+            let (side, material, variant, lip) = if slot < LIP_BASE {
+                let variant = slot % VARIANTS;
+                let side = (slot / VARIANTS) % 2;
+                (side, slot / VARIANTS / 2, variant, None)
+            } else {
+                let i = slot - LIP_BASE;
+                let lip = i / 2;
+                // Under the lip: the wall of that ground.
+                let material = match lip {
+                    2 => SAND,
+                    3 => SNOWROCK,
+                    6 => ASH,
+                    7 => CONCRETE,
+                    _ => EARTH,
+                };
+                (i % 2, material, 0, Some(LIPS[lip as usize]))
+            };
+            let base = MATERIALS[material as usize];
+            // Light from the upper left: the face towards +y is lit, the other in shade.
+            let light = if side == 0 { 0.95 } else { 0.70 };
+            for ty in 0..STRIP_H * TEXELS {
+                for tx in 0..STRIP_W * TEXELS {
+                    let u = (tx as f32 + 0.5) / TEXELS as f32;
+                    let v = (ty as f32 + 0.5) / TEXELS as f32;
+                    let edge = if side == 0 {
+                        u / 2.0
+                    } else {
+                        (STRIP_W as f32 - u) / 2.0
+                    };
+                    let below = v - edge;
+                    // Inside the strip, with a half-texel soft edge along the slanted top and
+                    // bottom so stacked strips meet without a seam.
+                    let alpha = (below * TEXELS as f32 + 0.5).clamp(0.0, 1.0)
+                        * ((crate::relief::STEP_PX - below) * TEXELS as f32 + 1.0).clamp(0.0, 1.0);
+                    if alpha <= 0.0 {
+                        continue;
+                    }
+                    let grain = noise(tx / 2, ty / 2, slot * 31 + variant) - 0.5;
+                    let strata = ((v * 1.7 + variant as f32 * 2.1).sin() * 0.5
+                        + (u * 0.45 + v * 0.9 + variant as f32).sin() * 0.25)
+                        * if material == MESA { 2.0 } else { 1.0 };
+                    let crack = if noise(tx / 3, 0, slot * 7 + variant) > 0.93 {
+                        0.6
+                    } else {
+                        1.0
+                    };
+                    let mut shade = light * (1.0 + 0.18 * grain + 0.07 * strata) * crack;
+                    // Darker towards the foot of each strip: the overhang of the one above.
+                    shade *= 1.0 - 0.10 * (below / crate::relief::STEP_PX).clamp(0.0, 1.0);
+                    let mut colour = base.map(|c| c * shade);
+                    if material == SNOWROCK && noise(tx / 2, ty / 3, slot) > 0.72 {
+                        colour = [228.0, 232.0, 238.0].map(|c| c * light);
+                    }
+                    if let Some(lip) = lip {
+                        // The ground's edge, a ragged band along the top.
+                        let ragged = 1.6 + 1.4 * noise(tx / 2, 1, slot);
+                        if below < ragged {
+                            colour = lip.map(|c| c * light * (1.0 + 0.15 * grain));
+                        }
+                    }
+                    let index = (((oy + ty) * width + ox + tx) * 4) as usize;
+                    data[index] = colour[0].clamp(0.0, 255.0) as u8;
+                    data[index + 1] = colour[1].clamp(0.0, 255.0) as u8;
+                    data[index + 2] = colour[2].clamp(0.0, 255.0) as u8;
+                    data[index + 3] = (alpha * 255.0) as u8;
+                }
+            }
+        }
+        let mut image = Image::new(
+            Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+            TextureDimension::D2,
+            data,
+            TextureFormat::Rgba8UnormSrgb,
+            RenderAssetUsages::default(),
+        );
+        image.sampler = ImageSampler::linear();
+        image
+    }
+}
+
+/// Decorations (docs/DECISIONS.md, "Maps with relief"): what the map property `decor` puts on a
+/// cell (`looks::decor`), drawn from the decoration atlases `terrain/26.png` to `34.png`, with
+/// the variant chosen by the cell.
+mod decorations {
+    use super::Soil;
+    use super::looks::decor;
+    use bevy::math::Vec2;
+
+    /// The first terrain atlas of decorations; `Materials::decor` holds them from here on.
+    pub const FIRST_ATLAS: usize = 26;
+    pub const ATLASES: usize = 10;
+    /// Texels per 64 screen pixels in every decoration atlas.
+    pub const SLOT_TEXELS: f32 = 256.0;
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum Height {
+        /// A 64 x 64 px canvas: sixteen to an atlas.
+        Low,
+        /// 64 x 128 px: eight to an atlas.
+        Tall,
+        /// 64 x 256 px: four to an atlas.
+        Sky,
+    }
+
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub struct Decoration {
+        /// Index into `Materials::decor`.
+        pub atlas: usize,
+        pub slot: u32,
+        pub height: Height,
+        /// Drawn instead of the cell's scenery top.
+        pub replaces: bool,
+        /// Floats on water at sea level.
+        pub on_water: bool,
+    }
+
+    impl Decoration {
+        pub fn size(self) -> Vec2 {
+            match self.height {
+                Height::Low => Vec2::splat(64.0),
+                Height::Tall => Vec2::new(64.0, 128.0),
+                Height::Sky => Vec2::new(64.0, 256.0),
+            }
+        }
+
+        pub fn texel_origin(self) -> (f32, f32) {
+            let rows = match self.height {
+                Height::Low => 1.0,
+                Height::Tall => 2.0,
+                Height::Sky => 4.0,
+            };
+            (
+                (self.slot % 4) as f32 * SLOT_TEXELS,
+                (self.slot / 4) as f32 * SLOT_TEXELS * rows,
+            )
+        }
+
+        pub fn reach(self) -> super::Reach {
+            match self.height {
+                Height::Low => super::Reach::Cell,
+                Height::Tall => super::Reach::Tall,
+                Height::Sky => super::Reach::Sky,
+            }
+        }
+    }
+
+    fn pick(slots: &[u32], x: u32, y: u32) -> u32 {
+        let roll = (x.wrapping_mul(0x9e37_79b1) ^ y.wrapping_mul(0x85eb_ca6b)) >> 7;
+        slots[(roll as usize) % slots.len()]
+    }
+
+    /// The decoration of a cell at (`x`, `y`) with decoration `code` on `ground`, if any.
+    pub fn of(code: u8, ground: Soil, x: u32, y: u32) -> Option<Decoration> {
+        let low = |atlas: usize, slots: &[u32], replaces: bool| Decoration {
+            atlas: atlas - FIRST_ATLAS,
+            slot: pick(slots, x, y),
+            height: Height::Low,
+            replaces,
+            on_water: false,
+        };
+        // The full-height masts, windmills, silos, turbines and lighthouses (`terrain/35.png`).
+        let tall = |slots: &[u32]| Decoration {
+            atlas: 35 - FIRST_ATLAS,
+            slot: pick(slots, x, y),
+            height: Height::Tall,
+            replaces: true,
+            on_water: false,
+        };
+        Some(match code {
+            decor::SKYSCRAPER => Decoration {
+                atlas: 0,
+                slot: pick(&[0, 1, 2, 3], x, y),
+                height: Height::Sky,
+                replaces: true,
+                on_water: false,
+            },
+            decor::LANDMARK => Decoration {
+                atlas: 34 - FIRST_ATLAS,
+                slot: pick(&[0, 1, 2, 3, 4, 5, 6, 7], x, y),
+                height: Height::Tall,
+                replaces: true,
+                on_water: false,
+            },
+            decor::URBAN_TALL => tall(&[0, 1]),
+            decor::URBAN => low(30, &[0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14], false),
+            decor::CRAG => match ground {
+                Soil::Snow | Soil::Ice => low(28, &[8, 9, 10, 11], true),
+                Soil::Sand => low(28, &[12, 13, 14, 15], true),
+                _ => low(28, &[0, 1, 2, 3, 4, 5, 6, 7], true),
+            },
+            decor::VEHICLE => low(29, &(0..16).collect::<Vec<_>>(), true),
+            decor::CLUTTER => low(27, &(0..16).collect::<Vec<_>>(), false),
+            decor::RURAL => low(31, &[0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14], false),
+            decor::RURAL_TALL => tall(&[2, 3, 4]),
+            decor::ARID => low(32, &[0, 1, 2, 4, 5, 6, 7], false),
+            decor::ARID_TALL => low(32, &[3], true),
+            decor::COLD => low(32, &[8, 9, 10, 12, 13, 15], false),
+            decor::COLD_TALL => low(32, &[11, 14], true),
+            decor::SEA => Decoration {
+                on_water: true,
+                ..low(33, &[0, 1, 2, 3, 4, 5, 6, 7], false)
+            },
+            decor::BEACH => low(33, &[8, 11, 12, 14, 15], false),
+            decor::COAST_TALL => match pick(&[0, 1, 2], x, y) {
+                0 => tall(&[5]),
+                _ => low(33, &[9, 10], true),
+            },
+            _ => return None,
+        })
     }
 }
