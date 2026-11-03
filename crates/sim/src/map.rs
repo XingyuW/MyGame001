@@ -54,9 +54,6 @@ pub const MAX_MAP_FILE_BYTES: u64 = 4 * 1024 * 1024;
 /// cell, `0` to `f`).
 pub const MAX_ELEVATION: u8 = 15;
 
-/// Elevation steps per cell of extra sight on high ground ([`Grid::sight_bonus`]).
-pub const ELEVATION_PER_SIGHT: u8 = 3;
-
 /// The map property that holds every cell's height, row-major, one hexadecimal digit per cell.
 pub const ELEVATION_PROPERTY: &str = "elevation";
 
@@ -216,8 +213,8 @@ pub struct Grid {
     mined: BTreeSet<u32>,
     /// Row-major, as `cells`: the height of every cell in elevation steps (0 to
     /// [`MAX_ELEVATION`]), from the optional map property `elevation`. Empty on a flat map,
-    /// which is hashed and played as before elevation existed. High ground sees farther
-    /// ([`Grid::sight_bonus`]); the renderer raises the cell by its height.
+    /// which is hashed as before elevation existed. No rule of play reads it (docs/DECISIONS.md,
+    /// "Maps with relief"); the renderer raises the cell by its height.
     elevation: Vec<u8>,
     /// Row-major, as `cells`: the decoration of every cell (0: none), from the optional map
     /// property `decor`. Presentation data the simulation never reads: props, crags, parked
@@ -305,12 +302,6 @@ impl Grid {
             decor
         };
         true
-    }
-
-    /// Cells of sight a unit or building standing on `cell` gains from its height: one per
-    /// [`ELEVATION_PER_SIGHT`] steps (docs/DECISIONS.md, "Maps with relief"). 0 on a flat map.
-    pub fn sight_bonus(&self, cell: CellPos) -> u32 {
-        u32::from(self.elevation(cell) / ELEVATION_PER_SIGHT)
     }
 
     pub fn width(&self) -> u32 {

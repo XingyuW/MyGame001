@@ -116,11 +116,11 @@ pub use harvest::{HarvestState, Harvester, MAX_HARVEST_ATTEMPTS};
 pub use hash::{Fnv1a64, state_hash};
 pub use id::{SimId, SimIdAllocator};
 pub use map::{
-    CELL_ROOM, Cell, CellPos, CheckedFile, DECOR_PROPERTY, ELEVATION_PER_SIGHT, ELEVATION_PROPERTY,
-    Grid, LoadedMap, MAP_SCHEMA_VERSION, MAX_ELEVATION, MAX_MAP_FILE_BYTES, MAX_MAP_SIDE,
-    MAX_TILESET_IMAGE_SIDE_PX, MAX_TILESET_TILES, MapError, MapErrorKind, NO_DECOR, SPOT_OFFSETS,
-    SPOTS_PER_CELL, SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX,
-    TilesetImage, load_map, load_map_with_files,
+    CELL_ROOM, Cell, CellPos, CheckedFile, DECOR_PROPERTY, ELEVATION_PROPERTY, Grid, LoadedMap,
+    MAP_SCHEMA_VERSION, MAX_ELEVATION, MAX_MAP_FILE_BYTES, MAX_MAP_SIDE, MAX_TILESET_IMAGE_SIDE_PX,
+    MAX_TILESET_TILES, MapError, MapErrorKind, NO_DECOR, SPOT_OFFSETS, SPOTS_PER_CELL,
+    SUBCELLS_PER_CELL, SubPos, TERRAIN_LAYER, TILE_HEIGHT_PX, TILE_WIDTH_PX, TilesetImage,
+    load_map, load_map_with_files,
 };
 pub use map_scale::{
     APRON_RADIUS, CORE_RADIUS, DEFAULT_ORE, EDGE_MARGIN, EnlargedMap, LOOK_FEATURE_BRIDGE,

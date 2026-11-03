@@ -13116,10 +13116,15 @@ and all 38 large maps (the three small maps that the tests are built on stay fla
   cell (`.` for none). A map without them is flat and bare and hashes as before; `Grid` keeps
   both (`elevation`, `decor`, `set_relief`), and `enlarged_map` shows them like the terrain and
   levels every made start position at its yard's height.
-* **Play.** High ground sees farther: a unit or building gets one cell of sight per
-  `ELEVATION_PER_SIGHT` = 3 steps of the cell it stands on (`Grid::sight_bonus`, used by
-  `update_visibility`). Movement, paths and weapons are unchanged: the generator keeps every
-  walkable slope to one step per cell, so heights never change where units can go.
+* **Play.** Heights are drawn and change no rule of play: movement, paths, weapons and sight
+  are unchanged, and the generator keeps every walkable slope to one step per cell, so heights
+  never change where units can go. A first version gave high ground one cell of sight per
+  3 steps. With it, the required M6 sweep (`m6_production_matches`) ended three of its 756
+  matches without a winner at their limits (steel_harbor Russia/Libya medium, arctic_floes
+  Iraq/Cuba brutal, oil_fields Cuba/Russia brutal): each stalled with one side down to towers
+  and no factory and the other holding its army back. Replayed with that bonus removed and
+  everything else the same, all three were won (ticks 85,545, 67,037 and 137,433). The user
+  chose to ship without it; a sight bonus can come back with AI that finishes such bases.
 * **Parked vehicles.** A house prop whose decoration is `v` (`VEHICLE_DECOR`) is a
   `PropKind::Vehicle` ("Civilian vehicle", 150 hit points, not garrisonable). The new tile
   `parked car` (blocked, pavement, house feature) carries it on plazas beside streets and on

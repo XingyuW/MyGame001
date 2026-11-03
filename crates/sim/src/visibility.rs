@@ -270,25 +270,12 @@ pub(crate) fn update_visibility(
             && let Some(state) = players.get_mut(g.owner)
         {
             let (x, y) = (i64::from(g.cell.x), i64::from(g.cell.y));
-            let sight = terms.sight.saturating_add(grid.sight_bonus(g.cell));
-            state.vision.reveal((x, y, x, y), sight);
+            state.vision.reveal((x, y, x, y), terms.sight);
         }
     }
     for (owner, sight, mobile, building) in &sources {
         let Some(state) = players.get_mut(owner.0) else {
             continue;
-        };
-        // High ground sees farther: by the height of the cell a unit stands on, or of the
-        // highest cell under a building (docs/DECISIONS.md, "Maps with relief").
-        let bonus = match (mobile, building) {
-            (Some(mobile), _) => grid.sight_bonus(mobile.cell),
-            (None, Some(building)) => building
-                .footprint
-                .cells()
-                .map(|cell| grid.sight_bonus(cell))
-                .max()
-                .unwrap_or(0),
-            (None, None) => 0,
         };
         let area = match (mobile, building) {
             (Some(mobile), _) => {
@@ -307,7 +294,7 @@ pub(crate) fn update_visibility(
             }
             (None, None) => continue,
         };
-        state.vision.reveal(area, sight.0.saturating_add(bonus));
+        state.vision.reveal(area, sight.0);
     }
 }
 

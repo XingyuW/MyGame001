@@ -873,7 +873,6 @@ fn with_relief(name: &str, elevation: &str, decor: &str) -> PathBuf {
 fn relief_is_read_per_cell_and_a_map_without_it_is_flat() {
     let flat = load_ok(&fixture("valid_4x3.tmx"));
     assert!(flat.grid.elevations().is_empty() && flat.grid.decors().is_empty());
-    assert_eq!(flat.grid.sight_bonus(CellPos::new(1, 1)), 0);
 
     let map = load_ok(&with_relief("relief_ok", "01234567cdef", "....a.b.c..T"));
     assert_eq!(map.grid.elevation(CellPos::new(0, 0)), 0);
@@ -887,10 +886,6 @@ fn relief_is_read_per_cell_and_a_map_without_it_is_flat() {
         "'.' is no decoration"
     );
     assert_eq!(map.grid.decor(CellPos::new(3, 2)), b'T');
-    // One cell of sight per three steps.
-    assert_eq!(map.grid.sight_bonus(CellPos::new(2, 0)), 0);
-    assert_eq!(map.grid.sight_bonus(CellPos::new(3, 0)), 1);
-    assert_eq!(map.grid.sight_bonus(CellPos::new(3, 2)), 5);
     // Elevation is part of the hash; decoration, presentation only, is not.
     let flat_trace = hash_trace(&mut sim_app_with_map(4, &flat), 5);
     let trace = hash_trace(&mut sim_app_with_map(4, &map), 5);

@@ -1111,9 +1111,21 @@ fn ra5_all_large_maps_have_symmetric_tech_and_real_objects_after_two_to_ten_play
                 .filter(|(_, f)| *f == feature)
                 .map(|(c, _)| c)
                 .collect();
-            assert_eq!(cells.len(), 2, "{} feature {feature}", spec.id);
-            assert_eq!(cells[0].x + cells[1].x, loaded.grid.width() as i32 - 1);
-            assert_eq!(cells[0].y + cells[1].y, loaded.grid.height() as i32 - 1);
+            // One mirrored pair of each kind, two where the map has room (docs/DECISIONS.md,
+            // "Maps with relief").
+            assert!(
+                [2, 4].contains(&cells.len()),
+                "{} feature {feature}: {} cells",
+                spec.id,
+                cells.len()
+            );
+            for cell in &cells {
+                let twin = CellPos::new(
+                    loaded.grid.width() as i32 - 1 - cell.x,
+                    loaded.grid.height() as i32 - 1 - cell.y,
+                );
+                assert!(cells.contains(&twin), "{} feature {feature}", spec.id);
+            }
         }
         for players in 2..=10 {
             let enlarged = sim::enlarged_map(&loaded.grid, &loaded.looks, &spec.starts, players)
