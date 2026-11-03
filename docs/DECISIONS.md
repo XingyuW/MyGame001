@@ -13230,3 +13230,33 @@ corners of the 256-by-256 map (from (2, 7) to (19, 154) over 60,000 ticks) and n
   decided: a Chrono Legionnaire began erasing it later in that tick. `m6_production_matches`
   now explains that rejection as it explains a unit lost in the tick before (D43): a sale of a
   building that was not being erased when the computer players last decided.
+
+### R230. Rebind the RA9 source scope to the ore-first sweep
+
+R229 changed the sim's `ai.rs` (the continued sweep, `Waypoint::ore` and its hash) and the
+game's `m6_production_matches` test. The model surface did not change (no command, domain,
+role, effect, crate, world object or `setup_match*` entrypoint was added) and no `code_guard`
+file changed, so this is a factual round as R228: the R228 `prepare`, `verify`, `propagate`
+and `readback` were copied to `docs/validation/ra2-parity/rebind-r230/controller-sources/`,
+with the directory and the `ROOT_REBIND_R230_` prefix changed. A Finder `assets/.DS_Store`
+was present and untracked; the producer read 770 source files, as in R228, so it is outside
+the scope.
+
+Phase `D-sweep-ore-01`, on `ff336c1` (R229): producer exit 0; only `model_census_sha256` moved
+(`56d41420...` to `ee943a12...`); surface `97cbecb2...`, closure, special and original hashes
+unchanged; no unaccounted candidate. Packet SHA-256
+`a07ced23be51fbb1351700236a196c66ec89589712b8f66012f93a036ff88802` (770 source files, 109 core,
+64 authority spans); verification `ROOT_REBIND_R230_D_SWEEP_ORE_01_FACTUAL_2026_11_03_212554`;
+propagation 3,311 cell deltas in 13 of 15 outputs, 71 legacy families' branch FNV moved (all
+from `ai.rs`), 72 completion rows proved; readback passed with every policy cell byte-equal.
+`ra9_data_parity` passes 185/185 (release, 448 s), and the whole sim suite passes.
+
+**Policy reconsideration.** The 71 families (F007, F010, F015, F018-F047, F049-F071, F153,
+F155, F171, F172, F210-F220) are the original AI keys that this AI replaces
+(`INTENTIONAL_DIFFERENCE`); their branch pointer moved because `ai.rs` changed. None of their
+reasons names the sweep. F010 (observed targets by weapon reach, roles and deterministic
+distance/id ties) is about observed targets, which R229 did not change; the sweep chooses
+where to look, from what the player has seen, and stays honest. F172 (waves from first_wave,
+wave_patience, think_interval and TeamDelays) and F045 (recovery from known reachable ore)
+read nothing R229 changed. Every recorded AI, power, ore, repair and completion policy stands.
+The 51 pending user checks are untouched.
