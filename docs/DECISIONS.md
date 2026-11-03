@@ -13154,3 +13154,42 @@ and all 38 large maps (the three small maps that the tests are built on stay fla
   avoid what stands in the match, and are shown only on cells the player sees now.
 
 Not yet checked by the user in a live match.
+
+### R228. Rebind the RA9 source scope to the maps with relief
+
+R227 changed the sim's `map.rs`, `map_scale.rs`, `match_setup.rs`, `props.rs` and `lib.rs`, the
+game's renderer, all 41 map files and their tilesets, and added the relief art and ambient
+sprites; the user asked (2026-11-02) for the RA9 audit before merging. The model surface did
+not change (no command, domain, role, effect, crate, world object or `setup_match*` entrypoint
+was added; the new `army_unit_count` is a helper of the existing setup), and no `code_guard`
+file changed, so this is a factual round as R226: the R226 `prepare`, `verify`, `propagate` and
+`readback` were copied to `docs/validation/ra2-parity/rebind-r228/controller-sources/`, with
+the directory and the `ROOT_REBIND_R228_` prefix changed. The reference cache was present and
+no Finder `.DS_Store` file was under `assets/` or `crates/`.
+
+Phase `D-relief-maps-01`, on `203ed84` (R227 with the sight bonus removed): producer exit 0;
+38 added and 50 newly changed files since the R195 base, all from R227; only
+`model_census_sha256` moved (`7e8ab0ad...` to `56d41420...`); surface `97cbecb2...`, closure,
+special and original hashes unchanged; no unaccounted candidate. Packet SHA-256
+`ded8bd8ae68d8ec9b506ce56ca83ace4f965f82d6eb0f4d6d995a16026c8de39` (770 source files, 109 core,
+64 authority spans); verification `ROOT_REBIND_R228_D_RELIEF_MAPS_01_FACTUAL_2026_11_03_032432`;
+propagation 3,383 cell deltas in 13 of 15 outputs, 30 legacy families' branch FNV moved, 72
+completion rows proved; readback passed with every policy cell byte-equal.
+`ra9_data_parity` passes 185/185 (release, 717 s).
+
+**Policy reconsideration.** Two legacy branch files changed, `crates/sim/src/map.rs` (28
+families) and `match_setup.rs` (2), and one pinned completion file, the game's `units.rs`.
+* `map.rs` only adds the `elevation` and `decor` properties, their storage and their hash.
+  The `Cell` flags are unchanged and no rule reads either property, so the terrain speed,
+  buildability and domain families (F014, F016, F017, F084-F091), the path and ore families
+  (F028, F045, F060, F061, F068, F069, F075, F094, F141, F208, F274, F275), F012 and F111 read
+  nothing that changed. F183 (no cliff-back impassability) and F205 (no slope speed) say the
+  grid has no altitude that plays: the grid now stores a height, but only the renderer reads
+  it (R227 removed the sight bonus), and cliffs are the ordinary impassable rock cells they
+  were. Both stand as worded about play.
+* `match_setup.rs` only adds `army_scale`, which multiplies the starting units (default 1x, as
+  before) and no money, so F180 (no campaign money deltas) and F059 (teams) stand.
+* `units.rs` is presentation: units are drawn on raised ground.
+
+Every recorded AI, power, ore, repair and completion policy stands. The 51 pending user checks
+are untouched.
