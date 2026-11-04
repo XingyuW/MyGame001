@@ -13333,3 +13333,29 @@ memory only (D31). The Iron Isthmus match now ends at tick 112,752 (Germany); wi
 ended at 130,190.
 
 Sprints 2 and 4 changed `ai.rs`, so the RA9 source scope is rebound as R230 (R231 below).
+
+### R231. Rebind the RA9 source scope to the feel sprints
+
+Feel sprints 1 to 4 changed core sources: the sim's `ai.rs` (sprint 2's raids and
+`next_raid` in the controller hash, sprint 4's endgame hunt) and the game's new modules
+`shake.rs`, `taunts.rs` and `voices.rs`, with new assets and scripts (the voice lines and
+`scripts/generate_voices.py`). The model surface did not change (no command, domain, role,
+effect, crate, world object or `setup_match*` entrypoint was added), so this is a factual round
+as R230: the R230 `prepare`, `verify`, `propagate` and `readback` were copied to
+`docs/validation/ra2-parity/rebind-r231/controller-sources/` with the directory and the
+`ROOT_REBIND_R231_` prefix changed. A Finder `assets/.DS_Store` is present and ignored, so it
+is outside the scope, as in R230.
+
+Phase `D-feel-endgame-01`, on `3b70843`: producer exit 0; only `model_census_sha256` moved
+(`ee943a12...` to `18319458...`); surface `97cbecb2...`, closure, special and original hashes
+unchanged. Packet SHA-256 `aee15bbb65ff430268629d985ed1f5d73ecb0f693da017217c52d6797c01826f` (826 source files, 112 core, 64 authority spans);
+verification `ROOT_REBIND_R231_D_FEEL_ENDGAME_01_FACTUAL_2026_11_04_183424`; propagation 3,383 cell deltas in 13 of 15 outputs, the same 71 legacy
+families' branch FNV moved (all from `ai.rs`), 72 completion rows proved; readback passed
+with every policy cell byte-equal. The whole sim suite passes (1,475 tests, release).
+
+**Policy reconsideration.** The 71 families are the original AI keys this AI replaces
+(`INTENTIONAL_DIFFERENCE`); their branch pointer moved because `ai.rs` changed. F172 (waves
+from first_wave, wave_patience, think_interval and TeamDelays) stands: raids use idle home
+units only before the first wave and never change wave assembly. F010 (observed targets) stands:
+the hunt targets only what the player sees now or remembers. Every recorded AI, power, ore,
+repair and completion policy stands. The 51 pending user checks are untouched.
