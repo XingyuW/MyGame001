@@ -55,6 +55,29 @@ pub fn walk_rect(facing: Direction, frame: u32) -> Rect {
 pub fn walk_anchor() -> Vec2 {
     Vec2::new(0.0, (UNIT_GROUND_OFFSET - WALK_GROUND_OFFSET) / WALK_SIZE)
 }
+
+/// How much larger than their true-scale art units are drawn on the battlefield. Classic RTS
+/// units are drawn larger than life so that a tank, a soldier and a ship read at a glance from
+/// the default camera height; at 1 the miniatures disappear into the terrain. Only the drawn
+/// size changes: the view keeps its ground point (see [`unit_anchor`]), and cell, range,
+/// pick area and every simulation quantity are unchanged.
+pub const UNIT_DISPLAY_SCALE: f32 = 1.3;
+
+/// World size of a drawn frame of `frame` world units (`UNIT_SIZE` or `WALK_SIZE`).
+pub fn unit_display_size(frame: f32) -> Vec2 {
+    Vec2::splat(frame * UNIT_DISPLAY_SCALE)
+}
+
+/// The sprite anchor that keeps a frame's ground point at the view's ground point when it is
+/// drawn [`UNIT_DISPLAY_SCALE`] times larger. The view's translation lies `UNIT_GROUND_OFFSET`
+/// above the ground point; the frame's ground point lies `ground_offset` below its centre in a
+/// frame of `frame` world units. At scale 1 this is the unscaled anchor (0, or [`walk_anchor`]).
+pub fn unit_anchor(frame: f32, ground_offset: f32) -> Vec2 {
+    Vec2::new(
+        0.0,
+        UNIT_GROUND_OFFSET / (frame * UNIT_DISPLAY_SCALE) - ground_offset / frame,
+    )
+}
 /// The part of `rect` (texture pixels) of an RGBA8 `image` that holds the miniature itself:
 /// the bounds of its solid pixels (the soft baked shadow is mostly translucent and left out),
 /// with a small margin. Production cameos show this crop, so a tank fills its card instead of
@@ -323,5 +346,20 @@ mod tests {
             facing_rect(Direction::ALL[7]).max.x,
             UNIT_SIZE * 8.0 * SCALE as f32
         );
+    }
+
+    #[test]
+    fn enlarged_units_keep_their_ground_point() {
+        for (frame, ground) in [
+            (UNIT_SIZE, UNIT_GROUND_OFFSET),
+            (WALK_SIZE, WALK_GROUND_OFFSET),
+        ] {
+            let size = unit_display_size(frame).y;
+            let anchor = unit_anchor(frame, ground);
+            // The frame's ground point, drawn relative to the view's translation.
+            let feet = (-ground / frame - anchor.y) * size;
+            assert!((feet + UNIT_GROUND_OFFSET).abs() < 1e-3, "{frame}: {feet}");
+        }
+        const { assert!(UNIT_DISPLAY_SCALE > 1.0) };
     }
 }

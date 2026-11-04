@@ -1190,6 +1190,7 @@ fn effects(
     buildings: Query<(&BuildingView, &Transform, &Visibility)>,
     particles: Query<&Particle>,
     terrain: Option<Res<MapTerrain>>,
+    mut shake: Option<ResMut<crate::shake::ScreenShake>>,
 ) {
     let (Some(map), Some(mat), Some(vision)) =
         (map, materials, crate::fog::human_vision(host.players()))
@@ -1258,19 +1259,33 @@ fn effects(
         if !vision.is_visible(cell) {
             continue;
         }
+        // A destruction the player sees jolts the view (`crate::shake`); scenery does not.
+        if let Some(shake) = shake.as_deref_mut()
+            && !matches!(event, SimEvent::PropDestroyed { .. })
+        {
+            shake.jolt(
+                pos,
+                if large {
+                    crate::shake::BUILDING_TRAUMA
+                } else {
+                    crate::shake::UNIT_TRAUMA
+                },
+            );
+        }
+        // Destructions are big, bright and smoky: a fireball that reads across the screen.
         let amount = if shot {
             3
         } else if large {
-            36
+            54
         } else {
-            18
+            26
         };
         let radius = if large {
-            50.0
+            66.0
         } else if shot {
             8.0
         } else {
-            22.0
+            30.0
         };
         for i in 0..amount.min(budget) {
             let angle = i as f32 * 2.399 + id.0 as f32;

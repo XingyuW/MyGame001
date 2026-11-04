@@ -981,7 +981,7 @@ impl Default for MenuSelection {
             map: 0,
             enemies: 0,
             color: 0,
-            game_speed: crate::game_speed::NORMAL_SPEED,
+            game_speed: crate::game_speed::DEFAULT_MATCH_SPEED,
             countries,
             difficulties: [0; sim::MAX_MATCH_PLAYERS],
             credits: lobby.starting_credits,

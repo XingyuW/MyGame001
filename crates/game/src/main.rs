@@ -33,6 +33,7 @@ mod projection;
 mod ra7_controls;
 mod relief;
 mod selection;
+mod shake;
 mod sidebar;
 mod sim_host;
 mod skirmish;
@@ -102,6 +103,7 @@ fn main() -> AppExit {
         weapon_fx::WeaponFxPlugin,
         arrival::ArrivalPlugin,
         ambient::AmbientPlugin,
+        shake::ShakePlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never
     // reads or changes the player's settings (docs/DECISIONS.md D52).

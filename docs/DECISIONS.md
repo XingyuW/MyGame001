@@ -13260,3 +13260,17 @@ where to look, from what the player has seen, and stays honest. F172 (waves from
 wave_patience, think_interval and TeamDelays) and F045 (recovery from known reachable ore)
 read nothing R229 changed. Every recorded AI, power, ore, repair and completion policy stands.
 The 51 pending user checks are untouched.
+
+## Feel sprint 1: pace, readability, combat punch (2026-11-03)
+
+Presentation and default-option changes only; the simulation, its data and every hash are unchanged.
+
+- **Default match speed 2×** (`game_speed::DEFAULT_MATCH_SPEED`). R7 keeps 1× equal to the
+  nominal 15-frame reference clock, which plays sluggishly; new matches start at 2× (40 ticks per
+  second). 1× and every other level remain selectable in the menu and with `[` / `]`.
+- **Units drawn 1.3× larger** (`hd_art::UNIT_DISPLAY_SCALE`) about their ground point, so they
+  read at a glance from the default camera. Cells, ranges, pick areas and footprints are unchanged;
+  health bars rise with the figure.
+- **Screen shake** (`shake.rs`) on destructions the human player sees, weighted by distance from
+  the view centre; applied after `Update` and removed before the next frame's input systems.
+  Destruction fireballs are larger and denser; up to 24 sound effects may play at once (was 14).
