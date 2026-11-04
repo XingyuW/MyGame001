@@ -13274,3 +13274,17 @@ Presentation and default-option changes only; the simulation, its data and every
 - **Screen shake** (`shake.rs`) on destructions the human player sees, weighted by distance from
   the view centre; applied after `Update` and removed before the next frame's input systems.
   Destruction fireballs are larger and denser; up to 24 sound effects may play at once (was 14).
+
+## Feel sprint 2: early raids and enemy taunts (2026-11-03)
+
+- **Harassment raids** (`sim::ai::raid`). With the shipped rules-driven opponent on Medium and
+  Brutal, between half the first-wave delay and the first wave, every `RAID_INTERVAL` (2,400)
+  ticks, the three fastest idle land vehicles at home attack-move to the enemy refinery the AI
+  remembers nearest its start, else to the nearest enemy start position. At least one armed unit
+  stays home; raids never run during a threat, on Easy, with legacy fixture plans, or once the
+  waves begin, so wave assembly/fall-back rules are untouched. Inputs are the AI's existing
+  remembered buildings and public start positions only; `next_raid` is hashed with the controller.
+  Observed in shipped Brutal matches: one raid per side at tick ~1,340.
+- **Enemy taunts** (`game::taunts`): a notice from "Enemy command" when one of the human player's
+  buildings is destroyed, or after five of its units are lost within 20 s; at most one per 25 s.
+  Prompted only by the human player's own losses, so nothing hidden is revealed.

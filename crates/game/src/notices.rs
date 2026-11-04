@@ -132,7 +132,7 @@ fn panel_colour(alpha: f32) -> Color {
 }
 
 /// A notice with `text` in `colour`.
-fn notice(text: String, colour: Color) -> impl Bundle {
+pub(crate) fn notice(text: String, colour: Color) -> impl Bundle {
     (
         Notice {
             left: NOTICE_SECONDS,

@@ -39,6 +39,7 @@ mod sim_host;
 mod skirmish;
 mod smoke;
 mod special_controls;
+mod taunts;
 mod tileset_image;
 mod units;
 mod visual_review;
@@ -104,6 +105,7 @@ fn main() -> AppExit {
         arrival::ArrivalPlugin,
         ambient::AmbientPlugin,
         shake::ShakePlugin,
+        taunts::TauntsPlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never
     // reads or changes the player's settings (docs/DECISIONS.md D52).

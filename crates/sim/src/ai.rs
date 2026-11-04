@@ -194,6 +194,8 @@ pub struct AiController {
     /// Whether it is selling its buildings in its last stand.
     last_stand: bool,
     next_wave: u64,
+    /// The tick from which the next harassment raid may leave ([`raid`]).
+    next_raid: u64,
     seen_air: bool,
     unseen_loss: bool,
     observed_units: BTreeMap<SimId, CellPos>,
@@ -394,6 +396,7 @@ impl AiController {
             stalled: (0, 0),
             last_stand: false,
             next_wave: 0,
+            next_raid: 0,
             seen_air: false,
             unseen_loss: false,
             observed_units: BTreeMap::new(),
@@ -542,6 +545,7 @@ impl AiController {
         hasher.write(&[u8::from(self.last_stand)]);
         hasher.write(&[u8::from(self.seen_air), u8::from(self.unseen_loss)]);
         hasher.write_u64(self.next_wave);
+        hasher.write_u64(self.next_raid);
         hasher.write_u64(self.next_naval_scan);
         hasher.write_u64(self.air_screens.len() as u64);
         for (id, progress) in &self.air_screens {
@@ -3436,6 +3440,73 @@ fn put_harvesters_to_work(view: &View<'_>, controller: &mut AiController) -> Opt
 
 // --- The army -------------------------------------------------------------------------------
 
+/// Units in a harassment raid ([`raid`]).
+pub const RAID_SIZE: usize = 3;
+/// Ticks between two raids (one minute at 2x speed).
+pub const RAID_INTERVAL: u64 = 2_400;
+
+/// A harassment raid (feel sprint 2): between half the first-wave delay and the first wave,
+/// every [`RAID_INTERVAL`] ticks, the [`RAID_SIZE`] fastest idle land vehicles at home attack-move
+/// to the enemy refinery it remembers nearest to its start, else to the nearest enemy start
+/// position. Only the shipped rules-driven opponent raids, never on the easiest difficulty, and
+/// a raid leaves at least one armed unit at home; once the waves begin, raids stop, so the
+/// waves' assembly and retreat rules are untouched. It uses only what
+/// the player knows (remembered buildings, public start positions) and an ordinary public
+/// command, like every other decision here.
+fn raid(view: &View<'_>, controller: &mut AiController, home: &[&UnitSnap]) -> Option<Command> {
+    let first_wave = u64::from(controller.difficulty.first_wave);
+    if !view.ai.rules_difficulty
+        || controller.difficulty.id == "easy"
+        || view.tick < first_wave / 2
+        || view.tick >= first_wave
+        || view.tick < controller.next_raid
+        || home.len() <= RAID_SIZE
+    {
+        return None;
+    }
+    let mut fast: Vec<(u16, SimId)> = home
+        .iter()
+        .filter(|unit| {
+            unit.idle()
+                && view.definitions.domain(unit.kind) == Domain::Land
+                && !view.definitions.on_foot(unit.kind)
+        })
+        .filter_map(|unit| {
+            let speed = view.definitions.unit(unit.kind)?.speed;
+            Some((speed, unit.id))
+        })
+        .collect();
+    if fast.len() < RAID_SIZE {
+        return None;
+    }
+    // Fastest first; equal speeds by id, so the choice is deterministic.
+    fast.sort_by_key(|&(speed, id)| (std::cmp::Reverse(speed), id));
+    let start = controller.start;
+    let refinery = controller
+        .known
+        .values()
+        .filter(|known| {
+            view.definitions
+                .building(known.kind)
+                .is_some_and(|def| def.credits_per_ore.is_some())
+        })
+        .map(|known| nearest_cell(known.footprint, start))
+        .min_by_key(|&cell| (chebyshev(cell, start), cell.x, cell.y));
+    let target = refinery.or_else(|| {
+        controller
+            .waypoints
+            .iter()
+            .filter(|waypoint| waypoint.priority)
+            .map(|waypoint| waypoint.cell)
+            .min_by_key(|&cell| (chebyshev(cell, start), cell.x, cell.y))
+    })?;
+    controller.next_raid = view.tick.saturating_add(RAID_INTERVAL);
+    Some(Command::AttackMove {
+        units: fast.iter().take(RAID_SIZE).map(|&(_, id)| id).collect(),
+        target,
+    })
+}
+
 /// Defence, gathering, and the attack wave.
 fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> {
     let mut commands = Vec::new();
@@ -3542,6 +3613,23 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         .into_iter()
         .filter(|unit| !defenders.contains(&unit.id))
         .collect();
+
+    // Harassment: a small fast raid on the enemy economy between the big waves. Raiders leave
+    // the units at home for this turn; once their attack-move ends they are idle strays and
+    // the gathering above calls them back.
+    let raiders = if threat.is_none() {
+        raid(view, controller, &home)
+    } else {
+        None
+    };
+    let home: Vec<_> = match raiders {
+        Some(Command::AttackMove { ref units, .. }) => home
+            .into_iter()
+            .filter(|unit| !units.contains(&unit.id))
+            .collect(),
+        _ => home,
+    };
+    commands.extend(raiders);
 
     // A wave reduced to less than half its size falls back to the gathering point and rejoins the
     // units at home, so that the next wave attacks with them at full size instead of feeding
@@ -4437,6 +4525,7 @@ mod tests {
             stalled: (0, 0),
             last_stand: false,
             next_wave: 0,
+            next_raid: 0,
             seen_air: false,
             unseen_loss: false,
             observed_units: BTreeMap::new(),
