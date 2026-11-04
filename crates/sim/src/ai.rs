@@ -3779,6 +3779,24 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         }
         controller.target =
             choose_target_with_sweep(controller, centroid, observed_scout, view.tick);
+        // Endgame: the sweep found nothing left to search (its waypoint is already in sight),
+        // so nothing hidden remains to be found. A wave at rest hunts what it sees or remembers
+        // instead, including targets it gave up on earlier; otherwise it would stand on a seen
+        // waypoint for the rest of the match.
+        let searched = matches!(controller.target, Some(WaveTarget::Waypoint(index))
+            if controller.waypoints.get(index).is_some_and(|w| view.vision.is_visible(w.cell)));
+        // Members still on their way or fighting are left to finish.
+        if view.ai.rules_difficulty && searched {
+            if members.iter().all(|unit| unit.idle())
+                && let Some(cell) = hunt_cell(view, controller, centroid)
+            {
+                commands.push(Command::AttackMove {
+                    units: members.iter().map(|unit| unit.id).collect(),
+                    target: cell,
+                });
+            }
+            return commands;
+        }
         if let Some(cell) = target_cell(controller, centroid) {
             commands.push(Command::AttackMove {
                 units: members.iter().map(|unit| unit.id).collect(),
@@ -3809,6 +3827,41 @@ fn command_army(view: &View<'_>, controller: &mut AiController) -> Vec<Command> 
         }
     }
     commands
+}
+
+/// Where an endgame wave at `from` hunts (see `command_army`): the nearest enemy it sees on
+/// land, else the nearest building it remembers (also one it failed to destroy before), else the
+/// nearest enemy it sees anywhere else (a ship near the shore may be within reach). Only what the
+/// player sees now or remembers is used. `None` when there is nothing.
+fn hunt_cell(view: &View<'_>, controller: &AiController, from: CellPos) -> Option<CellPos> {
+    let on_land = |unit: &&&UnitSnap| {
+        view.definitions.domain(unit.kind) != Domain::Air
+            && view
+                .grid
+                .cell(unit.mobile.cell)
+                .is_some_and(|cell| !cell.water)
+    };
+    let nearest = |cells: &mut dyn Iterator<Item = CellPos>| {
+        cells.min_by_key(|&cell| (chebyshev(cell, from), cell.y, cell.x))
+    };
+    nearest(&mut view.enemy_units.iter().filter(on_land).map(|u| u.mobile.cell))
+        .or_else(|| {
+            nearest(
+                &mut controller
+                    .known
+                    .values()
+                    .map(|known| nearest_cell(known.footprint, from)),
+            )
+        })
+        .or_else(|| {
+            nearest(
+                &mut view
+                    .enemy_units
+                    .iter()
+                    .filter(|u| view.definitions.domain(u.kind) != Domain::Air)
+                    .map(|u| u.mobile.cell),
+            )
+        })
 }
 
 /// How close (Chebyshev, cells) a wave's centre must come to its staging point.

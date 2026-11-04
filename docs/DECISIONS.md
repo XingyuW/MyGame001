@@ -13313,3 +13313,23 @@ synthesised.
   rotating takes, at most one reply per 0.5 s. One voice at a time: announcements and taunts
   queue (at most 3); a reply never interrupts them and cuts off an earlier reply. Voices use the
   effects volume, and each line's entity is removed by the game after it ends.
+
+## Feel sprint 4: endgame hunt (2026-11-04)
+
+The all-maps production sweep (`m6_production_matches`, release, 1,512 matches) found one
+stalemate after sprint 2's raids changed match courses: Iron Isthmus, France against Germany,
+both Medium, ran to its 270,000-tick limit. France was left with one Patriot, idle ore trucks and
+a fleet; Germany's wave of about 25 infantry stood still for 130,000 ticks. Germany saw the whole
+map, so every sweep waypoint was in sight: the continued sweep chose the waypoint under the
+wave's feet, which is invalid as soon as it is seen, and the wave re-chose it every think. The
+only remembered building had used up its attack-job failures.
+
+**Hunt** (`sim::ai::hunt_cell`): with the rules-driven opponent, when the sweep's choice is a
+waypoint already in sight there is nothing hidden left to search. A wave whose members are all
+idle then attack-moves to the nearest enemy unit it sees on land, else the nearest building it
+remembers (failed ones included), else the nearest enemy unit it sees elsewhere (not aircraft);
+members still moving or fighting are left to finish. Inputs are the player's current sight and
+memory only (D31). The Iron Isthmus match now ends at tick 112,752 (Germany); without raids it
+ended at 130,190.
+
+Sprints 2 and 4 changed `ai.rs`, so the RA9 source scope is rebound as R230 (R231 below).
