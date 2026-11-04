@@ -13288,3 +13288,28 @@ Presentation and default-option changes only; the simulation, its data and every
 - **Enemy taunts** (`game::taunts`): a notice from "Enemy command" when one of the human player's
   buildings is destroyed, or after five of its units are lost within 20 s; at most one per 25 s.
   Prompted only by the human player's own losses, so nothing hidden is revealed.
+
+## Feel sprint 3: voices (2026-11-03)
+
+D38 item 1 ("no audio file exists") is amended for speech only; effects and music stay
+synthesised.
+
+- **Recorded, original lines.** 52 lines written for this game: 14 announcer lines about the
+  player's own base and public news, three takes each of select / move / attack replies for
+  three crews (infantry, vehicles, aircraft and ships), and the 11 enemy taunts of sprint 2.
+  `scripts/generate_voices.py` speaks them with the Apache-2.0 Kokoro-82M model (five of its
+  stock voices), trims, filters (radio band for units and the enemy) and writes
+  `assets/audio/voices/*.wav`. The model is not committed; its source and hashes are in
+  `assets/LICENSES.md`.
+- **No new run-time input.** The files are compiled in with `include_bytes!` and decoded by
+  `voices::parse_wav`, which accepts only the generator's exact layout (mono 16-bit PCM at
+  22,050 Hz, 44-byte header, at most 4 s). They play as `audio::Pcm`, so no third-party decoder
+  runs and the checked asset reader (D16 item 3) is unchanged.
+- **What speaks** (`game::voices`, one system in `Last`). Announcements come from the human
+  player's own events (production complete, structure lost, promotion, superweapon ready, low
+  power, credits exhausted, its buildings or units fired on), from the public superweapon events
+  the effects already play, and from the match's start and end, each with a cooldown. Units
+  answer the player's accepted orders (`CommandSink::last_accepted`) and new selections,
+  rotating takes, at most one reply per 0.5 s. One voice at a time: announcements and taunts
+  queue (at most 3); a reply never interrupts them and cuts off an earlier reply. Voices use the
+  effects volume, and each line's entity is removed by the game after it ends.

@@ -111,6 +111,7 @@ fn taunt(
     time: Res<Time<Real>>,
     column: Option<Single<Entity, With<NoticeColumn>>>,
     notices: Query<(Entity, &Notice)>,
+    mut voices: ResMut<crate::voices::VoiceRequests>,
 ) {
     let now = time.elapsed_secs_f64();
     let mut said = None;
@@ -124,7 +125,12 @@ fn taunt(
             said = Some(line);
         }
     }
-    let (Some(line), Some(column)) = (said, column) else {
+    let Some(line) = said else {
+        return;
+    };
+    // The enemy says it over the radio too.
+    voices.0.extend(crate::voices::taunt_file(line));
+    let Some(column) = column else {
         return;
     };
     if notices.iter().count() >= MAX_NOTICES
