@@ -28,6 +28,12 @@ pub const SPEED_LEVELS: [f32; 6] = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0];
 /// Index of 1× in [`SPEED_LEVELS`].
 pub const NORMAL_SPEED: usize = 1;
 
+/// Index of the speed a new match starts at in the skirmish menu: 2×. At 1× a tick lasts as long
+/// as one nominal frame of the 15-frame reference clock (docs/DECISIONS.md R7), which plays
+/// sluggishly; classic skirmish was played well above that nominal rate, so new matches start
+/// at 2× (40 ticks per second). The simulation is unchanged; only ticks per real second differ.
+pub const DEFAULT_MATCH_SPEED: usize = 3;
+
 pub struct GameSpeedPlugin;
 
 impl Plugin for GameSpeedPlugin {
@@ -155,6 +161,11 @@ mod tests {
     use bevy::ecs::system::RunSystemOnce;
 
     use super::*;
+
+    #[test]
+    fn new_matches_start_at_twice_the_nominal_speed() {
+        assert_eq!(SPEED_LEVELS[DEFAULT_MATCH_SPEED], 2.0);
+    }
 
     #[test]
     fn levels_labels_and_steps() {

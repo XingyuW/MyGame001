@@ -360,6 +360,8 @@ pub struct CommandSink {
     accepted: u64,
     /// Commands refused so far (for the interface's error sound).
     refused: u64,
+    /// The last command accepted (for the units' voice replies, `crate::voices`).
+    last_accepted: Option<Command>,
     /// Accepted commands discarded so far without being issued, each with a log line (M6 review
     /// 1 P2-2).
     discarded: u64,
@@ -380,6 +382,7 @@ impl CommandSink {
             self.refused = self.refused.saturating_add(1);
             return Err(CommandRefused::Full);
         }
+        self.last_accepted = Some(command.clone());
         self.pending.push(command);
         self.accepted = self.accepted.saturating_add(1);
         Ok(())
@@ -410,6 +413,11 @@ impl CommandSink {
     /// Commands accepted so far.
     pub fn accepted(&self) -> u64 {
         self.accepted
+    }
+
+    /// The last command accepted.
+    pub fn last_accepted(&self) -> Option<&Command> {
+        self.last_accepted.as_ref()
     }
 
     /// Commands refused so far.

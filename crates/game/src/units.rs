@@ -525,11 +525,14 @@ pub(crate) fn spawn_unit_views(
                     stride: 0.0,
                     still: WALK_HOLD_SECONDS,
                 },
-                bevy::sprite::Anchor::CENTER,
+                bevy::sprite::Anchor(crate::hd_art::unit_anchor(
+                    crate::hd_art::UNIT_SIZE,
+                    UNIT_GROUND_OFFSET,
+                )),
                 Sprite {
                     image: image.clone(),
                     rect: Some(crate::hd_art::facing_rect(facing.0)),
-                    custom_size: Some(Vec2::splat(crate::hd_art::UNIT_SIZE)),
+                    custom_size: Some(crate::hd_art::unit_display_size(crate::hd_art::UNIT_SIZE)),
                     color: Color::WHITE,
                     ..default()
                 },
@@ -555,7 +558,8 @@ pub(crate) fn spawn_unit_views(
                     image: human.clone(),
                     rect: Some(crate::hd_art::facing_rect(facing.0)),
                     custom_size: Some(
-                        Vec2::splat(crate::hd_art::UNIT_SIZE) * Vec2::new(1.0, AIR_SHADOW_SQUASH),
+                        crate::hd_art::unit_display_size(crate::hd_art::UNIT_SIZE)
+                            * Vec2::new(1.0, AIR_SHADOW_SQUASH),
                     ),
                     color: Color::srgba(0.0, 0.0, 0.0, alpha),
                     ..default()
@@ -776,17 +780,20 @@ fn place_unit_views(
         let (rect, size, hang) = match gait {
             Some(_) => (
                 crate::hd_art::walk_rect(facing, crate::hd_art::walk_frame(view.stride)),
-                crate::hd_art::WALK_SIZE,
-                crate::hd_art::walk_anchor(),
+                crate::hd_art::unit_display_size(crate::hd_art::WALK_SIZE),
+                crate::hd_art::unit_anchor(
+                    crate::hd_art::WALK_SIZE,
+                    crate::hd_art::WALK_GROUND_OFFSET,
+                ),
             ),
             None => (
                 crate::hd_art::facing_rect(facing),
-                crate::hd_art::UNIT_SIZE,
-                Vec2::ZERO,
+                crate::hd_art::unit_display_size(crate::hd_art::UNIT_SIZE),
+                crate::hd_art::unit_anchor(crate::hd_art::UNIT_SIZE, UNIT_GROUND_OFFSET),
             ),
         };
-        if sprite.custom_size != Some(Vec2::splat(size)) {
-            sprite.custom_size = Some(Vec2::splat(size));
+        if sprite.custom_size != Some(size) {
+            sprite.custom_size = Some(size);
         }
         if anchor.0 != hang {
             anchor.0 = hang;

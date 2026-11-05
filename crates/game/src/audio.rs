@@ -57,7 +57,7 @@ pub const SAMPLE_RATE_HZ: u32 = 22_050;
 const RATE: SampleRate = SampleRate::MIN.saturating_add(SAMPLE_RATE_HZ - 1);
 
 /// Most effects that play at once.
-pub const MAX_ACTIVE_EFFECTS: usize = 14;
+pub const MAX_ACTIVE_EFFECTS: usize = 24;
 
 /// Shortest time between two starts of the same effect, in seconds.
 pub const MIN_REPEAT_SECS: f64 = 0.08;

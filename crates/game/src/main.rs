@@ -33,14 +33,17 @@ mod projection;
 mod ra7_controls;
 mod relief;
 mod selection;
+mod shake;
 mod sidebar;
 mod sim_host;
 mod skirmish;
 mod smoke;
 mod special_controls;
+mod taunts;
 mod tileset_image;
 mod units;
 mod visual_review;
+mod voices;
 mod weapon_fx;
 
 use bevy::prelude::*;
@@ -102,6 +105,9 @@ fn main() -> AppExit {
         weapon_fx::WeaponFxPlugin,
         arrival::ArrivalPlugin,
         ambient::AmbientPlugin,
+        shake::ShakePlugin,
+        taunts::TauntsPlugin,
+        voices::VoicesPlugin,
     ))
     // A smoke run stores its settings in a file of its own, which it removes, so that it never
     // reads or changes the player's settings (docs/DECISIONS.md D52).

@@ -214,8 +214,13 @@ fn draw_health_bars(
         };
         let shown = *visibility != Visibility::Hidden;
         // Above the sprite's frame; the sprite's centre lies `GROUND_OFFSET_PX` above the ground.
-        let centre = transform.translation.truncate()
-            + Vec2::new(0.0, FRAME_SIZE as f32 / 2.0 - GROUND_OFFSET_PX);
+        // Units are drawn `UNIT_DISPLAY_SCALE` times larger about their ground point, which lies
+        // `UNIT_GROUND_OFFSET` below the translation, so the bar rises with the figure's top.
+        let ground_lift = crate::hd_art::UNIT_GROUND_OFFSET;
+        let rise = (FRAME_SIZE as f32 / 2.0 - GROUND_OFFSET_PX + ground_lift)
+            * crate::hd_art::UNIT_DISPLAY_SCALE
+            - ground_lift;
+        let centre = transform.translation.truncate() + Vec2::new(0.0, rise);
         let on_foot = world
             .get::<Unit>(view.unit)
             .is_some_and(|unit| definitions.on_foot(unit.kind));

@@ -13260,3 +13260,102 @@ where to look, from what the player has seen, and stays honest. F172 (waves from
 wave_patience, think_interval and TeamDelays) and F045 (recovery from known reachable ore)
 read nothing R229 changed. Every recorded AI, power, ore, repair and completion policy stands.
 The 51 pending user checks are untouched.
+
+## Feel sprint 1: pace, readability, combat punch (2026-11-03)
+
+Presentation and default-option changes only; the simulation, its data and every hash are unchanged.
+
+- **Default match speed 2×** (`game_speed::DEFAULT_MATCH_SPEED`). R7 keeps 1× equal to the
+  nominal 15-frame reference clock, which plays sluggishly; new matches start at 2× (40 ticks per
+  second). 1× and every other level remain selectable in the menu and with `[` / `]`.
+- **Units drawn 1.3× larger** (`hd_art::UNIT_DISPLAY_SCALE`) about their ground point, so they
+  read at a glance from the default camera. Cells, ranges, pick areas and footprints are unchanged;
+  health bars rise with the figure.
+- **Screen shake** (`shake.rs`) on destructions the human player sees, weighted by distance from
+  the view centre; applied after `Update` and removed before the next frame's input systems.
+  Destruction fireballs are larger and denser; up to 24 sound effects may play at once (was 14).
+
+## Feel sprint 2: early raids and enemy taunts (2026-11-03)
+
+- **Harassment raids** (`sim::ai::raid`). With the shipped rules-driven opponent on Medium and
+  Brutal, between half the first-wave delay and the first wave, every `RAID_INTERVAL` (2,400)
+  ticks, the three fastest idle land vehicles at home attack-move to the enemy refinery the AI
+  remembers nearest its start, else to the nearest enemy start position. At least one armed unit
+  stays home; raids never run during a threat, on Easy, with legacy fixture plans, or once the
+  waves begin, so wave assembly/fall-back rules are untouched. Inputs are the AI's existing
+  remembered buildings and public start positions only; `next_raid` is hashed with the controller.
+  Observed in shipped Brutal matches: one raid per side at tick ~1,340.
+- **Enemy taunts** (`game::taunts`): a notice from "Enemy command" when one of the human player's
+  buildings is destroyed, or after five of its units are lost within 20 s; at most one per 25 s.
+  Prompted only by the human player's own losses, so nothing hidden is revealed.
+
+## Feel sprint 3: voices (2026-11-03)
+
+D38 item 1 ("no audio file exists") is amended for speech only; effects and music stay
+synthesised.
+
+- **Recorded, original lines.** 52 lines written for this game: 14 announcer lines about the
+  player's own base and public news, three takes each of select / move / attack replies for
+  three crews (infantry, vehicles, aircraft and ships), and the 11 enemy taunts of sprint 2.
+  `scripts/generate_voices.py` speaks them with the Apache-2.0 Kokoro-82M model (five of its
+  stock voices), trims, filters (radio band for units and the enemy) and writes
+  `assets/audio/voices/*.wav`. The model is not committed; its source and hashes are in
+  `assets/LICENSES.md`.
+- **No new run-time input.** The files are compiled in with `include_bytes!` and decoded by
+  `voices::parse_wav`, which accepts only the generator's exact layout (mono 16-bit PCM at
+  22,050 Hz, 44-byte header, at most 4 s). They play as `audio::Pcm`, so no third-party decoder
+  runs and the checked asset reader (D16 item 3) is unchanged.
+- **What speaks** (`game::voices`, one system in `Last`). Announcements come from the human
+  player's own events (production complete, structure lost, promotion, superweapon ready, low
+  power, credits exhausted, its buildings or units fired on), from the public superweapon events
+  the effects already play, and from the match's start and end, each with a cooldown. Units
+  answer the player's accepted orders (`CommandSink::last_accepted`) and new selections,
+  rotating takes, at most one reply per 0.5 s. One voice at a time: announcements and taunts
+  queue (at most 3); a reply never interrupts them and cuts off an earlier reply. Voices use the
+  effects volume, and each line's entity is removed by the game after it ends.
+
+## Feel sprint 4: endgame hunt (2026-11-04)
+
+The all-maps production sweep (`m6_production_matches`, release, 1,512 matches) found one
+stalemate after sprint 2's raids changed match courses: Iron Isthmus, France against Germany,
+both Medium, ran to its 270,000-tick limit. France was left with one Patriot, idle ore trucks and
+a fleet; Germany's wave of about 25 infantry stood still for 130,000 ticks. Germany saw the whole
+map, so every sweep waypoint was in sight: the continued sweep chose the waypoint under the
+wave's feet, which is invalid as soon as it is seen, and the wave re-chose it every think. The
+only remembered building had used up its attack-job failures.
+
+**Hunt** (`sim::ai::hunt_cell`): with the rules-driven opponent, when the sweep's choice is a
+waypoint already in sight there is nothing hidden left to search. A wave whose members are all
+idle then attack-moves to the nearest enemy unit it sees on land, else the nearest building it
+remembers (failed ones included), else the nearest enemy unit it sees elsewhere (not aircraft);
+members still moving or fighting are left to finish. Inputs are the player's current sight and
+memory only (D31). The Iron Isthmus match now ends at tick 112,752 (Germany); without raids it
+ended at 130,190.
+
+Sprints 2 and 4 changed `ai.rs`, so the RA9 source scope is rebound as R230 (R231 below).
+
+### R231. Rebind the RA9 source scope to the feel sprints
+
+Feel sprints 1 to 4 changed core sources: the sim's `ai.rs` (sprint 2's raids and
+`next_raid` in the controller hash, sprint 4's endgame hunt) and the game's new modules
+`shake.rs`, `taunts.rs` and `voices.rs`, with new assets and scripts (the voice lines and
+`scripts/generate_voices.py`). The model surface did not change (no command, domain, role,
+effect, crate, world object or `setup_match*` entrypoint was added), so this is a factual round
+as R230: the R230 `prepare`, `verify`, `propagate` and `readback` were copied to
+`docs/validation/ra2-parity/rebind-r231/controller-sources/` with the directory and the
+`ROOT_REBIND_R231_` prefix changed. A Finder `assets/.DS_Store` is present and ignored, so it
+is outside the scope, as in R230.
+
+Phase `D-feel-endgame-01`, on `3b70843`: producer exit 0; only `model_census_sha256` moved
+(`ee943a12...` to `18319458...`); surface `97cbecb2...`, closure, special and original hashes
+unchanged. Packet SHA-256 `aee15bbb65ff430268629d985ed1f5d73ecb0f693da017217c52d6797c01826f` (826 source files, 112 core, 64 authority spans);
+verification `ROOT_REBIND_R231_D_FEEL_ENDGAME_01_FACTUAL_2026_11_04_183424`; propagation 3,383 cell deltas in 13 of 15 outputs, the same 71 legacy
+families' branch FNV moved (all from `ai.rs`), 72 completion rows proved; readback passed
+with every policy cell byte-equal. The whole sim suite passes (1,475 tests, release).
+
+**Policy reconsideration.** The 71 families are the original AI keys this AI replaces
+(`INTENTIONAL_DIFFERENCE`); their branch pointer moved because `ai.rs` changed. F172 (waves
+from first_wave, wave_patience, think_interval and TeamDelays) stands: raids use idle home
+units only before the first wave and never change wave assembly. F010 (observed targets) stands:
+the hunt targets only what the player sees now or remembers. Every recorded AI, power, ore,
+repair and completion policy stands. The 51 pending user checks are untouched.
